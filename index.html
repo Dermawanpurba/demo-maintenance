@@ -2865,7 +2865,7 @@ const totalDowntime = downtimeUnsch + downtimeSch;
                 });
             }
 
-            // G. Master Data (Equip, Parts, Comp, Users)
+            // G. Master Data (Equip, Parts, Comp, Users, Mekanik, Pelapor)
             if (freshData.equip) {
                 updates['master_equip'] = {};
                 freshData.equip.forEach((e, i) => {
@@ -2889,6 +2889,18 @@ const totalDowntime = downtimeUnsch + downtimeSch;
                  freshData.usersData.forEach((u, i) => {
                      if(u.username) updates['users'][String(u.username).replace(/[\.\#\$\[\]\/]/g, "-")] = u;
                  });
+            }
+            if (freshData.mekanikList) {
+                updates['master_mekanik'] = {};
+                freshData.mekanikList.forEach((m, i) => {
+                    if(m.nama_mekanik) updates['master_mekanik']['MEK_'+i] = m;
+                });
+            }
+            if (freshData.pelaporList) {
+                updates['master_pelapor'] = {};
+                freshData.pelaporList.forEach((p, i) => {
+                    if(p.nama_pelapor) updates['master_pelapor']['PEL_'+i] = p;
+                });
             }
 
             // Eksekusi Push Massal ke Firebase
