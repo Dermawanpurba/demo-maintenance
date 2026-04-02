@@ -543,16 +543,16 @@
             </form>
 
             <h3 class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest mb-4 ml-2"><i class="fas fa-history mr-2"></i> Riwayat Input Service</h3>
-            <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
+            <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm bg-white">
                 <table class="w-full text-left text-sm min-w-[800px]">
                 <thead class="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] uppercase font-black text-slate-500 tracking-widest">
                     <tr>
-                        <th class="p-4 md:p-6 w-24">WO NO</th>
-                        <th class="p-4 md:p-6 w-56">UNIT / HM / BACKLOG</th>
-                        <th class="p-4 md:p-6">PROBLEM / KENDALA</th>
-                        <th class="p-4 md:p-6 w-32">BREAKDOWN DATE</th>
-                        <th class="p-4 md:p-6 text-center w-24">STATUS</th>
-                        <th class="p-4 md:p-6 text-right w-28">ACTIONS</th>
+                        <th class="p-4 md:p-6 w-40">ID / EQUIP NO</th>
+                        <th class="p-4 md:p-6 text-center w-32">PLAN HM</th>
+                        <th class="p-4 md:p-6 text-center w-32">PLAN DATE</th>
+                        <th class="p-4 md:p-6 text-center w-32">ACTUAL HM</th>
+                        <th class="p-4 md:p-6 text-center w-32">ACTUAL DATE</th>
+                        <th class="p-4 md:p-6 text-center w-32">DEVIASI HM</th>
                     </tr>
                 </thead>
                 <tbody id="serviceHistoryTableBody" class="divide-y divide-slate-50 font-medium text-slate-700"></tbody>
@@ -670,12 +670,12 @@
                 <table class="w-full text-left min-w-[1080px]">
                 <thead class="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] uppercase font-black text-slate-500 tracking-widest">
                     <tr>
-                        <th class="p-4 md:p-5 w-24">WO NO</th>
-                        <th class="p-4 md:p-5 w-60">UNIT / HM / BACKLOG</th>
-                        <th class="p-4 md:p-5 w-auto">PROBLEM / KENDALA</th>
-                        <th class="p-4 md:p-5 w-36">BREAKDOWN DATE</th>
-                        <th class="p-4 md:p-5 text-center w-32">STATUS</th>
-                        <th class="p-4 md:p-5 text-right w-40 pr-6">ACTIONS</th>
+                        <th class="p-4 md:p-6 w-32">EQUIP NO</th>
+                        <th class="p-4 md:p-6 text-center w-32">PLAN HM</th>
+                        <th class="p-4 md:p-6 text-center w-32">PLAN DATE</th>
+                        <th class="p-4 md:p-6 text-center w-32">ACTUAL HM</th>
+                        <th class="p-4 md:p-6 text-center w-32">ACTUAL DATE</th>
+                        <th class="p-4 md:p-6 text-center w-24">DEVIASI</th>
                     </tr>
                 </thead>
                 <tbody id="woTableBody" class="divide-y divide-slate-50 text-[11px] md:text-[13px] font-medium text-slate-700"></tbody>
@@ -1275,13 +1275,12 @@
         }
 
         try {
-            // Deteksi jika berjalan di dalam Google Apps Script (Iframe)
+            // 1. Deteksi native Apps Script (Iframe) - Mode Paling Aman
             if (typeof google !== 'undefined' && google.script && google.script.run) {
                 return new Promise((resolve, reject) => {
                     google.script.run
                         .withSuccessHandler(res => {
                             try {
-                                // Jika response berupa string, parse ke JSON
                                 const parsed = (typeof res === 'string') ? JSON.parse(res) : res;
                                 resolve(parsed);
                             } catch(e) {
@@ -1293,17 +1292,22 @@
                 });
             }
             
-            // Mode Fetch (untuk Web App URL langsung atau Cloudflare)
+            // 2. Mode Fetch Eksternal (Vercel/Cloudflare/Hosting Lokal)
             const response = await fetch(GAS_API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: actionName, data: payloadData })
+                method: "POST",
+                // PATCH: Hapus 'headers' secara paksa agar browser mengirim ini sebagai "Simple Request" (menghindari CORS Preflight Block)
+                body: JSON.stringify({ action: actionName, data: payloadData }),
+                redirect: "follow" // PATCH KRITIKAL: GAS wajib difollow karena selalu merespon dengan HTTP 302 Redirect
             });
             
             const textRes = await response.text();
             return JSON.parse(textRes);
         } catch (error) {
             console.error("GAS API Error:", error);
+            // PATCH: Berikan pesan spesifik jika terjadi CORS Network Error
+            if (error.message === 'Failed to fetch') {
+                throw new Error("Akses ditolak oleh Google Server. Mohon ikuti Protokol Deployment Web App (Versi Baru & Akses 'Siapa saja/Anyone').");
+            }
             throw error;
         }
         }
@@ -2118,16 +2122,16 @@
         }
         }
 
-        // FUNGSI BARU: MENGHASILKAN TABEL PER TIPE ALAT
-        function renderUnitPerformanceTables(unitDowntimeMap) {
-            const container = document.getElementById('unitGroupTablesContainer');
-            if(!container) return;
-            
-            // Mapping Nama Kategori Lengkap berdasarkan Alias/Model
-            const typeMapping = {
-                'EXC': 'EXCAVATOR',
-                'DZR': 'BULLDOZER',
-                'GDR': 'MOTOR GRADER',
+        // FUNGSI BARU: MENGHASILKAN TABEL PER TIPE ALAT (OPTIMIZED ANTI-FREEZE)
+        function renderUnitPerformanceTables(unitDowntimeMap) {
+            const container = document.getElementById('unitGroupTablesContainer');
+            if(!container) return;
+            
+            // Mapping Nama Kategori Lengkap berdasarkan Alias/Model
+            const typeMapping = {
+                'EXC': 'EXCAVATOR',
+                'DZR': 'BULLDOZER',
+                'GDR': 'MOTOR GRADER',
                 'DZ': 'DUMP TRUCK DONGFENG',
                 'BOMAG': 'COMPACTOR',
                 'HINO': 'DUMP TRUCK HINO',
@@ -2136,11 +2140,20 @@
                 'SITRAK': 'DUMP TRUCK SITRAK',
                 'WL': 'WHEEL LOADER',
                 'WP': 'WATER PUMP EBARA'
-            };
+            };
 
-            let groups = {};
-            masterCache.planAlat.forEach(plan => {
-                const unitNo = plan.equip_no.toUpperCase();
+            let groups = {};
+            
+            // ================= INJECTION: PRE-COMPUTE WO HASH MAP O(1) =================
+            let woCountMap = {};
+            (woDataCache || []).forEach(w => {
+                const eNo = String(w.equip_no || '').toUpperCase();
+                woCountMap[eNo] = (woCountMap[eNo] || 0) + 1;
+            });
+            // ===========================================================================
+
+            masterCache.planAlat.forEach(plan => {
+                const unitNo = plan.equip_no.toUpperCase();
                 const modelAlias = (plan.model || "").toUpperCase();
                 
                 // Logika identifikasi prefix DF/DZ untuk Dongfeng
@@ -2152,43 +2165,42 @@
                 if(!groups[typeLabel]) groups[typeLabel] = [];
                 
                 // Hitung PA unit ini
-                const downtime = unitDowntimeMap[unitNo] || 0;
-                const startDateStr = document.getElementById('kpiStartDate').value;
-                const endDateStr = document.getElementById('kpiEndDate').value;
-                const filterStart = new Date(startDateStr + 'T07:00:00');
-                const filterEnd = new Date(endDateStr + 'T06:59:59');
-                const filterEndReal = new Date(Math.min(filterEnd.getTime(), new Date().getTime()));
-                const totalHoursInRange = Math.max(1, (filterEndReal - filterStart) / (1000 * 60 * 60));
-                
-                let actPaCalc = ((totalHoursInRange - downtime) / totalHoursInRange) * 100;
+                const downtime = unitDowntimeMap[unitNo] || 0;
+                const startDateStr = document.getElementById('kpiStartDate').value;
+                const endDateStr = document.getElementById('kpiEndDate').value;
+                const filterStart = new Date(startDateStr + 'T07:00:00');
+                const filterEnd = new Date(endDateStr + 'T06:59:59');
+                const filterEndReal = new Date(Math.min(filterEnd.getTime(), new Date().getTime()));
+                const totalHoursInRange = Math.max(1, (filterEndReal - filterStart) / (1000 * 60 * 60));
+                
+                let actPaCalc = ((totalHoursInRange - downtime) / totalHoursInRange) * 100;
                 if (actPaCalc < 0) actPaCalc = 0; // Proteksi limit 0%
                 
                 const actPa = actPaCalc.toFixed(1);
-                const planPaRaw = plan.plan_pa || 85;
+                const planPaRaw = plan.plan_pa || 85;
                 // Konversi desimal 0.85 ke 85% jika perlu
                 const planPa = (parseFloat(planPaRaw) > 0 && parseFloat(planPaRaw) < 1) ? (parseFloat(planPaRaw) * 100).toFixed(0) : planPaRaw;
-                
-                // Hitung MTTR & MTBF per Unit
-                const unitWOs = woDataCache.filter(w => String(w.equip_no).toUpperCase() === unitNo);
-                const breakdownCount = unitWOs.length;
+                
+                // Hitung MTTR & MTBF per Unit TANPA NESTED LOOP FILTERING
+                const breakdownCount = woCountMap[unitNo] || 0;
                 const mttrVal = breakdownCount > 0 ? (downtime / breakdownCount).toFixed(1) : "0";
                 
                 // MTBF Simple: (Uptime / Jumlah Breakdown)
                 const uptime = Math.max(0, totalHoursInRange - downtime);
                 const mtbfVal = breakdownCount > 0 ? (uptime / breakdownCount).toFixed(1) : uptime.toFixed(1);
 
-                groups[typeLabel].push({
-                    unitNo: unitNo,
-                    model: plan.model,
-                    planPa: planPa,
-                    actPa: actPa,
+                groups[typeLabel].push({
+                    unitNo: unitNo,
+                    model: plan.model,
+                    planPa: planPa,
+                    actPa: actPa,
                     mttr: mttrVal,
                     mtbf: mtbfVal,
-                    downtime: downtime.toFixed(1)
-                });
-            });
+                    downtime: downtime.toFixed(1)
+                });
+            });
 
-            // 2. Render HTML Tabel (Compact Edition & Calculation Fix)
+            // 2. Render HTML Tabel (Compact Edition & Calculation Fix)
             let html = '';
             Object.keys(groups).sort().forEach(type => {
                 html += `
@@ -2500,12 +2512,15 @@
             return matchQuery && matchStatus;
         });
 
-        // --- PATCH SORTING: Urutkan data berdasarkan tanggal & jam ---
+        // --- PATCH SORTING: Urutkan data berdasarkan tanggal & jam (KEBAL NaN) ---
         window.woSortOrder = window.woSortOrder || 'desc'; // Default: Terbaru di atas
         filtered.sort((a, b) => {
-            // Bersihkan format jam dari petik dan pastikan formatnya HH:mm
-            let jamA = String(a.jam_rusak || '00:00').replace(/['"]/g,'').trim().padStart(5, '0');
-            let jamB = String(b.jam_rusak || '00:00').replace(/['"]/g,'').trim().padStart(5, '0');
+            // Evaluasi melalui Helper Anti-Desimal terlebih dahulu
+            let extractedJamA = formatTimeOnly(a.jam_rusak);
+            let extractedJamB = formatTimeOnly(b.jam_rusak);
+            
+            let jamA = (extractedJamA === '-' ? '00:00' : extractedJamA).padStart(5, '0');
+            let jamB = (extractedJamB === '-' ? '00:00' : extractedJamB).padStart(5, '0');
             
             let dateA = new Date((a.tgl_rusak || '1970-01-01') + 'T' + jamA).getTime();
             let dateB = new Date((b.tgl_rusak || '1970-01-01') + 'T' + jamB).getTime();
@@ -2550,7 +2565,7 @@
             if (isPlanner || isPlant) actionButtons += `<button onclick="updateStatus('${i.no_wo}')" class="w-8 h-8 flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-sm" title="Update Status"><i class="fas fa-tasks text-xs"></i></button>`;
             if (isPlanner) actionButtons += `<button onclick="handleDeleteWO('${i.no_wo}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl" title="Hapus WO"><i class="fas fa-trash text-xs"></i></button>`;
 
-            const safeJamR = String(i.jam_rusak || '-').replace(/'/g, '');
+            const safeJamR = formatTimeOnly(i.jam_rusak);
             
             // Data Kendala
             const kendalaText = i.kendala || '<span class="italic opacity-50">Tidak ada deskripsi</span>';
@@ -2568,21 +2583,70 @@
         }).join('');
         }
 
+        // ==========================================
+        // UNIVERSAL FUZZY EXTRACTOR (ANTI-TYPO HEADER)
+        // ==========================================
+        function getFuzzyValue(obj, keywords) {
+            if(!obj) return "";
+            for (let key in obj) {
+                let lowerKey = String(key).toLowerCase();
+                for (let kw of keywords) {
+                    if (lowerKey.includes(kw)) {
+                        if(obj[key] && String(obj[key]).trim() !== '') return String(obj[key]).trim();
+                    }
+                }
+            }
+            return "";
+        }
+
+        // ==========================================
+        // RENDER BACKLOG TABLE (PATCHED)
+        // ==========================================
         function renderBacklogTable() {
             const tbody = document.getElementById('backlogTableBody');
             if(!tbody) return;
             const q = (document.getElementById('filterBacklog')?.value || '').toLowerCase();
             const statusFilter = document.getElementById('filterStatusBacklog')?.value || 'ALL';
+            
             let filtered = (backlogCache || []).filter(b => {
-                const matchQuery = String(b.equip_no||'').toLowerCase().includes(q) || String(b.id||'').toLowerCase().includes(q) || String(b.deskripsi_backlog||'').toLowerCase().includes(q);
+                const safeDesc = String(b.deskripsi_backlog || b.deskripsibacklog || b.deskripsi || '').toLowerCase();
+                const matchQuery = String(b.equip_no||'').toLowerCase().includes(q) || String(b.id||'').toLowerCase().includes(q) || safeDesc.includes(q);
                 const matchStatus = statusFilter === 'ALL' || b.status === statusFilter;
                 return matchQuery && matchStatus;
             });
 
-            if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold">Data Backlog tidak ditemukan.</td></tr>'; return; }
+            if (filtered.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold">Data Backlog tidak ditemukan.</td></tr>'; 
+                return; 
+            }
+            
             tbody.innerHTML = filtered.map(b => {
                 const stCol = b.status === 'OPEN' ? "bg-amber-100 text-amber-700 border border-amber-300" : "bg-emerald-100 text-emerald-700 border border-emerald-300";
-                return `<tr class="hover:bg-slate-50 border-b"><td class="p-4"><div class="font-black text-slate-800 text-xs">${b.id}</div><div class="text-[9px] font-bold text-slate-400 mt-1">${b.tanggal}</div></td><td class="p-4 font-black uppercase text-theme-accent">${b.equip_no}</td><td class="p-4"><div class="font-medium text-slate-700 text-sm mb-1">${b.deskripsi_backlog}</div><div class="text-[10px] text-slate-500 font-bold"><i class="fas fa-tools mr-1 opacity-50"></i> Rencana: ${b.rencana_eksekusi || '-'}</div></td><td class="p-4 text-center"><span class="px-4 py-1.5 rounded-lg text-[9px] font-black cursor-pointer ${stCol}" onclick="updateBacklogStatus('${b.id}')" title="Ubah status">${b.status || 'OPEN'}</span></td><td class="p-4 text-right"><button onclick="deleteBacklog('${b.id}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl ml-auto"><i class="fas fa-trash"></i></button></td></tr>`;
+                
+                // EKSTRAKSI UI KEBAL ERROR
+                let finalDesc = b.deskripsi_backlog || b.deskripsibacklog || b.deskripsi;
+                if (!finalDesc || finalDesc.trim() === "" || finalDesc === "Data Kosong di Excel") {
+                   finalDesc = '<span class="italic text-red-500 font-bold">Data Deskripsi Kosong / Tidak Terbaca</span>';
+                }
+                const finalPlan = b.rencana_eksekusi || b.rencanaeksekusi || b.rencana || '-';
+
+                return `<tr class="hover:bg-slate-50 border-b">
+                            <td class="p-4">
+                                <div class="font-black text-slate-800 text-xs">${b.id || '-'}</div>
+                                <div class="text-[9px] font-bold text-slate-400 mt-1">${b.tanggal || '-'}</div>
+                            </td>
+                            <td class="p-4 font-black uppercase text-theme-accent">${b.equip_no || '-'}</td>
+                            <td class="p-4">
+                                <div class="font-medium text-slate-700 text-sm mb-1">${finalDesc}</div>
+                                <div class="text-[10px] text-slate-500 font-bold"><i class="fas fa-tools mr-1 opacity-50"></i> Rencana: ${finalPlan}</div>
+                            </td>
+                            <td class="p-4 text-center">
+                                <span class="px-4 py-1.5 rounded-lg text-[9px] font-black cursor-pointer ${stCol}" onclick="updateBacklogStatus('${b.id}')" title="Ubah status">${b.status || 'OPEN'}</span>
+                            </td>
+                            <td class="p-4 text-right">
+                                <button onclick="deleteBacklog('${b.id}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl ml-auto"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
             }).join('');
         }
 
@@ -2780,14 +2844,13 @@
             startLoading("MENGAMBIL DATA DARI GOOGLE SHEETS...");
             
             try {
-                // 1. Tarik data fresh langsung dari Google Sheets
                 const freshData = await fetchGAS("getOptimizedData");
                 if(!freshData || !freshData.success) throw new Error("Gagal mengambil data dari Google Sheets");
 
                 startLoading("MENYINKRONKAN KE FIREBASE...");
 
                 const parseNum = (v) => parseFloat(String(v).replace(',', '.')) || 0;
-                const updates = {}; // Gunakan Multi-path update agar cepat dan aman
+                const updates = {}; 
 
                 // A. Work Orders
                 if(freshData.wo) {
@@ -2800,32 +2863,55 @@
                     });
                 }
 
-                // B. Backlogs
+                // B. BACKLOGS (INJEKSI BRUTE-FORCE EXTRACTOR)
                 if(freshData.backlog) {
                     updates['backlogs'] = {};
                     freshData.backlog.forEach(b => {
-                        if(b.id) {
-                            let safeId = String(b.id).replace(/[\.\#\$\[\]\/]/g, "-");
-                            updates['backlogs'][safeId] = { ...b, id: safeId, last_sync: new Date().toISOString() };
+                        if(b.id || b.equip_no) {
+                            let fallbackId = b.id || b.equip_no || ("BL" + Math.random().toString(36).substr(2, 5).toUpperCase());
+                            let safeId = String(fallbackId).replace(/[\.\#\$\[\]\/]/g, "-");
+                            
+                            // 1. Coba cari key normal
+                            let desc = b.deskripsi_backlog || b.deskripsibacklog || b.deskripsi || b.kendala || "";
+                            
+                            // 2. JIKA GAGAL, CARI TEKS TERPANJANG DI BARIS EXCEL TERSEBUT (BRUTE FORCE)
+                            if (!desc || String(desc).trim() === "") {
+                                let longestText = "";
+                                for(let key in b) {
+                                    let val = String(b[key] || "");
+                                    // Abaikan key yang sudah pasti bukan deskripsi
+                                    if (!['id','tanggal','equip_no','equipno','status','rencana','rencana_eksekusi'].includes(key.toLowerCase())) {
+                                        if (val.length > longestText.length) {
+                                            longestText = val;
+                                        }
+                                    }
+                                }
+                                desc = longestText;
+                            }
+                            
+                            updates['backlogs'][safeId] = { 
+                                ...b, 
+                                id: safeId, 
+                                deskripsi_backlog: desc || "Data Kosong di Excel",
+                                rencana_eksekusi: b.rencana_eksekusi || b.rencanaeksekusi || b.rencana || "-",
+                                status: String(b.status || 'OPEN').toUpperCase(),
+                                last_sync: new Date().toISOString() 
+                            };
                         }
                     });
                 }
 
-                // C. Daily HM (Auto-Repair ID dan Koma Desimal)
+                // C. Daily HM
                 if(freshData.dailyHM) {
                     updates['daily_hm'] = {};
-                    freshData.dailyHM.forEach((h, idx) => {
+                    freshData.dailyHM.forEach((h) => {
                         let eq = String(h.equip_no || h.equipno || '').toUpperCase();
                         let tgl = h.tanggal || '';
-                        let safeId = `${tgl}_${eq}_${idx}`.replace(/[\.\#\$\[\]\/]/g, "-");
+                        let safeId = `${tgl}_${eq}`.replace(/[\.\#\$\[\]\/]/g, "-");
                         updates['daily_hm'][safeId] = {
-                            id: safeId,
-                            tanggal: tgl,
-                            equip_no: eq,
-                            hm_awal: parseNum(h.hm_awal || h.hmawal),
-                            hm_akhir: parseNum(h.hm_akhir || h.hmakhir),
-                            total_hm: parseNum(h.total_hm || h.totalhm),
-                            last_sync: new Date().toISOString()
+                            id: safeId, tanggal: tgl, equip_no: eq,
+                            hm_awal: parseNum(h.hm_awal || h.hmawal), hm_akhir: parseNum(h.hm_akhir || h.hmakhir),
+                            total_hm: parseNum(h.total_hm || h.totalhm), last_sync: new Date().toISOString()
                         };
                     });
                 }
@@ -2836,12 +2922,9 @@
                     freshData.serviceHistory.forEach((s, i) => {
                         const id = String(s.id || ('SVC' + new Date().getTime() + i)).replace(/[\.\#\$\[\]\/]/g, "-");
                         updates['service_history'][id] = {
-                            id: id, 
-                            equip_no: String(s.equip_no || s.equipno || '').toUpperCase(),
-                            plan_hm: parseNum(s.plan_hm || s.planhm),
-                            plan_date: s.plan_date || s.plandate || '',
-                            actual_hm: parseNum(s.actual_hm || s.actualhm),
-                            actual_date: s.actual_date || s.actualdate || '',
+                            id: id, equip_no: String(s.equip_no || s.equipno || '').toUpperCase(),
+                            plan_hm: parseNum(s.plan_hm || s.planhm), plan_date: s.plan_date || s.plandate || '',
+                            actual_hm: parseNum(s.actual_hm || s.actualhm), actual_date: s.actual_date || s.actualdate || '',
                             timestamp: new Date().toISOString()
                         };
                     });
@@ -2853,11 +2936,9 @@
                     freshData.activities.forEach((a, i) => {
                         const id = String(a.id || ('ACT' + new Date().getTime() + i)).replace(/[\.\#\$\[\]\/]/g, "-");
                         updates['mechanic_activity'][id] = {
-                            id: id, tanggal: a.tanggal || '', 
-                            no_wo: a.no_wo || a.nowo || '',
+                            id: id, tanggal: a.tanggal || '', no_wo: a.no_wo || a.nowo || '',
                             mekanik: a.mekanik || '', aktifitas: a.aktifitas || '',
-                            jam_mulai: a.jam_mulai || a.jammulai || '00:00',
-                            jam_selesai: a.jam_selesai || a.jamselesai || '00:00'
+                            jam_mulai: a.jam_mulai || a.jammulai || '00:00', jam_selesai: a.jam_selesai || a.jamselesai || '00:00'
                         };
                     });
                 }
@@ -2880,51 +2961,37 @@
                     });
                 }
 
-                // G. Master Data (Equip, Parts, Comp, Users, Mekanik, Pelapor)
+                // G. Master Data
                 if (freshData.equip) {
                     updates['master_equip'] = {};
-                    freshData.equip.forEach((e, i) => {
-                        if(e.equip_no) updates['master_equip'][String(e.equip_no).replace(/[\.\#\$\[\]\/]/g, "-")] = e;
-                    });
+                    freshData.equip.forEach((e) => { if(e.equip_no) updates['master_equip'][String(e.equip_no).replace(/[\.\#\$\[\]\/]/g, "-")] = e; });
                 }
                 if (freshData.parts) {
                     updates['master_parts'] = {};
-                    freshData.parts.forEach((p, i) => {
-                        if(p.part_number) updates['master_parts'][String(p.part_number).replace(/[\.\#\$\[\]\/]/g, "-")] = p;
-                    });
+                    freshData.parts.forEach((p) => { if(p.part_number) updates['master_parts'][String(p.part_number).replace(/[\.\#\$\[\]\/]/g, "-")] = p; });
                 }
                 if (freshData.components) {
                     updates['master_comp'] = {};
-                    freshData.components.forEach((c, i) => {
-                        updates['master_comp']['COMP_'+i] = c;
-                    });
+                    freshData.components.forEach((c, i) => { updates['master_comp']['COMP_'+i] = c; });
                 }
                 if (freshData.usersData) {
                     updates['users'] = {};
-                    freshData.usersData.forEach((u, i) => {
-                        if(u.username) updates['users'][String(u.username).replace(/[\.\#\$\[\]\/]/g, "-")] = u;
-                    });
+                    freshData.usersData.forEach((u) => { if(u.username) updates['users'][String(u.username).replace(/[\.\#\$\[\]\/]/g, "-")] = u; });
                 }
                 if (freshData.mekanikList) {
                     updates['master_mekanik'] = {};
-                    freshData.mekanikList.forEach((m, i) => {
-                        if(m.nama_mekanik) updates['master_mekanik']['MEK_'+i] = m;
-                    });
+                    freshData.mekanikList.forEach((m, i) => { if(m.nama_mekanik) updates['master_mekanik']['MEK_'+i] = m; });
                 }
                 if (freshData.pelaporList) {
                     updates['master_pelapor'] = {};
-                    freshData.pelaporList.forEach((p, i) => {
-                        if(p.nama_pelapor) updates['master_pelapor']['PEL_'+i] = p;
-                    });
+                    freshData.pelaporList.forEach((p, i) => { if(p.nama_pelapor) updates['master_pelapor']['PEL_'+i] = p; });
                 }
 
-                // Eksekusi Push Massal ke Firebase
+                // EKSEKUSI PUSH MASSAL KE FIREBASE
                 await db.ref().update(updates);
 
                 endLoading();
-                Swal.fire('Sukses', 'Data berhasil ditarik dari Sheets dan di-migrasi ke Firebase secara utuh!', 'success');
-                
-                // Segarkan UI dari Data Baru
+                Swal.fire('Sukses', 'Data berhasil ditarik dan distandarisasi di Firebase!', 'success');
                 globalDataSync(); 
             } catch(e) {
                 endLoading();
@@ -3645,24 +3712,33 @@
         if (result.isConfirmed) {
             startLoading("DELETING FROM CLOUD...");
             try {
-                // EKSEKUSI LANGSUNG KE FIREBASE (MENGHAPUS NODE)
                 const cleanId = String(id).trim();
-                await db.ref('mechanic_activity/' + cleanId).remove();
+                
+                // HYBRID SYNC: Hapus di Google Sheets Server dahulu
+                const res = await fetchGAS("deleteActivity", { id: cleanId });
+                
+                if(res.success || isPreviewMode) {
+                    // EKSEKUSI PENGHAPUSAN NODE FIREBASE
+                    await db.ref('mechanic_activity/' + cleanId).remove();
 
-                endLoading();
-                Swal.fire({
-                    toast: true,
-                    position: 'top-end',
-                    icon: 'success',
-                    title: 'Terhapus!',
-                    text: 'Laporan aktifitas berhasil dihapus dari Cloud.',
-                    showConfirmButton: false,
-                    timer: 2000
-                });
+                    endLoading();
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: 'Terhapus!',
+                        text: 'Laporan aktifitas berhasil dihapus dari Server & Cloud.',
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
 
-                // Catatan: Tidak perlu memanggil globalDataSync() atau render ulang manual, 
-                // karena listener 'on value' Firebase akan mendeteksi penghapusan ini 
-                // dan langsung menghilangkan barisnya dari tabel secara otomatis.
+                    // Catatan: Tidak perlu memanggil globalDataSync() atau render ulang manual, 
+                    // karena listener 'on value' Firebase akan mendeteksi penghapusan ini 
+                    // dan langsung menghilangkan barisnya dari tabel secara otomatis.
+                } else {
+                    endLoading();
+                    Swal.fire('Gagal', res.message, 'error');
+                }
 
             } catch (err) {
                 endLoading();
@@ -3752,16 +3828,24 @@
                 let deviasiHM = parseFloat(d.actual_hm) - parseFloat(d.plan_hm);
                 let devBadge = '';
                 
+                // Kalkulasi Logika Visual Deviasi
                 if(isNaN(deviasiHM)) devBadge = '-';
-                else if(deviasiHM <= 0) devBadge = `<span class="text-emerald-500 font-black px-2 py-1 bg-emerald-50 rounded-lg text-[10px]">${deviasiHM} h</span>`;
-                else devBadge = `<span class="text-red-500 font-black px-2 py-1 bg-red-50 rounded-lg text-[10px] animate-pulse">+${deviasiHM} h</span>`;
+                else if(deviasiHM === 0) devBadge = `<span class="text-blue-600 font-black px-3 py-1.5 bg-blue-50 rounded-lg text-[10px] border border-blue-200 shadow-sm"><i class="fas fa-check-circle mr-1"></i> TEPAT WAKTU</span>`;
+                else if(deviasiHM < 0) devBadge = `<span class="text-emerald-600 font-black px-3 py-1.5 bg-emerald-50 rounded-lg text-[10px] border border-emerald-200 shadow-sm"><i class="fas fa-arrow-down mr-1"></i> AWAL ${Math.abs(deviasiHM)} h</span>`;
+                else devBadge = `<span class="text-red-600 font-black px-3 py-1.5 bg-red-50 rounded-lg text-[10px] border border-red-200 shadow-sm animate-pulse"><i class="fas fa-arrow-up mr-1"></i> TELAT ${deviasiHM} h</span>`;
 
-                return `<tr class="border-b hover:bg-slate-50">
-                            <td class="p-4 font-black uppercase text-theme-accent">${d.equip_no || '-'}</td>
-                            <td class="p-4 text-center font-bold text-slate-600 bg-blue-50/10">${d.plan_hm || '-'}</td>
-                            <td class="p-4 text-center text-xs text-slate-500 bg-blue-50/10">${d.plan_date || '-'}</td>
-                            <td class="p-4 text-center font-black text-emerald-700 bg-emerald-50/10">${d.actual_hm || '-'}</td>
-                            <td class="p-4 text-center font-bold text-slate-800 bg-emerald-50/10 text-xs">${d.actual_date || '-'}</td>
+                const safeEquip = d.equip_no || '-';
+
+                return `<tr class="border-b hover:bg-slate-50 transition-colors">
+                            <td class="p-4">
+                                <button type="button" onclick="navigate('master-plan'); setTimeout(() => { document.getElementById('filterPlan').value = '${safeEquip}'; renderMasterPlanTable(); }, 100);" class="font-black uppercase text-theme-main bg-slate-100 hover:bg-theme-main hover:text-white px-3 py-2 rounded-lg transition-all shadow-sm text-xs cursor-pointer flex items-center gap-2 border border-slate-200 hover:border-theme-main group">
+                                    <i class="fas fa-external-link-alt group-hover:scale-110 transition-transform"></i> ${safeEquip}
+                                </button>
+                            </td>
+                            <td class="p-4 text-center font-black text-slate-500 bg-blue-50/30 text-sm">${d.plan_hm || '-'}</td>
+                            <td class="p-4 text-center font-bold text-slate-400 bg-blue-50/30 text-xs uppercase tracking-widest">${d.plan_date || '-'}</td>
+                            <td class="p-4 text-center font-black text-emerald-700 bg-emerald-50/30 text-sm">${d.actual_hm || '-'}</td>
+                            <td class="p-4 text-center font-bold text-slate-600 bg-emerald-50/30 text-xs uppercase tracking-widest">${d.actual_date || '-'}</td>
                             <td class="p-4 text-center">${devBadge}</td>
                         </tr>`;
             }).join('');
@@ -3865,7 +3949,6 @@
         window.showBreakdownDetail = function(equipNo) {
             if(!equipNo) return;
             
-            // 1. Cari WO yang masih OPEN/PROGRESS/WAITING PART untuk unit ini
             const activeWOs = (woDataCache || []).filter(w => 
                 String(w.equip_no).toUpperCase() === equipNo.toUpperCase() && 
                 w.status !== 'CLOSED'
@@ -3880,17 +3963,14 @@
                 return;
             }
 
-            // 2. Ambil WO terbaru
             activeWOs.sort((a, b) => new Date(b.tgl_rusak) - new Date(a.tgl_rusak));
             const wo = activeWOs[0];
 
-            // 3. Cari Backlog yang masih OPEN untuk unit ini
             const pendingBacklogs = (backlogCache || []).filter(b => 
                 String(b.equip_no).toUpperCase() === equipNo.toUpperCase() && 
                 b.status === 'OPEN'
             );
 
-            // 4. Hitung Status Service / PM (NEW FEATURE)
             const plan = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === equipNo.toUpperCase());
             let pmStatusHtml = '';
             if (plan) {
@@ -3911,24 +3991,19 @@
                 pmStatusHtml = `<div class="bg-slate-100 border border-slate-200 text-slate-400 px-3 py-2 rounded-lg text-[10px] font-black uppercase flex items-center shadow-sm"><i class="fas fa-info-circle mr-2"></i> Belum terdaftar di Plan Alat</div>`;
             }
 
-            // 5. Siapkan UI SweetAlert HTML
             let htmlContent = `
                 <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 mt-4 space-y-4">
-                    
                     ${pmStatusHtml}
-
                     <div class="grid grid-cols-2 gap-2 text-xs pt-2">
                         <div><span class="text-slate-400 font-bold uppercase text-[9px] tracking-widest block">No WO:</span><span class="font-black text-slate-700">${wo.no_wo || '-'}</span></div>
                         <div><span class="text-slate-400 font-bold uppercase text-[9px] tracking-widest block">Status:</span><span class="font-black text-amber-600">${wo.status || 'OPEN'}</span></div>
                         <div><span class="text-slate-400 font-bold uppercase text-[9px] tracking-widest block">Tgl Rusak:</span><span class="font-bold text-slate-700">${wo.tgl_rusak || '-'} ${wo.jam_rusak || ''}</span></div>
                         <div><span class="text-slate-400 font-bold uppercase text-[9px] tracking-widest block">Mekanik:</span><span class="font-bold text-slate-700">${wo.tech || '-'}</span></div>
                     </div>
-                    
                     <div class="border-t border-slate-200 pt-3">
                         <span class="text-slate-400 font-bold uppercase text-[9px] tracking-widest block mb-1">Masalah / Laporan:</span>
                         <p class="text-sm font-medium text-red-600 bg-red-50 p-2 rounded-lg border border-red-100">${wo.kendala || 'Tidak ada deskripsi'}</p>
                     </div>
-                    
                     <div>
                         <span class="text-slate-400 font-bold uppercase text-[9px] tracking-widest block mb-1">Diagnosa / Reason of Failure:</span>
                         <p class="text-sm font-medium text-slate-700 bg-white p-2 rounded-lg border border-slate-200">${wo.failure_reason || '-'}</p>
@@ -3942,14 +4017,15 @@
                         <ul class="list-disc pl-5 text-xs font-medium text-slate-600 space-y-1">
                 `;
                 pendingBacklogs.forEach(b => {
-                    htmlContent += `<li>${b.deskripsi_backlog}</li>`;
+                    // EXTRACTOR CERDAS
+                    let safeDesc = b.deskripsi_backlog || b.deskripsibacklog || b.deskripsi || 'Tidak ada deskripsi';
+                    htmlContent += `<li>${safeDesc}</li>`;
                 });
                 htmlContent += `</ul></div>`;
             }
 
             htmlContent += `</div>`;
 
-            // 6. Tampilkan Modal
             Swal.fire({
                 title: `<span class="text-theme-main font-black text-2xl">${equipNo}</span>`,
                 html: htmlContent,
