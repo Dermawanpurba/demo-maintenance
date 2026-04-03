@@ -1856,6 +1856,8 @@
 
         let downtimeUnsch = 0; let downtimeSch = 0; let countUnsch = 0; let countSch = 0;
         let unitDowntime = {}; 
+        let unitStatusDowntime = {};
+        let majorCompDowntime = {};
 
         kpiData.forEach(wo => {
             try {
@@ -1912,13 +1914,20 @@
                         const eq = wo.equip_no ? wo.equip_no.toUpperCase() : '';
                         unitDowntime[eq] = (unitDowntime[eq] || 0) + diffHours;
 
+                        let mc = wo.major_comp ? String(wo.major_comp).toUpperCase() : 'UNSPECIFIED';
+                        majorCompDowntime[mc] = (majorCompDowntime[mc] || 0) + diffHours;
+
+                        if(!unitStatusDowntime[eq]) unitStatusDowntime[eq] = { OPEN: 0, PROGRESS: 0, 'WAITING PART': 0, CLOSED: 0 };
+                        let currentStatus = wo.status ? wo.status.toUpperCase() : 'OPEN';
+                        unitStatusDowntime[eq][currentStatus] = (unitStatusDowntime[eq][currentStatus] || 0) + diffHours;
+
                         // Format kembalian ke CSV agar menggunakan jam lokal, bukan jam UTC
                         const pad = n => (n < 10 ? '0'+n : n);
                         const fmtStart = `${actualStart.getFullYear()}-${pad(actualStart.getMonth()+1)}-${pad(actualStart.getDate())} ${pad(actualStart.getHours())}:${pad(actualStart.getMinutes())}`;
                         const fmtEnd = `${actualEnd.getFullYear()}-${pad(actualEnd.getMonth()+1)}-${pad(actualEnd.getDate())} ${pad(actualEnd.getHours())}:${pad(actualEnd.getMinutes())}`;
 
                         window.kpiAuditRawData.wo.push({
-                            WO_No: wo.no_wo, Equip_No: eq, Status: finalStatus,
+                            WO_No: wo.no_wo, Equip_No: eq, Major_Comp: mc, Status: finalStatus,
                             Type: (wo.sch_unsch || 'UNSCH').toUpperCase(),
                             Breakdown_Start: fmtStart, Breakdown_End: fmtEnd,
                             Downtime_Hours: diffHours.toFixed(2)
@@ -2029,15 +2038,15 @@
         const topEquipHoursContainer = document.getElementById('topEquipHoursList');
         
         if(topEquipFreqContainer && topEquipHoursContainer) {
-            let equipFreq = {};
+            let compFreq = {};
             
             filteredWOForCounts.forEach(d => { 
-                const eq = d.equip_no.toUpperCase();
-                equipFreq[eq] = (equipFreq[eq] || 0) + 1; 
+                const mc = d.major_comp ? String(d.major_comp).toUpperCase() : 'UNSPECIFIED';
+                compFreq[mc] = (compFreq[mc] || 0) + 1; 
             });
 
-            let sortedFreq = Object.entries(equipFreq).sort((a,b) => b[1] - a[1]).slice(0, 5);
-            window.kpiAuditRawData.topFreq = sortedFreq; // <--- INJEKSI BARIS INI
+            let sortedFreq = Object.entries(compFreq).sort((a,b) => b[1] - a[1]).slice(0, 5);
+            window.kpiAuditRawData.topFreq = sortedFreq; 
             if(sortedFreq.length === 0) {
                 topEquipFreqContainer.innerHTML = '<div class="text-center text-slate-400 font-bold mt-10">Belum ada data breakdown</div>';
             } else {
@@ -2056,8 +2065,8 @@
                 }).join('');
             }
 
-            let sortedHours = Object.entries(unitDowntime).sort((a,b) => b[1] - a[1]).slice(0, 5);
-            window.kpiAuditRawData.topHours = sortedHours; // <--- INJEKSI BARIS INI
+            let sortedHours = Object.entries(majorCompDowntime).sort((a,b) => b[1] - a[1]).slice(0, 5); 
+            window.kpiAuditRawData.topHours = sortedHours; 
             if(sortedHours.length === 0) {
                 topEquipHoursContainer.innerHTML = '<div class="text-center text-slate-400 font-bold mt-10">Belum ada data downtime</div>';
             } else {
@@ -2066,8 +2075,8 @@
                     const pct = (e[1] / maxValH) * 100;
                     return `<div class="mb-4">
                                 <div class="flex justify-between text-[10px] md:text-xs font-black text-slate-600 mb-1.5">
-                                <span>#${i+1} ${e[0]}</span>
-                                <span class="text-red-500">${e[1].toFixed(1)} Jam</span>
+                                <span class="truncate pr-2">#${i+1} ${e[0]}</span>
+                                <span class="text-red-500 whitespace-nowrap">${e[1].toFixed(1)} Jam</span>
                                 </div>
                                 <div class="w-full bg-slate-100 rounded-full h-2.5">
                                 <div class="bg-red-500 h-2.5 rounded-full" style="width: ${pct}%"></div>
@@ -2117,13 +2126,13 @@
             if(document.getElementById('totalBdCount')) document.getElementById('totalBdCount').innerText = `${totalBD} B/D`;
             if(detailBody) detailBody.innerHTML = detailHTML;
 
-            // Panggil fungsi render tabel detail unit
-            renderUnitPerformanceTables(unitDowntime);
+            // Panggil fungsi render tabel detail unit DENGAN mengirimkan data status
+            renderUnitPerformanceTables(unitDowntime, unitStatusDowntime);
         }
         }
 
         // FUNGSI BARU: MENGHASILKAN TABEL PER TIPE ALAT (OPTIMIZED ANTI-FREEZE)
-        function renderUnitPerformanceTables(unitDowntimeMap) {
+        function renderUnitPerformanceTables(unitDowntimeMap, unitStatusDowntimeMap = {}) {
             const container = document.getElementById('unitGroupTablesContainer');
             if(!container) return;
             
@@ -2189,6 +2198,9 @@
                 const uptime = Math.max(0, totalHoursInRange - downtime);
                 const mtbfVal = breakdownCount > 0 ? (uptime / breakdownCount).toFixed(1) : uptime.toFixed(1);
 
+                // EKSTRAK DATA JAM PER STATUS
+                let statusHours = unitStatusDowntimeMap[unitNo] || { OPEN: 0, PROGRESS: 0, 'WAITING PART': 0 };
+
                 groups[typeLabel].push({
                     unitNo: unitNo,
                     model: plan.model,
@@ -2196,7 +2208,10 @@
                     actPa: actPa,
                     mttr: mttrVal,
                     mtbf: mtbfVal,
-                    downtime: downtime.toFixed(1)
+                    downtime: downtime.toFixed(1),
+                    bdOpen: (statusHours.OPEN || 0).toFixed(1),
+                    bdProg: (statusHours.PROGRESS || 0).toFixed(1),
+                    bdWait: (statusHours['WAITING PART'] || 0).toFixed(1)
                 });
             });
 
@@ -2210,7 +2225,7 @@
                         <span class="text-blue-400 text-[9px]">${groups[type].length} UNITS</span>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse table-fixed min-w-[600px]">
+                        <table class="w-full text-left border-collapse table-fixed min-w-[800px]">
                             <thead>
                                 <tr class="bg-slate-50 border-b border-slate-200">
                                     <th class="p-2 w-20 text-[9px] font-black text-slate-400 uppercase">Unit No</th>
@@ -2219,7 +2234,10 @@
                                     <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase">Act PA</th>
                                     <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase text-red-500">MTTR</th>
                                     <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase text-blue-500">MTBF</th>
-                                    <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase text-slate-600">Downtime</th>
+                                    <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase text-slate-600">Total BD</th>
+                                    <th class="p-2 w-20 text-center text-[9px] font-black text-blue-500 uppercase">BD Open</th>
+                                    <th class="p-2 w-20 text-center text-[9px] font-black text-amber-500 uppercase">BD Prog</th>
+                                    <th class="p-2 w-20 text-center text-[9px] font-black text-red-500 uppercase">Wait Part</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
@@ -2247,6 +2265,9 @@
                                         <td class="p-2 text-center font-mono font-bold text-[11px] text-red-600">${u.mttr}h</td>
                                         <td class="p-2 text-center font-mono font-bold text-[11px] text-blue-600">${u.mtbf}h</td>
                                         <td class="p-2 text-center font-mono font-bold text-[11px] text-slate-700 bg-slate-50/50">${u.downtime}h</td>
+                                        <td class="p-2 text-center font-mono font-bold text-[11px] text-blue-600">${u.bdOpen}h</td>
+                                        <td class="p-2 text-center font-mono font-bold text-[11px] text-amber-600">${u.bdProg}h</td>
+                                        <td class="p-2 text-center font-mono font-bold text-[11px] text-red-600">${u.bdWait}h</td>
                                     </tr>`;
                                 }).join('')}
                             </tbody>
@@ -3868,13 +3889,13 @@
             let html = ''; let title = '';
 
             if (type === 'freq') {
-                title = 'Audit Formula: Top 5 Frekuensi';
-                html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">Count(Unscheduled WO) per Equip_No</code></div>
-                        <div><span class="font-black text-slate-700">Keterangan:</span><br>Menghitung total frekuensi/jumlah kejadian kerusakan alat (hanya status UNSCHEDULED) selama rentang filter tanggal yang dipilih di Dashboard.</div>`;
+                title = 'Audit Formula: Top 5 Frekuensi Major Component';
+                html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">Count(Unscheduled WO) per Major_Comp</code></div>
+                        <div><span class="font-black text-slate-700">Keterangan:</span><br>Menghitung total frekuensi/jumlah kejadian kerusakan alat (hanya status UNSCHEDULED) berdasarkan Major Component selama rentang filter tanggal yang dipilih di Dashboard.</div>`;
             } else {
-                title = 'Audit Formula: Top 5 Jam Downtime';
-                html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">Sum(Jam Selesai - Jam Rusak) per Equip_No</code></div>
-                        <div><span class="font-black text-slate-700">Keterangan:</span><br>Menghitung akumulasi jam berhenti operasi (Downtime) dari semua status kerusakan per unit. Dilengkapi <b>Downtime Capper</b> (dibatasi logika rasional maksimal 24 Jam per hari).</div>`;
+                title = 'Audit Formula: Top 5 Jam Downtime Major Component';
+                html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">Sum(Jam Selesai - Jam Rusak) per Major_Comp</code></div>
+                        <div><span class="font-black text-slate-700">Keterangan:</span><br>Menghitung akumulasi jam berhenti operasi (Downtime) dari semua status kerusakan berdasarkan kelompok Major Component. Dilengkapi <b>Downtime Capper</b> (dibatasi logika rasional maksimal 24 Jam per hari per unit).</div>`;
             }
             
             html += `<button onclick="downloadTop5CSV('${type}')" class="mt-5 w-full bg-emerald-500 hover:bg-emerald-600 text-white font-black py-3 rounded-xl text-xs uppercase tracking-widest transition-all active:scale-95 shadow-lg"><i class="fas fa-file-csv mr-2"></i> Download Rekap CSV</button>`;
@@ -3897,7 +3918,7 @@
                 const data = window.kpiAuditRawData.topFreq;
                 if (!data || data.length === 0) return Swal.fire('Kosong', 'Tidak ada data untuk didownload.', 'info');
                 
-                csvContent = `data:text/csv;charset=utf-8,Peringkat,Equip_No,Kali_Rusak\n`;
+                csvContent = `data:text/csv;charset=utf-8,Peringkat,Major_Component,Kali_Rusak\n`;
                 data.forEach((item, index) => {
                     csvContent += `${index + 1},"${item[0]}","${item[1]}"\n`;
                 });
@@ -3906,31 +3927,31 @@
                 const topHoursData = window.kpiAuditRawData.topHours;
                 if (!topHoursData || topHoursData.length === 0) return Swal.fire('Kosong', 'Tidak ada data untuk didownload.', 'info');
                 
-                // 1. Ambil daftar Equip_No yang masuk peringkat Top 5
-                const topEquips = topHoursData.map(item => item[0]);
+                // 1. Ambil daftar Major_Comp yang masuk peringkat Top 5
+                const topComps = topHoursData.map(item => item[0]);
                 
-                // 2. Filter detail WO mentah khusus untuk unit-unit Top 5 tersebut
-                const detailWOs = window.kpiAuditRawData.wo.filter(w => topEquips.includes(w.Equip_No));
+                // 2. Filter detail WO mentah khusus untuk komponen Top 5 tersebut
+                const detailWOs = window.kpiAuditRawData.wo.filter(w => topComps.includes(w.Major_Comp));
                 
                 // 3. Buat Header CSV dengan rincian lengkap
-                csvContent = `data:text/csv;charset=utf-8,Equip_No,WO_No,Status,Type,Argo_Mulai_(Filtered),Argo_Selesai_(Filtered),Durasi_(Jam)\n`;
+                csvContent = `data:text/csv;charset=utf-8,Major_Comp,Equip_No,WO_No,Status,Type,Argo_Mulai_(Filtered),Argo_Selesai_(Filtered),Durasi_(Jam)\n`;
                 
                 // 4. Masukkan baris data WO satu per satu
                 detailWOs.forEach(w => {
-                    csvContent += `"${w.Equip_No}","${w.WO_No}","${w.Status}","${w.Type}","${w.Breakdown_Start}","${w.Breakdown_End}","${w.Downtime_Hours}"\n`;
+                    csvContent += `"${w.Major_Comp}","${w.Equip_No}","${w.WO_No}","${w.Status}","${w.Type}","${w.Breakdown_Start}","${w.Breakdown_End}","${w.Downtime_Hours}"\n`;
                 });
                 
                 // 5. Tambahkan Tabel Summary Capper (Pembatas 24 Jam) di bagian bawah CSV
-                csvContent += `\n\nSUMMARY TOTAL & SISTEM PEMBATAS (CAPPER)\n`;
-                csvContent += `Equip_No,Total_Jam_Original,Total_Jam_Setelah_Capper (Final)\n`;
+                csvContent += `\n\nSUMMARY TOTAL & SISTEM PEMBATAS (CAPPER) PER MAJOR COMPONENT\n`;
+                csvContent += `Major_Component,Total_Jam_Original,Total_Jam_Setelah_Capper (Final)\n`;
                 
                 topHoursData.forEach(item => {
-                    const eq = item[0];
+                    const comp = item[0];
                     const cappedHours = item[1].toFixed(2);
                     // Hitung total jam murni sebelum dipotong oleh sistem Capper 24H
-                    const originalHours = detailWOs.filter(w => w.Equip_No === eq).reduce((sum, w) => sum + parseFloat(w.Downtime_Hours), 0).toFixed(2);
+                    const originalHours = detailWOs.filter(w => w.Major_Comp === comp).reduce((sum, w) => sum + parseFloat(w.Downtime_Hours), 0).toFixed(2);
                     
-                    csvContent += `"${eq}","${originalHours}","${cappedHours}"\n`;
+                    csvContent += `"${comp}","${originalHours}","${cappedHours}"\n`;
                 });
             }
 
