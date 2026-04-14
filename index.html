@@ -1027,6 +1027,7 @@
                     <option value="SPV Planner">SPV Planner</option>
                     <option value="Admin Plant">Admin Plant</option>
                     <option value="Mekanik">Mekanik</option>
+                    <option value="Operation">Operation</option>
                 </select>
                 </div>
                 <button type="submit" class="md:col-span-4 bg-theme-main text-white font-black py-4 rounded-xl md:rounded-2xl shadow-xl hover:opacity-90 transition-all uppercase tracking-[0.2em] text-[10px] md:text-xs mt-2 active:scale-95">Simpan Data User</button>
@@ -1464,39 +1465,59 @@
         const uRD = document.getElementById('userRoleDisplay'); if(uRD) uRD.innerText = currentUser.role;
         const uI = document.getElementById('userInitial'); if(uI) uI.innerText = currentUser.nama.charAt(0).toUpperCase();
 
-        const isMekanik = currentUser.role === 'Mekanik';
         const r = (currentUser.role || '').toUpperCase();
+        const isMekanik = r === 'MEKANIK';
+        const isOperation = r === 'OPERATION';
+
+        // 1. Reset Semua Navigasi & Elemen ke Status Default (Mencegah bug saat ganti akun)
+        document.querySelectorAll('.nav-btn').forEach(b => b.style.display = 'flex');
+        const nDb = document.getElementById('nav-database-section'); if(nDb) nDb.style.display = 'block';
+        const nAd = document.getElementById('nav-admin-section'); if(nAd) nAd.style.display = 'none'; 
+        const nDl = document.getElementById('nav-daily-group'); if(nDl) nDl.style.display = 'block';
+        const btnWoBanner = document.getElementById('dash-btn-wo'); if(btnWoBanner) btnWoBanner.style.display = 'block';
+        
+        const dashboardElements = document.getElementById('page-dashboard') ? document.getElementById('page-dashboard').children : [];
+        for(let i=0; i<dashboardElements.length; i++) {
+            if(dashboardElements[i].id !== 'banner-admin') dashboardElements[i].style.display = '';
+        }
 
         if (isMekanik) {
             const dT = document.getElementById('dashTitle'); if(dT) dT.innerText = "Mechanic Area 👋";
             const dD = document.getElementById('dashDesc'); if(dD) dD.innerText = "Pantau status Work Order, Backlog, Laporan Aktifitas, dan Monitoring.";
             
-            const nDb = document.getElementById('nav-database-section'); if(nDb) nDb.style.display = 'block';
             const btnPlan = document.querySelector('[data-page="master-plan"]'); if(btnPlan) btnPlan.style.display = 'none';
             const btnParts = document.querySelector('[data-page="master-parts"]'); if(btnParts) btnParts.style.display = 'none';
             const btnComp = document.querySelector('[data-page="master-comp"]'); if(btnComp) btnComp.style.display = 'none';
-            const btnEquip = document.querySelector('[data-page="master-equip"]'); if(btnEquip) btnEquip.style.display = 'flex';
-
-            const nAd = document.getElementById('nav-admin-section'); if(nAd) nAd.style.display = 'none';
-            const nDl = document.getElementById('nav-daily-group'); if(nDl) nDl.style.display = 'none';
             const btnBuatWo = document.querySelector('[data-page="buat-wo"]'); if(btnBuatWo) btnBuatWo.style.display = 'none';
-            
-            // --- PATCH: Sembunyikan Input Service untuk Mekanik ---
             const btnInputSvc = document.querySelector('[data-page="input-service"]'); if(btnInputSvc) btnInputSvc.style.display = 'none';
+            if(nDl) nDl.style.display = 'none';
+            
+        } else if (isOperation) {
+            const dT = document.getElementById('dashTitle'); if(dT) dT.innerText = "Operation Area 👋";
+            const dD = document.getElementById('dashDesc'); if(dD) dD.innerText = "Pantau Kesiapan Unit (Status Board) & Daftar Backlog Management.";
+            
+            // Sembunyikan SEMUA menu KECUALI Dashboard & Backlog
+            document.querySelectorAll('.nav-btn').forEach(b => {
+                if(b.dataset.page !== 'dashboard' && b.dataset.page !== 'backlog') b.style.display = 'none';
+            });
+            if(nDb) nDb.style.display = 'none';
+            if(nDl) nDl.style.display = 'none';
+            if(btnWoBanner) btnWoBanner.style.display = 'none';
+            
+            // Sembunyikan KPI, Chart, Table dll di Dashboard (HANYA Sisakan Banner & Unit Status Board)
+            for(let i=0; i<dashboardElements.length; i++) {
+                const el = dashboardElements[i];
+                const text = el.innerText || '';
+                if (el.id !== 'banner-admin' && !text.includes('Unit Status Board') && !el.querySelector('#detailBoardBody')) {
+                    el.style.display = 'none';
+                }
+            }
+            
         } else {
-            const nDb = document.getElementById('nav-database-section'); if(nDb) nDb.style.display = 'block';
-            
-            const btnPlan = document.querySelector('[data-page="master-plan"]'); if(btnPlan) btnPlan.style.display = 'flex';
-            const btnParts = document.querySelector('[data-page="master-parts"]'); if(btnParts) btnParts.style.display = 'flex';
-            const btnComp = document.querySelector('[data-page="master-comp"]'); if(btnComp) btnComp.style.display = 'flex';
-            const btnEquip = document.querySelector('[data-page="master-equip"]'); if(btnEquip) btnEquip.style.display = 'flex';
-
-            const nAd = document.getElementById('nav-admin-section'); if(nAd) nAd.style.display = r.includes('PLANNER') ? 'block' : 'none';
-            const nDl = document.getElementById('nav-daily-group'); if(nDl) nDl.style.display = 'block';
-            const btnBuatWo = document.querySelector('[data-page="buat-wo"]'); if(btnBuatWo) btnBuatWo.style.display = 'flex';
-            
-            // --- PATCH: Tampilkan Input Service untuk Admin/Planner ---
-            const btnInputSvc = document.querySelector('[data-page="input-service"]'); if(btnInputSvc) btnInputSvc.style.display = 'flex';
+            // SPV PLANNER / ADMIN PLANT
+            const dT = document.getElementById('dashTitle'); if(dT) dT.innerText = "Welcome back, " + dN.innerText + "!";
+            const dD = document.getElementById('dashDesc'); if(dD) dD.innerText = "Pantau metrik KPI, WO Terbuka, Backlog, dan ketersediaan alat secara Real-Time.";
+            if(nAd) nAd.style.display = r.includes('PLANNER') ? 'block' : 'none';
         }
 
         initTimeSelectors();
