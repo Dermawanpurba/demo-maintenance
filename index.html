@@ -3390,7 +3390,52 @@
             document.getElementById('planForm').reset(); 
         } catch(err) { endLoading(); Swal.fire('Error', err.toString(), 'error'); } 
     }
+async function handleSaveUser(e) {
+        e.preventDefault(); // Mencegah halaman refresh (mutar)
+        
+        // Ambil data dari form
+        const username = document.getElementById('u_username').value.trim().toLowerCase();
+        const password = document.getElementById('u_password').value.trim();
+        const nama = document.getElementById('u_nama').value.trim();
+        const role = document.getElementById('u_role').value;
 
+        if (!username || !password || !nama) {
+            return Swal.fire('Peringatan', 'Harap isi semua kolom data user!', 'warning');
+        }
+
+        startLoading("MENYIMPAN DATA USER KE FIREBASE..."); 
+        
+        // Buat ID aman untuk Firebase (hilangkan karakter ilegal)
+        const safeId = username.replace(/[\.\#\$\[\]\/]/g, "-");
+
+        try {
+            // Cek apakah username sudah ada sebelumnya
+            const snapshot = await db.ref('users/' + safeId).once('value');
+            if (snapshot.exists()) {
+                endLoading();
+                return Swal.fire('Ditolak', 'Username ini sudah terdaftar. Gunakan yang lain!', 'error');
+            }
+
+            // Simpan ke Firebase Realtime Database
+            await db.ref('users/' + safeId).set({ 
+                username: username, 
+                password: password, 
+                nama: nama, 
+                role: role 
+            });
+            
+            endLoading(); 
+            Swal.fire('Sukses', `Akses untuk ${role} berhasil ditambahkan!`, 'success'); 
+            
+            // Bersihkan form dan refresh tabel user
+            document.getElementById('userForm').reset(); 
+            globalDataSync(); 
+            
+        } catch(err) { 
+            endLoading(); 
+            Swal.fire('Error Firebase', err.toString(), 'error'); 
+        } 
+    }
         // --- FITUR PENCARIAN MEKANIK DI DALAM POPUP UPDATE STATUS ---
         window.filterSwalMekanik = function() {
             const keyword = document.getElementById('swal-search-mekanik').value.toLowerCase();
