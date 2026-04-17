@@ -75,6 +75,59 @@
         color: white;
         border-color: var(--theme-main);
         }
+
+        /* Menu Group Collapse Animations */
+        .menu-group {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .menu-group.collapsed .menu-items {
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+        .menu-group .menu-items {
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown { 
+            from { opacity: 0; max-height: 0; overflow: hidden; } 
+            to { opacity: 1; max-height: 1000px; overflow: visible; } 
+        }
+        @keyframes slideUp { 
+            from { opacity: 1; max-height: 1000px; overflow: visible; } 
+            to { opacity: 0; max-height: 0; overflow: hidden; } 
+        }
+        .menu-group-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+        .menu-group-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        .menu-group-toggle-icon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            width: 20px;
+            height: 20px;
+            justify-content: center;
+        }
+        .menu-group.collapsed .menu-group-toggle-icon {
+            transform: rotate(-90deg);
+        }
+        .menu-group-label {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.5);
+        }
     </style>
     </head>
     <body class="text-slate-800 flex flex-col min-h-screen">
@@ -135,56 +188,84 @@
                 <i class="fas fa-chart-pie w-8 group-hover:scale-110 transition-transform"></i> KPI Dashboard
             </button>
             
-            <div id="nav-service-group">
-                <div class="text-[9px] text-white/50 font-black uppercase px-3 pt-6 pb-2 tracking-widest">Service Menu</div>
-                <button onclick="navigate('buat-wo', true)" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="buat-wo">
-                    <i class="fas fa-plus-circle w-8 group-hover:scale-110 transition-transform"></i> Buat WO
-                </button>
-                <button onclick="navigate('backlog')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="backlog">
-                    <i class="fas fa-clipboard-check w-8 group-hover:scale-110 transition-transform text-amber-400"></i> Backlog Mgmt
-                </button>
-                <button onclick="navigate('aktifitas')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="aktifitas">
-                    <i class="fas fa-hard-hat w-8 group-hover:scale-110 transition-transform text-orange-400"></i> Laporan Aktifitas
-                </button>
-                <button onclick="navigate('input-service')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="input-service">
-                    <i class="fas fa-wrench w-8 group-hover:scale-110 transition-transform text-emerald-400"></i> Input Service (PM)
-                </button>
-            </div>
-            
-            <button onclick="navigate('list-wo')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="list-wo">
-                <i class="fas fa-laptop-medical w-8 group-hover:scale-110 transition-transform"></i> Monitoring Service
-            </button>
-
-            <div id="nav-daily-group">
-                <button onclick="navigate('daily-hm')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="daily-hm">
-                    <i class="fas fa-tachometer-alt w-8 group-hover:scale-110 transition-transform"></i> Input Daily HM
-                </button>
-            </div>
-            
-            <div id="nav-database-section">
-            <div class="text-[9px] text-white/50 font-black uppercase px-3 pt-6 pb-2 tracking-widest">Master Data</div>
-            <button onclick="navigate('master-plan')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-plan">
-                <i class="fas fa-calendar-alt w-8 group-hover:scale-110 transition-transform"></i> Plan Alat & Service
-            </button>
-            <button onclick="navigate('master-equip')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-equip">
-                <i class="fas fa-truck-pickup w-8 group-hover:scale-110 transition-transform"></i> Equipments
-            </button>
-            <button onclick="navigate('master-parts')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-parts">
-                <i class="fas fa-cogs w-8 group-hover:scale-110 transition-transform"></i> Spareparts
-            </button>
-            <button onclick="navigate('master-comp')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-comp">
-                <i class="fas fa-layer-group w-8 group-hover:scale-110 transition-transform"></i> Komponen
-            </button>
+            <div id="nav-service-group" class="menu-group">
+                <div class="menu-group-toggle px-3 pt-6 pb-3 rounded-lg transition-colors" onclick="toggleMenuGroup('service')">
+                    <div class="menu-group-label">
+                        <i class="fas fa-tools text-blue-300"></i> Service Menu
+                    </div>
+                    <span class="menu-group-toggle-icon text-white/40 group-hover:text-white/60"><i class="fas fa-chevron-down text-sm"></i></span>
+                </div>
+                <div class="menu-items space-y-1 px-2">
+                    <button onclick="navigate('buat-wo', true)" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="buat-wo">
+                        <i class="fas fa-plus-circle w-8 group-hover:scale-110 transition-transform"></i> Buat WO
+                    </button>
+                    <button onclick="navigate('backlog')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="backlog">
+                        <i class="fas fa-clipboard-check w-8 group-hover:scale-110 transition-transform text-amber-400"></i> Backlog Mgmt
+                    </button>
+                    <button onclick="navigate('aktifitas')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="aktifitas">
+                        <i class="fas fa-hard-hat w-8 group-hover:scale-110 transition-transform text-orange-400"></i> Laporan Aktifitas
+                    </button>
+                    <button onclick="navigate('input-service')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="input-service">
+                        <i class="fas fa-wrench w-8 group-hover:scale-110 transition-transform text-emerald-400"></i> Input Service (PM)
+                    </button>
+                    <button onclick="navigate('list-wo')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="list-wo">
+                        <i class="fas fa-laptop-medical w-8 group-hover:scale-110 transition-transform text-cyan-400"></i> Monitoring Service
+                    </button>
+                </div>
             </div>
 
-            <div id="nav-admin-section" style="display: none;">
-            <div class="text-[9px] text-white/40 font-black uppercase px-3 pt-6 pb-2 tracking-widest">System Control</div>
-            <button onclick="navigate('manage-users')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="manage-users">
-                <i class="fas fa-user-shield w-8 group-hover:scale-110 transition-transform"></i> Kelola User
-            </button>
-            <button onclick="navigate('pengaturan')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="pengaturan">
-                <i class="fas fa-paint-roller w-8 group-hover:scale-110 transition-transform"></i> Pengaturan Tema
-            </button>
+            <div id="nav-daily-group" class="menu-group">
+                <div class="menu-group-toggle px-3 pt-4 pb-3 rounded-lg transition-colors" onclick="toggleMenuGroup('daily')">
+                    <div class="menu-group-label">
+                        <i class="fas fa-clock text-purple-300"></i> Daily Operations
+                    </div>
+                    <span class="menu-group-toggle-icon text-white/40 hover:text-white/60"><i class="fas fa-chevron-down text-sm"></i></span>
+                </div>
+                <div class="menu-items space-y-1 px-2">
+                    <button onclick="navigate('daily-hm')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="daily-hm">
+                        <i class="fas fa-tachometer-alt w-8 group-hover:scale-110 transition-transform"></i> Input Daily HM
+                    </button>
+                </div>
+            </div>
+            
+            <div id="nav-database-section" class="menu-group">
+                <div class="menu-group-toggle px-3 pt-6 pb-3 rounded-lg transition-colors" onclick="toggleMenuGroup('database')">
+                    <div class="menu-group-label">
+                        <i class="fas fa-database text-green-300"></i> Master Data
+                    </div>
+                    <span class="menu-group-toggle-icon text-white/40 hover:text-white/60"><i class="fas fa-chevron-down text-sm"></i></span>
+                </div>
+                <div class="menu-items space-y-1 px-2">
+                    <button onclick="navigate('master-plan')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-plan">
+                        <i class="fas fa-calendar-alt w-8 group-hover:scale-110 transition-transform"></i> Plan Alat & Service
+                    </button>
+                    <button onclick="navigate('master-equip')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-equip">
+                        <i class="fas fa-truck-pickup w-8 group-hover:scale-110 transition-transform"></i> Equipments
+                    </button>
+                    <button onclick="navigate('master-parts')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-parts">
+                        <i class="fas fa-cogs w-8 group-hover:scale-110 transition-transform"></i> Spareparts
+                    </button>
+                    <button onclick="navigate('master-comp')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="master-comp">
+                        <i class="fas fa-layer-group w-8 group-hover:scale-110 transition-transform"></i> Komponen
+                    </button>
+                </div>
+            </div>
+
+            <div id="nav-admin-section" class="menu-group">
+                <div class="menu-group-toggle px-3 pt-6 pb-3 rounded-lg transition-colors" onclick="toggleMenuGroup('admin')">
+                    <div class="menu-group-label">
+                        <i class="fas fa-cog text-red-300"></i> System Control
+                    </div>
+                    <span class="menu-group-toggle-icon text-white/40 hover:text-white/60"><i class="fas fa-chevron-down text-sm"></i></span>
+                </div>
+                <div class="menu-items space-y-1 px-2">
+                    <button onclick="navigate('manage-users')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="manage-users">
+                        <i class="fas fa-user-shield w-8 group-hover:scale-110 transition-transform"></i> Kelola User
+                    </button>
+                    <button onclick="navigate('pengaturan')" class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group" data-page="pengaturan">
+                        <i class="fas fa-paint-roller w-8 group-hover:scale-110 transition-transform"></i> Pengaturan Tema
+                    </button>
+                </div>
             </div>
         </nav>
 
@@ -1521,6 +1602,9 @@
             if(nAd) nAd.style.display = r.includes('PLANNER') ? 'block' : 'none';
         }
 
+        // Restore sidebar preferences setelah role-based visibility selesai
+        restoreSidebarPreferences();
+        
         initTimeSelectors();
         globalDataSync(); 
         navigate('dashboard');
@@ -1728,8 +1812,39 @@
         }
 
         function toggleSidebar() {
-        const sb = document.getElementById('sidebar'); if(sb) sb.classList.toggle('open');
-        const sbo = document.getElementById('sidebarOverlay'); if(sbo) sbo.classList.toggle('active');
+            const sb = document.getElementById('sidebar'); if(sb) sb.classList.toggle('open');
+            const sbo = document.getElementById('sidebarOverlay'); if(sbo) sbo.classList.toggle('active');
+        }
+
+        // Toggle Menu Group dengan localStorage persistence
+        window.toggleMenuGroup = function(groupName) {
+            const groupId = `nav-${groupName}-${groupName === 'database' ? 'section' : 'group'}`;
+            const group = document.getElementById(groupId);
+            if(!group) return;
+            
+            // Skip if group is hidden (role-based visibility)
+            if(group.style.display === 'none') return;
+            
+            group.classList.toggle('collapsed');
+            
+            // Simpan preference ke localStorage
+            const preferences = JSON.parse(localStorage.getItem('sidebarMenuPrefs') || '{}');
+            preferences[groupName] = group.classList.contains('collapsed');
+            localStorage.setItem('sidebarMenuPrefs', JSON.stringify(preferences));
+        }
+
+        // Restore menu preferences setelah role-based visibility selesai
+        window.restoreSidebarPreferences = function() {
+            const preferences = JSON.parse(localStorage.getItem('sidebarMenuPrefs') || '{}');
+            
+            Object.keys(preferences).forEach(groupName => {
+                const groupId = `nav-${groupName}-${groupName === 'database' ? 'section' : 'group'}`;
+                const group = document.getElementById(groupId);
+                // Only restore if not hidden by role-based logic
+                if(group && preferences[groupName] && group.style.display !== 'none') {
+                    group.classList.add('collapsed');
+                }
+            });
         }
 
         function startLoading(t) { 
