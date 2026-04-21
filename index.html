@@ -1123,6 +1123,55 @@
                 <tbody id="userTableBody" class="divide-y divide-slate-50 font-medium text-slate-700"></tbody>
                 </table>
             </div>
+
+            <!-- SECTION: KELOLA AKSES USER -->
+            <div class="mt-12 pt-12 border-t border-slate-200">
+                <h3 class="text-lg md:text-xl font-black text-theme-main uppercase tracking-tighter mb-6"><i class="fas fa-shield-alt mr-2"></i> Kelola Akses Menu User</h3>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8">
+                    <p class="text-xs md:text-sm text-blue-700 font-bold"><i class="fas fa-info-circle mr-2"></i> Pilih user untuk melihat dan mengelola akses menu apa saja yang bisa diakses oleh user tersebut.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="space-y-2">
+                        <label class="text-[9px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest">Pilih User</label>
+                        <select id="access_username" onchange="loadUserAccess()" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-theme-accent outline-none font-bold shadow-sm cursor-pointer text-sm">
+                            <option value="">-- Pilih User --</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest">Tambah Menu Akses</label>
+                        <select id="access_feature" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-theme-accent outline-none font-bold shadow-sm cursor-pointer text-sm">
+                            <option value="">-- Pilih Menu --</option>
+                            <option value="dashboard">KPI Dashboard</option>
+                            <option value="buat-wo">Buat Work Order</option>
+                            <option value="backlog">Backlog Management</option>
+                            <option value="aktifitas">Laporan Aktifitas</option>
+                            <option value="input-service">Input Service (PM)</option>
+                            <option value="list-wo">Monitoring Service</option>
+                            <option value="daily-hm">Input Daily HM</option>
+                            <option value="master-plan">Plan Alat & Service</option>
+                            <option value="master-equip">Equipments</option>
+                            <option value="master-parts">Spareparts</option>
+                            <option value="master-comp">Komponen</option>
+                            <option value="manage-users">Kelola User</option>
+                            <option value="pengaturan">Pengaturan Tema</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="addUserAccess()" class="w-full bg-green-600 text-white font-black py-3 rounded-xl hover:bg-green-700 transition-all uppercase tracking-[0.15em] text-[9px] active:scale-95"><i class="fas fa-plus mr-2"></i> Tambah Akses</button>
+                    </div>
+                </div>
+
+                <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
+                        <h4 class="text-sm font-black text-slate-700 uppercase tracking-widest"><i class="fas fa-list mr-2"></i> Akses Menu untuk: <span id="selectedUserDisplay" class="text-theme-accent">-</span></h4>
+                    </div>
+                    <div id="userAccessList" class="divide-y divide-slate-50 max-h-96 overflow-y-auto">
+                        <div class="p-6 text-center text-slate-400 font-medium">Pilih user untuk melihat akses mereka</div>
+                    </div>
+                </div>
+            </div>
             </div>
         </section>
 
@@ -1448,6 +1497,7 @@
         let masterCache = { equip: [], parts: [], planAlat: [], dailyHM: [], components: [], usersData: [], mekanikList: [], pelaporList: [], activities: [], serviceHistory: [] };
         let partsDictCache = []; 
         let allUsersCache = [];
+        let globalDataSync_userAccess = {}; // Store user access control data
         
         let currentMonPage = 1, currentEqPage = 1, currentPtPage = 1, currentHmPage = 1;
         const ITEMS_PER_PAGE = 50;
@@ -1606,7 +1656,8 @@
         restoreSidebarPreferences();
         
         initTimeSelectors();
-        globalDataSync(); 
+        globalDataSync();
+        applyUserAccessVisibility();
         navigate('dashboard');
         }
 
@@ -1684,6 +1735,15 @@
                 backlogCache = fb.backlogs ? Object.values(fb.backlogs) : [];
                 partsDictCache = masterCache.parts;
                 allUsersCache = masterCache.usersData;
+                
+                                // Load user access data - ambil dari GAS karena disimpan di UserAccess sheet
+                                fetchGAS('getAllUserAccess', {}, function(res) {
+                                    if(res.success && res.data) {
+                                        globalDataSync_userAccess = res.data;
+                                        populateAccessUserList();
+                                        if (currentUser) applyUserAccessVisibility();
+                                    }
+                                });
 
                 // Render UI
                 const le = document.getElementById('listEquip');
@@ -1845,6 +1905,41 @@
                     group.classList.add('collapsed');
                 }
             });
+        }
+
+        // Apply access control - hide menu items berdasarkan UserAccess data
+        window.applyUserAccessVisibility = function() {
+            if(!currentUser) return;
+            
+            const userAccess = globalDataSync_userAccess || {};
+            const allowedFeatures = userAccess[currentUser.username] || [];
+            
+            // If user has specific access restrictions
+            if(allowedFeatures.length > 0) {
+              // Hide ALL menu buttons first
+              document.querySelectorAll('.nav-btn').forEach(btn => {
+                const page = btn.getAttribute('data-page');
+                // Hide if feature is in allowedFeatures
+                if(page && !allowedFeatures.includes(page)) {
+                  btn.style.display = 'none';
+                }
+              });
+              
+              // Also hide menu groups if all their items are hidden
+              const groups = ['service', 'daily', 'database', 'admin'];
+              groups.forEach(groupName => {
+                const groupId = `nav-${groupName}-${groupName === 'database' ? 'section' : 'group'}`;
+                const group = document.getElementById(groupId);
+                if(!group) return;
+                
+                const items = group.querySelectorAll('.nav-btn');
+                const allHidden = Array.from(items).every(btn => btn.style.display === 'none');
+                
+                if(allHidden) {
+                  group.style.display = 'none';
+                }
+              });
+            }
         }
 
         function startLoading(t) { 
@@ -2811,7 +2906,20 @@
         function loadUsers() {
             // Karena data user sudah ditarik oleh globalDataSync() dari Firebase, 
             // kita tidak perlu fetchGAS lagi, langsung render saja!
-            renderUserTable(); 
+            renderUserTable();
+            
+            // Load user access data if not loaded yet
+            if(!globalDataSync_userAccess || Object.keys(globalDataSync_userAccess).length === 0) {
+                            fetchGAS('getAllUserAccess', {}, function(res) {
+                                if(res.success && res.data) {
+                                    globalDataSync_userAccess = res.data;
+                                    populateAccessUserList();
+                                    if (currentUser) applyUserAccessVisibility();
+                                }
+                            });
+            } else {
+              populateAccessUserList();
+            }
         }
 
         function renderUserTable() {
@@ -2819,6 +2927,134 @@
         if(!tbody) return;
         if (!allUsersCache || allUsersCache.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400 font-bold">Data kosong.</td></tr>'; return; }
         tbody.innerHTML = allUsersCache.map(u => `<tr class="hover:bg-slate-50 border-b"><td class="p-4 font-black text-slate-800">${u.username}</td><td class="p-4 font-medium">${u.nama}</td><td class="p-4"><span class="px-3 py-1.5 bg-theme-main/10 text-theme-main rounded-lg font-black text-[9px] uppercase tracking-widest">${u.role}</span></td><td class="p-4 text-right"><button onclick="deleteUserAccount('${u.username}')" class="w-8 h-8 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white ml-auto flex items-center justify-center"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+        
+        // Populate user dropdown untuk access control
+        populateAccessUserList();
+        }
+
+        // ==========================================
+        // USER ACCESS CONTROL FUNCTIONS
+        // ==========================================
+        function populateAccessUserList() {
+          const select = document.getElementById('access_username');
+          if(!select || !allUsersCache) return;
+          const currentValue = select.value;
+          select.innerHTML = '<option value="">-- Pilih User --</option>';
+          allUsersCache.forEach(u => {
+            select.innerHTML += `<option value="${u.username}">${u.username} (${u.nama})</option>`;
+          });
+          if(currentValue) select.value = currentValue;
+        }
+
+        function loadUserAccess() {
+          const username = document.getElementById('access_username').value;
+          if(!username) {
+            document.getElementById('userAccessList').innerHTML = '<div class="p-6 text-center text-slate-400 font-medium">Pilih user untuk melihat akses mereka</div>';
+            document.getElementById('selectedUserDisplay').textContent = '-';
+            return;
+          }
+
+          document.getElementById('selectedUserDisplay').textContent = username;
+          
+          const userAccess = globalDataSync_userAccess || {};
+          const features = userAccess[username] || [];
+          
+          if(features.length === 0) {
+            document.getElementById('userAccessList').innerHTML = '<div class="p-6 text-center text-slate-400 font-medium">User ini belum memiliki akses menu apapun</div>';
+            return;
+          }
+
+          const featureLabels = {
+            'dashboard': 'KPI Dashboard',
+            'buat-wo': 'Buat Work Order',
+            'backlog': 'Backlog Management',
+            'aktifitas': 'Laporan Aktifitas',
+            'input-service': 'Input Service (PM)',
+            'list-wo': 'Monitoring Service',
+            'daily-hm': 'Input Daily HM',
+            'master-plan': 'Plan Alat & Service',
+            'master-equip': 'Equipments',
+            'master-parts': 'Spareparts',
+            'master-comp': 'Komponen',
+            'manage-users': 'Kelola User',
+            'pengaturan': 'Pengaturan Tema'
+          };
+
+          document.getElementById('userAccessList').innerHTML = features.map(f => `
+            <div class="p-4 flex justify-between items-center hover:bg-slate-50">
+              <div class="flex-1">
+                <div class="font-bold text-slate-800">${featureLabels[f] || f}</div>
+                <div class="text-[10px] text-slate-500 font-mono">${f}</div>
+              </div>
+              <button onclick="deleteUserAccessItem('${username}', '${f}')" class="px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all text-[9px] font-bold uppercase tracking-widest">Hapus</button>
+            </div>
+          `).join('');
+        }
+
+        function addUserAccess() {
+          const username = document.getElementById('access_username').value;
+          const feature = document.getElementById('access_feature').value;
+
+          if(!username) return Swal.fire('Peringatan', 'Pilih user terlebih dahulu!', 'warning');
+          if(!feature) return Swal.fire('Peringatan', 'Pilih menu/fitur yang ingin ditambahkan!', 'warning');
+
+          startLoading("MENAMBAHKAN AKSES USER...");
+
+          const userAccess = globalDataSync_userAccess || {};
+          const currentFeatures = userAccess[username] || [];
+          
+          if(currentFeatures.includes(feature)) {
+            stopLoading();
+            return Swal.fire('Info', 'User sudah memiliki akses menu ini!', 'info');
+          }
+
+          const newFeatures = [...currentFeatures, feature];
+
+          sendGAS('saveUserAccess', { username: username, features: newFeatures }, function(res) {
+            stopLoading();
+                    if(res.success) {
+                            Swal.fire('Sukses', 'Akses user berhasil ditambahkan!', 'success');
+                            globalDataSync_userAccess[username] = newFeatures;
+                            document.getElementById('access_feature').value = '';
+                            loadUserAccess();
+                            // Terapkan visibilitas setelah update akses
+                            applyUserAccessVisibility();
+                        } else {
+              Swal.fire('Error', res.message || 'Gagal menambahkan akses', 'error');
+            }
+          });
+        }
+
+        function deleteUserAccessItem(username, feature) {
+          Swal.fire({
+            title: 'Hapus Akses?',
+            text: `Yakin ingin menghapus akses menu ini dari user ${username}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b'
+          }).then(result => {
+            if(!result.isConfirmed) return;
+
+            startLoading("MENGHAPUS AKSES USER...");
+
+            const userAccess = globalDataSync_userAccess || {};
+            const currentFeatures = userAccess[username] || [];
+            const newFeatures = currentFeatures.filter(f => f !== feature);
+
+            sendGAS('saveUserAccess', { username: username, features: newFeatures }, function(res) {
+              stopLoading();
+                        if(res.success) {
+                                Swal.fire('Sukses', 'Akses user berhasil dihapus!', 'success');
+                                globalDataSync_userAccess[username] = newFeatures;
+                                loadUserAccess();
+                                // Terapkan visibilitas setelah update akses
+                                applyUserAccessVisibility();
+                            } else {
+                Swal.fire('Error', res.message || 'Gagal menghapus akses', 'error');
+              }
+            });
+          });
         }
 
         // ==========================================
