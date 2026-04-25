@@ -1239,6 +1239,10 @@
                                     class="px-5 py-3 md:px-6 md:py-3 bg-theme-main text-white rounded-xl md:rounded-2xl font-black text-[9px] md:text-[10px] tracking-widest shadow-lg hover:opacity-90 transition-all uppercase"><i
                                         class="fas fa-sync-alt md:mr-2"></i> <span
                                         class="hidden md:inline">Sync</span></button>
+                                <button onclick="openBDModal()"
+                                    class="px-5 py-3 md:px-6 md:py-3 bg-red-500 text-white rounded-xl md:rounded-2xl font-black text-[9px] md:text-[10px] tracking-widest shadow-lg hover:bg-red-600 transition-all uppercase"><i
+                                        class="fas fa-plus md:mr-2"></i> <span
+                                        class="hidden md:inline">Laporan BD Awal</span></button>
                             </div>
                         </div>
                     </div>
@@ -1263,11 +1267,11 @@
                                     class="bg-slate-50 border-b border-slate-100 text-[9px] md:text-[10px] uppercase font-black text-slate-500 tracking-widest">
                                     <tr>
                                         <th class="p-4 md:p-6 w-32">EQUIP NO</th>
-                                        <th class="p-4 md:p-6 text-center w-32">PLAN HM</th>
-                                        <th class="p-4 md:p-6 text-center w-32">PLAN DATE</th>
-                                        <th class="p-4 md:p-6 text-center w-32">ACTUAL HM</th>
-                                        <th class="p-4 md:p-6 text-center w-32">ACTUAL DATE</th>
-                                        <th class="p-4 md:p-6 text-center w-24">DEVIASI</th>
+                                        <th class="p-4 md:p-6 text-center w-32">NO ID</th>
+                                        <th class="p-4 md:p-6 text-center w-32">PROBLEM</th>
+                                        <th class="p-4 md:p-6 text-center w-32">TGL & JAM BD</th>
+                                        <th class="p-4 md:p-6 text-center w-32">STATUS</th>
+                                        <th class="p-4 md:p-6 text-center w-24">PRINT DAN EDIT</th>
                                     </tr>
                                 </thead>
                                 <tbody id="woTableBody"
@@ -2128,6 +2132,46 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <!-- Modal Laporan BD Awal -->
+    <div id="modalBDAwal" class="fixed inset-0 bg-slate-900/80 z-[9999] hidden flex flex-col items-center justify-center backdrop-blur-md transition-all">
+        <div class="bg-white w-full max-w-lg rounded-2xl md:rounded-[2rem] shadow-2xl overflow-hidden animate-slideUp">
+            <div class="bg-red-500 p-4 md:p-6 flex justify-between items-center relative overflow-hidden">
+                <div class="absolute -right-6 -top-6 text-white opacity-10 text-6xl transform rotate-12"><i class="fas fa-tools"></i></div>
+                <h3 class="text-white font-black text-sm md:text-lg uppercase tracking-widest relative z-10"><i class="fas fa-file-signature mr-2"></i> Input Laporan BD Awal</h3>
+                <button onclick="closeBDModal()" class="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full text-white transition-colors relative z-10"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="formBDAwal" onsubmit="handleSaveBDAwal(event)" class="p-4 md:p-6 space-y-4">
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip No (Wajib)</label>
+                    <input type="text" id="bd_equip_no" list="listEquip" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-black uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" placeholder="Ketik Kode Unit" required>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">No ID / No WO (Opsional)</label>
+                    <input type="text" id="bd_no_id" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-slate-50" placeholder="Kosongkan untuk otomatis">
+                    <small id="bd_next_wo_info" class="text-[10px] font-bold text-red-500 block mt-1 ml-1"></small>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Problem / Kendala Awal</label>
+                    <textarea id="bd_problem" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-red-400 outline-none resize-none h-20 text-sm shadow-sm" placeholder="Deskripsi kendala kerusakan..." required></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Tgl BD</label>
+                        <input type="date" id="bd_tgl" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Jam BD</label>
+                        <input type="time" id="bd_jam" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" required>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-slate-100 flex gap-3">
+                    <button type="button" onclick="closeBDModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-black rounded-xl uppercase tracking-widest text-[10px] hover:bg-slate-200 transition-colors">Batal</button>
+                    <button type="submit" class="flex-1 py-3 bg-red-500 text-white font-black rounded-xl uppercase tracking-widest text-[10px] shadow-lg shadow-red-500/30 hover:bg-red-600 transition-colors">Simpan Laporan</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         // ==========================================
@@ -3626,13 +3670,13 @@
                 const kendalaText = i.kendala || '<span class="italic opacity-50">Tidak ada deskripsi</span>';
 
                 return `<tr class="hover:bg-slate-50 border-b transition-colors">
-                    <td class="p-4 font-black text-slate-900 text-xs md:text-sm">${i.no_wo}</td>
                     <td class="p-4"><div class="font-black text-base md:text-lg text-theme-accent uppercase">${unitNo}</div><div class="text-[9px] md:text-[10px] font-bold text-slate-500 mt-1 uppercase">HM: ${actualHM} | Tipe: ${i.unit_type || '-'}</div>${backlogBadge}</td>
+                    <td class="p-4 font-black text-slate-900 text-xs md:text-sm text-center">${i.no_wo}</td>
                     <td class="p-4 py-5"><div class="text-xs font-bold text-red-700 bg-red-50/80 p-3 rounded-xl border border-red-100/50 line-clamp-2 leading-relaxed" title="${i.kendala || ''}">${kendalaText}</div></td>
-                    <td class="p-4 text-xs md:text-sm">${i.tgl_rusak || '-'} <br><span class="font-bold text-slate-500 text-[9px] md:text-[10px]"><i class="far fa-clock"></i> ${safeJamR}</span></td>
+                    <td class="p-4 text-xs md:text-sm text-center">${i.tgl_rusak || '-'} <br><span class="font-bold text-slate-500 text-[9px] md:text-[10px]"><i class="far fa-clock"></i> ${safeJamR}</span></td>
                     <td class="p-4 text-center"><span class="px-3 py-1.5 rounded-xl text-[9px] font-black shadow-sm ${stCol}">${i.status || 'OPEN'}</span></td>
                     <td class="p-4 text-right pr-6">
-                        <div class="flex justify-end gap-2">${actionButtons}</div>
+                        <div class="flex justify-center gap-2">${actionButtons}</div>
                     </td>
                     </tr>`;
             }).join('');
@@ -4314,6 +4358,30 @@
             }
         }
 
+        function generateNextWONumber() {
+            const d = new Date();
+            const yy = d.getFullYear().toString().slice(-2);
+            const mm = ('0' + (d.getMonth() + 1)).slice(-2);
+            const prefix = yy + mm + '-';
+
+            let maxSeq = 0;
+            if (typeof woDataCache !== 'undefined' && woDataCache.length > 0) {
+                woDataCache.forEach(wo => {
+                    const noWo = String(wo.no_wo || '').trim();
+                    const match = noWo.match(/^\d{4}-(\d{4})$/);
+                    if (match) {
+                        const seq = parseInt(match[1], 10);
+                        if (seq > maxSeq) {
+                            maxSeq = seq;
+                        }
+                    }
+                });
+            }
+
+            const nextSeq = (maxSeq + 1).toString().padStart(4, '0');
+            return prefix + nextSeq;
+        }
+
         async function handleSaveWO(e) {
             e.preventDefault();
 
@@ -4332,15 +4400,10 @@
                 }
             });
 
-            // 2. Ambil Input WO atau Generate Otomatis (Format: WOYYMMDD + 4 Huruf Acak)
+            // 2. Ambil Input WO atau Generate Otomatis (Format: YYMM-XXXX)
             let noWoInput = document.getElementById('no_wo').value.trim().toUpperCase();
             if (!noWoInput) {
-                const d = new Date();
-                const dateStr = d.getFullYear().toString().slice(-2) +
-                    ('0' + (d.getMonth() + 1)).slice(-2) +
-                    ('0' + d.getDate()).slice(-2);
-                const randomChar = Math.random().toString(36).substring(2, 6).toUpperCase();
-                noWoInput = "WO" + dateStr + randomChar;
+                noWoInput = generateNextWONumber();
             }
 
             // 3. Tarik data action_log jika sedang mode edit WO (Tarik dari cache lokal Firebase)
@@ -5423,6 +5486,54 @@
 
             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Export Berhasil!', showConfirmButton: false, timer: 2000 });
         };
+
+        function openBDModal() {
+            const modal = document.getElementById('modalBDAwal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.getElementById('formBDAwal').reset();
+                document.getElementById('bd_tgl').value = getShiftDate();
+                const nextWoInfo = document.getElementById('bd_next_wo_info');
+                if (nextWoInfo) {
+                    nextWoInfo.innerText = "Otomatis selanjutnya: " + generateNextWONumber();
+                }
+            }
+        }
+
+        function closeBDModal() {
+            const modal = document.getElementById('modalBDAwal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        async function handleSaveBDAwal(e) {
+            e.preventDefault();
+            let noIdInput = document.getElementById('bd_no_id').value.trim().toUpperCase();
+            if (!noIdInput) {
+                noIdInput = generateNextWONumber();
+            }
+
+            const payload = {
+                no_wo: noIdInput,
+                equip_no: document.getElementById('bd_equip_no').value.toUpperCase(),
+                kendala: document.getElementById('bd_problem').value,
+                tgl_rusak: document.getElementById('bd_tgl').value,
+                jam_rusak: document.getElementById('bd_jam').value,
+                status: 'OPEN',
+                last_sync: new Date().toISOString()
+            };
+
+            startLoading("MENYIMPAN LAPORAN BD AWAL...");
+            try {
+                await db.ref('work_orders/' + noIdInput).set(payload);
+                endLoading();
+                closeBDModal();
+                Swal.fire('Sukses', 'Laporan BD Awal tersimpan sebagai WO (OPEN).', 'success');
+            } catch (err) {
+                endLoading();
+                console.error("Save BD Awal Error:", err);
+                Swal.fire('Error', err.toString(), 'error');
+            }
+        }
 
         function backupToGoogleSheets() {
             startLoading("MEMBACA DATA FIREBASE...");
