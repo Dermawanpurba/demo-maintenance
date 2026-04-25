@@ -18,7 +18,17 @@
         :root {
             --theme-main: #0f172a;
             --theme-accent: #3b82f6;
+            --theme-text: #ffffff;
         }
+
+        /* Dynamic Theme Colors for Sidebar */
+        #sidebar .text-white { color: var(--theme-text) !important; }
+        #sidebar .text-white\/80 { color: color-mix(in srgb, var(--theme-text) 80%, transparent) !important; }
+        #sidebar .text-white\/60 { color: color-mix(in srgb, var(--theme-text) 60%, transparent) !important; }
+        #sidebar .text-white\/40 { color: color-mix(in srgb, var(--theme-text) 40%, transparent) !important; }
+        #sidebar .bg-white\/10 { background-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important; }
+        #sidebar .hover\:bg-white\/10:hover { background-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important; }
+        #sidebar .border-white\/10 { border-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -501,7 +511,7 @@
                     </div>
                 </div>
 
-                <div id="nav-admin-section" class="menu-group">
+                <div id="nav-admin-group" class="menu-group">
                     <div class="menu-group-toggle px-3 pt-6 pb-3 rounded-lg transition-colors"
                         onclick="toggleMenuGroup('admin')">
                         <div class="menu-group-label">
@@ -1862,9 +1872,9 @@
                                     <label
                                         class="text-[9px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest">Tambah
                                         Menu Akses</label>
-                                    <select id="access_feature"
-                                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-theme-accent outline-none font-bold shadow-sm cursor-pointer text-sm">
-                                        <option value="">-- Pilih Menu --</option>
+                                    <select id="access_feature" multiple title="Tahan CTRL untuk memilih beberapa menu sekaligus"
+                                        class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-theme-accent outline-none font-bold shadow-sm cursor-pointer text-sm h-32">
+                                        <option value="" disabled>-- Pilih Menu (Bisa Banyak) --</option>
                                         <option value="dashboard">KPI Dashboard</option>
                                         <option value="buat-wo">Buat Work Order</option>
                                         <option value="backlog">Backlog Management</option>
@@ -1933,15 +1943,15 @@
                                     class="block text-[10px] md:text-[11px] font-black text-slate-500 mb-3 md:mb-4 uppercase tracking-widest">Warna
                                     Tema Aplikasi</label>
                                 <div class="flex gap-4 md:gap-6 items-center">
-                                    <input type="color" id="conf_color"
-                                        class="h-12 w-24 md:h-16 md:w-32 rounded-xl cursor-pointer border-2 border-white shadow-md p-0">
+                                    <select id="conf_color" class="w-full md:w-1/2 px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none text-sm shadow-sm" onchange="document.getElementById('conf_color_display').innerText = this.options[this.selectedIndex].text">
+                                        <option value="#0f172a">Dark Mode (Hitam)</option>
+                                        <option value="#ffffff">Light Mode (Putih)</option>
+                                    </select>
                                     <div>
                                         <p
                                             class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">
-                                            Kode Hex</p>
-                                        <span
-                                            class="text-base md:text-lg text-slate-700 font-mono font-black bg-white px-3 md:px-4 py-1.5 md:py-2 rounded-xl border border-slate-200 shadow-sm"
-                                            id="hexDisplay">#0f172a</span>
+                                            Mode Terpilih</p>
+                                        <p class="text-sm md:text-base font-black text-slate-700" id="conf_color_display">Dark Mode (Hitam)</p>
                                     </div>
                                 </div>
                             </div>
@@ -2146,11 +2156,18 @@
                     <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip No (Wajib)</label>
                     <input type="text" id="bd_equip_no" list="listEquip" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-black uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" placeholder="Ketik Kode Unit" required>
                 </div>
-                <div class="space-y-2">
-                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">No ID / No WO (Opsional)</label>
-                    <input type="text" id="bd_no_id" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-slate-50" placeholder="Kosongkan untuk otomatis">
-                    <small id="bd_next_wo_info" class="text-[10px] font-bold text-red-500 block mt-1 ml-1"></small>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="space-y-2 col-span-2">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest" title="Kosongkan untuk otomatis">No ID / No WO</label>
+                        <input type="text" id="bd_no_id" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-slate-50" placeholder="Kosongkan u/ otomatis">
+                    </div>
+                    <div class="space-y-2 col-span-1">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest" title="Ketik urutan WO terakhir di database untuk memperbaiki urutan otomatis jika salah">Set Akhir</label>
+                        <input type="number" id="bd_last_seq" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-yellow-50 text-center" placeholder="Auto" oninput="saveManualSeq(this.value)">
+                    </div>
                 </div>
+                <small id="bd_next_wo_info" class="text-[10px] font-bold text-red-500 block mt-1 ml-1"></small>
+            </div>
                 <div class="space-y-2">
                     <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Problem / Kendala Awal</label>
                     <textarea id="bd_problem" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-red-400 outline-none resize-none h-20 text-sm shadow-sm" placeholder="Deskripsi kendala kerusakan..." required></textarea>
@@ -2395,7 +2412,14 @@
 
         function applySettingsUI(payload) {
             // 1. Terapkan Warna Tema & Nama Perusahaan
-            if (payload.ThemeColor) document.documentElement.style.setProperty('--theme-main', payload.ThemeColor);
+            if (payload.ThemeColor) {
+                document.documentElement.style.setProperty('--theme-main', payload.ThemeColor);
+                if (payload.ThemeColor.toLowerCase() === '#ffffff') {
+                    document.documentElement.style.setProperty('--theme-text', '#0f172a');
+                } else {
+                    document.documentElement.style.setProperty('--theme-text', '#ffffff');
+                }
+            }
             if (payload.CompanyName) document.querySelectorAll('.company-display-name').forEach(el => el.innerText = payload.CompanyName);
 
             const wrappers = document.querySelectorAll('.dynamic-logo-wrapper');
@@ -2450,7 +2474,7 @@
             // 1. Reset Semua Navigasi & Elemen ke Status Default (Mencegah bug saat ganti akun)
             document.querySelectorAll('.nav-btn').forEach(b => b.style.display = 'flex');
             const nDb = document.getElementById('nav-database-section'); if (nDb) nDb.style.display = 'block';
-            const nAd = document.getElementById('nav-admin-section'); if (nAd) nAd.style.display = 'none';
+            const nAd = document.getElementById('nav-admin-group'); if (nAd) nAd.style.display = 'none';
             const nDl = document.getElementById('nav-daily-group'); if (nDl) nDl.style.display = 'block';
             const btnWoBanner = document.getElementById('dash-btn-wo'); if (btnWoBanner) btnWoBanner.style.display = 'block';
 
@@ -3839,25 +3863,21 @@
 
         function addUserAccess() {
             const username = document.getElementById('access_username').value;
-            const feature = document.getElementById('access_feature').value;
+            const featureSelect = document.getElementById('access_feature');
+            const selectedFeatures = Array.from(featureSelect.selectedOptions).map(opt => opt.value);
 
             if (!username) return Swal.fire('Peringatan', 'Pilih user terlebih dahulu!', 'warning');
-            if (!feature) return Swal.fire('Peringatan', 'Pilih menu/fitur yang ingin ditambahkan!', 'warning');
+            if (selectedFeatures.length === 0) return Swal.fire('Peringatan', 'Pilih minimal satu menu/fitur!', 'warning');
 
             startLoading("MENAMBAHKAN AKSES USER...");
 
             const userAccess = globalDataSync_userAccess || {};
             const currentFeatures = userAccess[username] || [];
 
-            if (currentFeatures.includes(feature)) {
-                stopLoading();
-                return Swal.fire('Info', 'User sudah memiliki akses menu ini!', 'info');
-            }
-
-            const newFeatures = [...currentFeatures, feature];
+            const newFeatures = [...new Set([...currentFeatures, ...selectedFeatures])];
 
             sendGAS('saveUserAccess', { username: username, features: newFeatures }, function (res) {
-                stopLoading();
+                endLoading();
                 if (res.success) {
                     Swal.fire('Sukses', 'Akses user berhasil ditambahkan!', 'success');
                     globalDataSync_userAccess[username] = newFeatures;
@@ -4358,17 +4378,40 @@
             }
         }
 
+        function saveManualSeq(val) {
+            if(val && val.trim() !== '') {
+                localStorage.setItem('manual_last_wo_seq', val);
+            } else {
+                localStorage.removeItem('manual_last_wo_seq');
+            }
+            updateNextWoInfo();
+        }
+
+        function updateNextWoInfo() {
+            const nextWoInfo = document.getElementById('bd_next_wo_info');
+            if (nextWoInfo) {
+                nextWoInfo.innerText = "Otomatis selanjutnya: " + generateNextWONumber();
+            }
+        }
+
         function generateNextWONumber() {
             const d = new Date();
             const yy = d.getFullYear().toString().slice(-2);
             const mm = ('0' + (d.getMonth() + 1)).slice(-2);
             const prefix = yy + mm + '-';
 
+            const manualSeq = localStorage.getItem('manual_last_wo_seq');
+            if (manualSeq && manualSeq.trim() !== '') {
+                const seq = parseInt(manualSeq, 10);
+                return prefix + (seq + 1).toString().padStart(4, '0');
+            }
+
             let maxSeq = 0;
             if (typeof woDataCache !== 'undefined' && woDataCache.length > 0) {
+                const regexYear = new RegExp('^' + yy + '\\d{2}-(\\d{4})$');
                 woDataCache.forEach(wo => {
                     const noWo = String(wo.no_wo || '').trim();
-                    const match = noWo.match(/^\d{4}-(\d{4})$/);
+                    const match = noWo.match(regexYear);
                     if (match) {
                         const seq = parseInt(match[1], 10);
                         if (seq > maxSeq) {
@@ -4404,6 +4447,8 @@
             let noWoInput = document.getElementById('no_wo').value.trim().toUpperCase();
             if (!noWoInput) {
                 noWoInput = generateNextWONumber();
+                const match = noWoInput.match(/-(\d{4})$/);
+                if (match) localStorage.setItem('manual_last_wo_seq', parseInt(match[1], 10).toString());
             }
 
             // 3. Tarik data action_log jika sedang mode edit WO (Tarik dari cache lokal Firebase)
@@ -5493,10 +5538,12 @@
                 modal.classList.remove('hidden');
                 document.getElementById('formBDAwal').reset();
                 document.getElementById('bd_tgl').value = getShiftDate();
-                const nextWoInfo = document.getElementById('bd_next_wo_info');
-                if (nextWoInfo) {
-                    nextWoInfo.innerText = "Otomatis selanjutnya: " + generateNextWONumber();
-                }
+                
+                const savedSeq = localStorage.getItem('manual_last_wo_seq');
+                const lastSeqInput = document.getElementById('bd_last_seq');
+                if (lastSeqInput) lastSeqInput.value = savedSeq || "";
+                
+                updateNextWoInfo();
             }
         }
 
@@ -5510,6 +5557,8 @@
             let noIdInput = document.getElementById('bd_no_id').value.trim().toUpperCase();
             if (!noIdInput) {
                 noIdInput = generateNextWONumber();
+                const match = noIdInput.match(/-(\d{4})$/);
+                if (match) localStorage.setItem('manual_last_wo_seq', parseInt(match[1], 10).toString());
             }
 
             const payload = {
