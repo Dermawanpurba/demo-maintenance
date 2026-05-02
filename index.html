@@ -4176,7 +4176,7 @@
             const hh = ['jam_rusak_hh', 'jam_selesai_hh'];
             const mm = ['jam_rusak_mm', 'jam_selesai_mm'];
             hh.forEach(id => { const sel = document.getElementById(id); if (sel) { sel.innerHTML = '<option value="">HH</option>'; for (let i = 0; i < 24; i++) { let v = i.toString().padStart(2, '0'); sel.innerHTML += `<option value="${v}">${v}</option>`; } } });
-            mm.forEach(id => { const sel = document.getElementById(id); if (sel) { sel.innerHTML = '<option value="">MM</option>'; for (let i = 0; i < 60; i += 5) { let v = i.toString().padStart(2, '0'); sel.innerHTML += `<option value="${v}">${v}</option>`; } } });
+            mm.forEach(id => { const sel = document.getElementById(id); if (sel) { sel.innerHTML = '<option value="">MM</option>'; for (let i = 0; i < 60; i++) { let v = i.toString().padStart(2, '0'); sel.innerHTML += `<option value="${v}">${v}</option>`; } } });
         }
 
         function populateDependentDropdowns() {
