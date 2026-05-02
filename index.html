@@ -517,6 +517,11 @@
                             data-page="master-stock">
                             <i class="fas fa-boxes w-8 group-hover:scale-110 transition-transform text-amber-300"></i> Stock Inventory
                         </button>
+                        <button onclick="navigate('part-usage')"
+                            class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
+                            data-page="part-usage">
+                            <i class="fas fa-file-invoice w-8 group-hover:scale-110 transition-transform text-indigo-400"></i> Part Usage Log
+                        </button>
                     </div>
                 </div>
 
@@ -1867,6 +1872,68 @@
                     </div>
                 </section>
 
+                <section id="page-part-usage" class="page pb-12">
+                    <div class="max-w-6xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                            <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter">
+                                <i class="fas fa-history mr-3 text-indigo-500"></i> Log Penggunaan Part
+                            </h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="runPartUsageImport()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                    <i class="fas fa-file-export mr-2"></i> Import ke Google Sheet "PartUsage"
+                                </button>
+                                <button onclick="syncFromPartUsageSheet()" class="bg-amber-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync dari Sheet ke Firebase
+                                </button>
+                                <button onclick="runFullBackupUI()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Refresh Tampilan
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl mb-8 text-indigo-800 text-[10px] md:text-xs font-medium leading-relaxed">
+                            <i class="fas fa-info-circle text-indigo-500 mr-1"></i> 
+                            Halaman ini menampilkan jabaran material (parts) yang diminta melalui Work Order. 
+                            Data ini sinkron dengan sheet <b>PartUsage</b> di Google Sheets.
+                        </div>
+
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                            <div class="relative w-full md:w-96">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="filterPartUsage" onkeyup="renderPartUsageTable()"
+                                    class="w-full pl-12 pr-5 py-3 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium text-sm shadow-sm"
+                                    placeholder="Cari No WO / Part Number / Unit...">
+                            </div>
+                            <div class="flex items-center gap-4 w-full md:w-auto">
+                                <select id="sortPartUsage" onchange="renderPartUsageTable()" class="px-4 py-3 border border-slate-200 rounded-xl font-bold text-slate-600 outline-none text-sm shadow-sm">
+                                    <option value="desc">Terbaru</option>
+                                    <option value="asc">Terlama</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm bg-white">
+                            <table class="w-full text-left text-sm min-w-[1000px]">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                                    <tr>
+                                        <th class="p-4">NO WO / UNIT</th>
+                                        <th class="p-4">TGL RUSAK</th>
+                                        <th class="p-4">PART NUMBER</th>
+                                        <th class="p-4">DESCRIPTION</th>
+                                        <th class="p-4 text-center">QTY</th>
+                                        <th class="p-4 text-center">UOM</th>
+                                        <th class="p-4">REMARK</th>
+                                        <th class="p-4 text-center">STATUS WO</th>
+                                        <th class="p-4 text-center">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="partUsageTableBody" class="divide-y divide-slate-50 font-medium text-slate-700">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="page-manage-users" class="page pb-12">
                     <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
                         <div class="flex justify-between items-center mb-8 border-b pb-6">
@@ -1970,6 +2037,7 @@
                                         <option value="master-parts">Spareparts</option>
                                         <option value="master-comp">Komponen</option>
                                         <option value="master-stock">Stock Inventory</option>
+                                        <option value="part-usage">Part Usage Log</option>
                                         <option value="manage-users">Kelola User</option>
                                         <option value="pengaturan">Pengaturan Tema</option>
                                     </select>
@@ -2834,6 +2902,7 @@
             if (id === 'master-comp') { renderMasterCompTable(); }
             if (id === 'master-plan') { renderMasterPlanTable(); }
             if (id === 'master-stock') { currentStockPage = 1; renderMasterStockTable(); }
+            if (id === 'part-usage') { renderPartUsageTable(); }
             if (id === 'manage-users') { loadUsers(); }
         }
 
@@ -4022,6 +4091,7 @@
                 'master-parts': 'Spareparts',
                 'master-comp': 'Komponen',
                 'master-stock': 'Stock Inventory',
+                'part-usage': 'Part Usage Log',
                 'manage-users': 'Kelola User',
                 'pengaturan': 'Pengaturan Tema'
             };
@@ -5832,17 +5902,192 @@
         }
 
         function backupToGoogleSheets() {
-            startLoading("MEMBACA DATA FIREBASE...");
+            startLoading("MENGIRIM DATA...");
             db.ref().once('value').then(snapshot => {
                 const allData = snapshot.val();
-                startLoading("MENGIRIM BACKUP KE GOOGLE SHEETS...");
-
-                // INI SATU-SATUNYA YANG MEMANGGIL GAS UNTUK BACKUP
                 fetchGAS("runFullBackup", allData).then(res => {
                     endLoading();
                     if (res.success) Swal.fire('Backup Sukses', 'Semua data direkap ke Google Sheets!', 'success');
                     else Swal.fire('Gagal Backup', res.message, 'error');
                 }).catch(err => { endLoading(); Swal.fire('Error', err.toString(), 'error'); });
+            });
+        }
+
+        function renderPartUsageTable() {
+            const tbody = document.getElementById('partUsageTableBody');
+            if (!tbody) return;
+
+            const filter = document.getElementById('filterPartUsage').value.toLowerCase();
+            const sort = document.getElementById('sortPartUsage').value;
+
+            let flatParts = [];
+            woDataCache.forEach(wo => {
+                let parts = [];
+                try {
+                    if (wo.parts_json) parts = JSON.parse(wo.parts_json);
+                    else if (wo.parts) parts = wo.parts;
+                } catch(e) {}
+
+                if (Array.isArray(parts)) {
+                    parts.forEach(p => {
+                        if (p.no || p.desc) {
+                            flatParts.push({
+                                no_wo: wo.no_wo,
+                                equip_no: wo.equip_no,
+                                tgl_rusak: wo.tgl_rusak,
+                                part_no: p.no,
+                                desc: p.desc,
+                                qty: p.qty,
+                                uom: p.uom,
+                                rem: p.rem,
+                                status: wo.status
+                            });
+                        }
+                    });
+                }
+            });
+
+            let filtered = flatParts.filter(p => 
+                String(p.no_wo).toLowerCase().includes(filter) ||
+                String(p.equip_no).toLowerCase().includes(filter) ||
+                String(p.part_no).toLowerCase().includes(filter) ||
+                String(p.desc).toLowerCase().includes(filter)
+            );
+
+            filtered.sort((a, b) => {
+                return sort === 'desc' ? b.no_wo.localeCompare(a.no_wo) : a.no_wo.localeCompare(b.no_wo);
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="p-12 text-center text-slate-400 font-medium">Data penggunaan part tidak ditemukan.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="p-4">
+                        <div class="font-black text-slate-900">${p.no_wo}</div>
+                        <div class="text-[10px] text-theme-accent font-bold uppercase tracking-widest">${p.equip_no}</div>
+                    </td>
+                    <td class="p-4 text-xs font-bold text-slate-600">${p.tgl_rusak}</td>
+                    <td class="p-4">
+                        <div class="px-2 py-1 bg-slate-100 rounded text-[10px] font-black inline-block">${p.part_no}</div>
+                    </td>
+                    <td class="p-4 text-xs font-medium text-slate-700">${p.desc}</td>
+                    <td class="p-4 text-center font-black text-theme-main">${p.qty}</td>
+                    <td class="p-4 text-center text-[10px] font-bold text-slate-500 uppercase">${p.uom}</td>
+                    <td class="p-4 text-[10px] text-slate-500 italic">${p.rem || '-'}</td>
+                    <td class="p-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${p.status === 'CLOSED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
+                            ${p.status}
+                        </span>
+                    </td>
+                    <td class="p-4 text-center">
+                        <button onclick="deletePartFromUsage('${p.no_wo}', '${p.part_no}')" class="text-red-500 hover:text-red-700 transition-colors">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function runFullBackupUI() {
+            Swal.fire({
+                title: 'Refresh Data?',
+                text: 'Sistem akan menarik ulang data dari database untuk memastikan tampilan log sesuai dengan Work Order terbaru.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Refresh',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    globalDataSync();
+                }
+            });
+        }
+
+        function runPartUsageImport() {
+            Swal.fire({
+                title: 'Import ke Google Sheet?',
+                text: 'Data penggunaan part akan dikirim dan dimigrasikan ke sheet "PartUsage" di Google Spreadsheet.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Import Sekarang',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10b981'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    backupToGoogleSheets();
+                }
+            });
+        }
+
+        async function deletePartFromUsage(noWo, partNo) {
+            const result = await Swal.fire({
+                title: 'Hapus Part?',
+                text: `Apakah Anda yakin ingin menghapus Part ${partNo} dari WO ${noWo}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#ef4444'
+            });
+
+            if (result.isConfirmed) {
+                startLoading("MENGHAPUS PART DARI FIREBASE...");
+                try {
+                    const snapshot = await db.ref('work_orders/' + noWo).once('value');
+                    if (!snapshot.exists()) throw new Error("Work Order tidak ditemukan");
+                    
+                    const wo = snapshot.val();
+                    let parts = [];
+                    try {
+                        if (wo.parts_json) parts = JSON.parse(wo.parts_json);
+                        else if (wo.parts) parts = wo.parts;
+                    } catch(e) {}
+
+                    const newParts = parts.filter(p => String(p.no) !== String(partNo));
+
+                    await db.ref('work_orders/' + noWo).update({
+                        parts_json: JSON.stringify(newParts),
+                        parts: newParts
+                    });
+
+                    endLoading();
+                    Swal.fire('Terhapus!', 'Item part telah dihapus dari database.', 'success');
+                    globalDataSync();
+                } catch (err) {
+                    endLoading();
+                    Swal.fire('Error', err.toString(), 'error');
+                }
+            }
+        }
+
+        function syncFromPartUsageSheet() {
+            Swal.fire({
+                title: 'Sync dari Sheet ke Firebase?',
+                text: 'Sistem akan membaca isi sheet "PartUsage" dan mengupdate data Parts di Firebase sesuai No WO. Pastikan format kolom tidak berubah.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sinkronkan!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#f59e0b'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("SINKRONISASI REVERSE...");
+                    fetchGAS("syncPartUsageSheetToFirebase", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            globalDataSync();
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
             });
         }
     </script>
