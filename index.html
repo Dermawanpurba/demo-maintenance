@@ -1051,10 +1051,17 @@
                 <!-- INJEKSI PAGE INPUT SERVICE -->
                 <section id="page-input-service" class="page pb-12">
                     <div class="max-w-6xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div
-                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-wrench mr-3 text-emerald-500"></i> Input Service Tracker</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="runGenerateServiceIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                    <i class="fas fa-fingerprint mr-2"></i> Generate ID & Time
+                                </button>
+                                <button onclick="runSyncServiceToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
+                                </button>
+                            </div>
                         </div>
 
                         <div
@@ -1149,10 +1156,17 @@
 
                 <section id="page-aktifitas" class="page pb-12">
                     <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div
-                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-hard-hat mr-3 text-orange-500"></i> Laporan Aktifitas Mekanik</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="runGenerateActivityIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                    <i class="fas fa-fingerprint mr-2"></i> Generate ID & Time
+                                </button>
+                                <button onclick="runSyncActivityToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
+                                </button>
+                            </div>
                         </div>
 
                         <div
@@ -1308,10 +1322,17 @@
 
                 <section id="page-backlog" class="page pb-12">
                     <div class="max-w-6xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div
-                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-clipboard-check mr-3 text-amber-500"></i> Backlog Management</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="runGenerateBacklogIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                    <i class="fas fa-fingerprint mr-2"></i> Generate ID
+                                </button>
+                                <button onclick="runSyncBacklogToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
+                                </button>
+                            </div>
                         </div>
 
                         <div
@@ -1394,9 +1415,17 @@
 
                 <section id="page-daily-hm" class="page pb-12">
                     <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex justify-between items-center mb-6 border-b pb-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-tachometer-alt mr-3"></i> Input Daily HM</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="runGenerateHMIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                    <i class="fas fa-fingerprint mr-2"></i> Generate ID & Time
+                                </button>
+                                <button onclick="runSyncHMToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
+                                </button>
+                            </div>
                         </div>
                         <div
                             class="bg-blue-50 border border-blue-200 p-4 md:p-5 rounded-2xl mb-8 text-blue-800 text-[10px] md:text-xs font-medium leading-relaxed shadow-sm">
@@ -6063,6 +6092,31 @@
             }
         }
 
+        function runGenerateBacklogIDs() {
+            Swal.fire({
+                title: 'Generate ID Random?',
+                text: 'Sistem akan memeriksa sheet "Backlog" dan mengisi ID yang kosong secara otomatis. Ini membantu data agar bisa terbaca di Firebase.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Jalankan',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("GENERATING IDS...");
+                    fetchGAS("generateBacklogIDs", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message + '\nSilakan jalankan Migrasi Total jika ingin data ini langsung muncul di aplikasi.', 'success');
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
         function syncFromPartUsageSheet() {
             Swal.fire({
                 title: 'Sync dari Sheet ke Firebase?',
@@ -6076,6 +6130,194 @@
                 if (result.isConfirmed) {
                     startLoading("SINKRONISASI REVERSE...");
                     fetchGAS("syncPartUsageSheetToFirebase", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            globalDataSync();
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+        function runSyncBacklogToFirebase() {
+            Swal.fire({
+                title: 'Sinkronkan Backlog?',
+                text: 'Semua data di sheet "Backlog" akan dikirim ke Firebase. Ini akan menimpa data di Firebase dengan data dari Spreadsheet.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sinkronkan!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10b981'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("SINKRONISASI BACKLOG...");
+                    fetchGAS("syncBacklogSheetToFirebase", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            globalDataSync();
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function runGenerateServiceIDs() {
+            Swal.fire({
+                title: 'Generate ID & Timestamp?',
+                text: 'Sistem akan mengisi ID dan Waktu Input yang kosong pada sheet "ServiceHistory".',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Jalankan',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("GENERATING SERVICE IDS...");
+                    fetchGAS("generateServiceHistoryIDs", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function runSyncServiceToFirebase() {
+            Swal.fire({
+                title: 'Sync Service ke Firebase?',
+                text: 'Semua riwayat service di spreadsheet akan dikirim ke database Firebase.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sync!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10b981'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("SINKRONISASI SERVICE HISTORY...");
+                    fetchGAS("syncServiceHistoryToFirebase", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            globalDataSync();
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+        function runGenerateHMIDs() {
+            Swal.fire({
+                title: 'Generate ID & Timestamp?',
+                text: 'Sistem akan mengisi ID dan Waktu Input yang kosong pada sheet "DailyHM".',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Jalankan',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("GENERATING HM IDS...");
+                    fetchGAS("generateDailyHMIDs", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function runSyncHMToFirebase() {
+            Swal.fire({
+                title: 'Sync HM ke Firebase?',
+                text: 'Semua data Hour Meter di spreadsheet akan dikirim ke database Firebase.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sync!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10b981'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("SINKRONISASI DAILY HM...");
+                    fetchGAS("syncDailyHMToFirebase", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            globalDataSync();
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function runGenerateActivityIDs() {
+            Swal.fire({
+                title: 'Generate ID & Timestamp?',
+                text: 'Sistem akan mengisi ID dan Waktu Input yang kosong pada sheet "MechanicActivity".',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Jalankan',
+                cancelButtonText: 'Batal'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("GENERATING ACTIVITY IDS...");
+                    fetchGAS("generateActivityIDs", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function runSyncActivityToFirebase() {
+            Swal.fire({
+                title: 'Sync Aktifitas ke Firebase?',
+                text: 'Semua data laporan aktifitas di spreadsheet akan dikirim ke database Firebase.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sync!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10b981'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("SINKRONISASI MEKANIK AKTIFITAS...");
+                    fetchGAS("syncActivityToFirebase", {}).then(res => {
                         endLoading();
                         if (res.success) {
                             Swal.fire('Berhasil!', res.message, 'success');
