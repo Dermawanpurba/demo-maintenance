@@ -394,14 +394,18 @@
 
         <aside id="sidebar"
             class="w-72 md:w-64 bg-theme-main text-white flex-shrink-0 flex flex-col no-print shadow-2xl z-40 relative h-screen sticky top-0">
-            <div class="hidden md:flex p-6 border-b border-white/10 items-center space-x-4">
+            <div class="p-6 border-b border-white/10 flex items-center space-x-4">
                 <div
                     class="w-12 h-12 flex-shrink-0 rounded-xl bg-white/10 flex items-center justify-center overflow-hidden p-1 dynamic-logo-wrapper shadow-sm">
                     <i class="fas fa-industry text-white text-2xl dynamic-logo-icon"></i>
                 </div>
-                <div
-                    class="font-black text-white text-sm uppercase tracking-tight company-display-name leading-snug break-words">
-                    WOSys ERP</div>
+                <div class="flex-grow">
+                    <div class="text-sm font-black tracking-tighter uppercase company-display-name">WOSys ERP</div>
+                    <div class="text-[9px] text-white/40 font-bold uppercase tracking-widest">Maintenance Hub</div>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg hover:bg-white/20">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -507,6 +511,11 @@
                             class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
                             data-page="master-comp">
                             <i class="fas fa-layer-group w-8 group-hover:scale-110 transition-transform"></i> Komponen
+                        </button>
+                        <button onclick="navigate('master-stock')"
+                            class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
+                            data-page="master-stock">
+                            <i class="fas fa-boxes w-8 group-hover:scale-110 transition-transform text-amber-300"></i> Stock Inventory
                         </button>
                     </div>
                 </div>
@@ -1783,6 +1792,80 @@
                         </div>
                     </div>
                 </section>
+                
+                <section id="page-master-stock" class="page pb-12">
+                    <div class="max-w-7xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6 gap-4">
+                            <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
+                                    class="fas fa-boxes mr-3 text-amber-500"></i> Stock Inventory (Logistik)</h2>
+                            <div class="flex space-x-2">
+                                <button onclick="migrateStockToFirebase()" class="bg-amber-100 text-amber-700 font-bold px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-amber-200 transition-all">
+                                    <i class="fas fa-sync-alt mr-1"></i> Sync from Sheet
+                                </button>
+                                <button onclick="exportStockToExcel()" class="bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all">
+                                    <i class="fas fa-file-excel mr-1"></i> Export
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Items</p>
+                                <p class="text-xl font-black text-slate-700" id="stock-total-items">0</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-2xl border border-red-100">
+                                <p class="text-[9px] font-black text-red-400 uppercase tracking-widest">Out of Stock</p>
+                                <p class="text-xl font-black text-red-700" id="stock-out-items">0</p>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                                <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Available</p>
+                                <p class="text-xl font-black text-blue-700" id="stock-avail-items">0</p>
+                            </div>
+                            <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+                                <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Stock Value</p>
+                                <p class="text-xl font-black text-emerald-700" id="stock-total-value">Rp 0</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                            <div class="relative w-full md:max-w-md group">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-theme-accent transition-colors"></i>
+                                <input type="text" id="stockSearch" oninput="renderMasterStockTable()"
+                                    class="w-full pl-12 pr-5 py-3 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-theme-accent font-medium text-xs md:text-sm shadow-sm"
+                                    placeholder="Cari Part Number / Deskripsi / Lokasi...">
+                            </div>
+
+                            <div class="flex items-center space-x-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+                                <button onclick="changeStockPage(-1)"
+                                    class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-200 transition-all font-black"><i
+                                        class="fas fa-chevron-left"></i></button>
+                                <span class="text-[10px] font-black px-4 text-slate-500 tracking-widest" id="stockPageInfo">1 / 1</span>
+                                <button onclick="changeStockPage(1)"
+                                    class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-200 transition-all font-black"><i
+                                        class="fas fa-chevron-right"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
+                            <table class="w-full text-left text-sm min-w-[1000px]">
+                                <thead class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                                    <tr>
+                                        <th class="p-4 md:p-6">PART NUMBER</th>
+                                        <th class="p-4 md:p-6">DESCRIPTION</th>
+                                        <th class="p-4 md:p-6">CATEGORY</th>
+                                        <th class="p-4 md:p-6 text-center">QTY FINAL</th>
+                                        <th class="p-4 md:p-6">UOM</th>
+                                        <th class="p-4 md:p-6">LOCATION</th>
+                                        <th class="p-4 md:p-6 text-right">AMOUNT</th>
+                                        <th class="p-4 md:p-6 text-center">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="masterStockBody" class="divide-y divide-slate-50 font-medium text-slate-700">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
 
                 <section id="page-manage-users" class="page pb-12">
                     <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
@@ -1886,6 +1969,7 @@
                                         <option value="master-equip">Equipments</option>
                                         <option value="master-parts">Spareparts</option>
                                         <option value="master-comp">Komponen</option>
+                                        <option value="master-stock">Stock Inventory</option>
                                         <option value="manage-users">Kelola User</option>
                                         <option value="pengaturan">Pengaturan Tema</option>
                                     </select>
@@ -1974,6 +2058,15 @@
                                 class="w-full bg-red-600 text-white font-black py-3 md:py-4 rounded-xl md:rounded-2xl shadow-lg shadow-red-500/30 hover:bg-red-700 transition-all active:scale-95 text-xs uppercase tracking-widest"><i
                                     class="fas fa-cloud-upload-alt mr-2"></i> Mulai Migrasi Database ke
                                 Firebase</button>
+                        </div>
+                        <div
+                            class="bg-amber-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-amber-100 mt-6 shadow-inner">
+                            <h3 class="text-sm md:text-base font-black text-amber-700 uppercase tracking-widest mb-2"><i
+                                    class="fas fa-boxes mr-2"></i> Stock Migration (Integrasi Logistic)</h3>
+                            <p class="text-[10px] md:text-xs text-amber-600/80 font-bold mb-6 leading-relaxed">Migrasikan data stock terbaru dari sheet Logistic ke Firebase untuk keperluan validasi ketersediaan barang saat pembuatan Work Order.</p>
+                            <button type="button" onclick="migrateStockToFirebase()"
+                                class="w-full bg-amber-600 text-white font-black py-3 md:py-4 rounded-xl md:rounded-2xl shadow-lg shadow-amber-500/30 hover:bg-amber-700 transition-all active:scale-95 text-xs uppercase tracking-widest"><i
+                                    class="fas fa-sync-alt mr-2"></i> Sinkronisasi Stock ke Firebase</button>
                         </div>
                         <div
                             class="bg-blue-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-blue-100 mt-6 shadow-inner">
@@ -2490,6 +2583,7 @@
                 const btnPlan = document.querySelector('[data-page="master-plan"]'); if (btnPlan) btnPlan.style.display = 'none';
                 const btnParts = document.querySelector('[data-page="master-parts"]'); if (btnParts) btnParts.style.display = 'none';
                 const btnComp = document.querySelector('[data-page="master-comp"]'); if (btnComp) btnComp.style.display = 'none';
+                const btnStock = document.querySelector('[data-page="master-stock"]'); if (btnStock) btnStock.style.display = 'none';
                 const btnBuatWo = document.querySelector('[data-page="buat-wo"]'); if (btnBuatWo) btnBuatWo.style.display = 'none';
                 const btnInputSvc = document.querySelector('[data-page="input-service"]'); if (btnInputSvc) btnInputSvc.style.display = 'none';
                 if (nDl) nDl.style.display = 'none';
@@ -2600,10 +2694,11 @@
                     masterCache.activities = fb.mechanic_activity ? Object.values(fb.mechanic_activity) : [];
                     masterCache.dailyHM = fb.daily_hm ? Object.values(fb.daily_hm) : [];
                     masterCache.serviceHistory = fb.service_history ? Object.values(fb.service_history) : [];
+                    masterCache.stock = fb.master_stock ? Object.values(fb.master_stock) : [];
 
                     woDataCache = fb.work_orders ? Object.values(fb.work_orders) : [];
                     backlogCache = fb.backlogs ? Object.values(fb.backlogs) : [];
-                    partsDictCache = masterCache.parts;
+                    partsDictCache = masterCache.stock; // Menggantikan masterCache.parts
                     allUsersCache = masterCache.usersData;
 
                     // Load user access data - ambil dari GAS karena disimpan di UserAccess sheet
@@ -2619,14 +2714,14 @@
                     const le = document.getElementById('listEquip');
                     if (le) le.innerHTML = masterCache.planAlat.map(e => `<option value="${e.equip_no}">${e.model} - ${e.equip_no}</option>`).join('');
                     const lp = document.getElementById('listParts');
-                    if (lp) lp.innerHTML = masterCache.parts.map(p => `<option value="${p.part_number}">${p.description}</option>`).join('');
+                    if (lp) lp.innerHTML = masterCache.stock.map(s => `<option value="${s.part_number}">${s.description} (Tersedia: ${s.qty_final} ${s.uom})</option>`).join('');
 
                     populateDependentDropdowns();
 
                     const pLwo = document.getElementById('page-list-wo'); if (pLwo && pLwo.classList.contains('active')) renderWOTable();
                     const pDb = document.getElementById('page-dashboard'); if (pDb && pDb.classList.contains('active')) calculateKPIFrontEnd();
 
-                    renderMasterEquipTable(); renderMasterPartsTable(); renderMasterCompTable(); renderActivityTable(); prefillActivityForm();
+                    renderMasterEquipTable(); renderMasterPartsTable(); renderMasterCompTable(); renderMasterStockTable(); renderActivityTable(); prefillActivityForm();
                     if (document.getElementById('serviceHistoryTableBody')) renderServiceHistoryTable();
                     if (document.getElementById('userTableBody')) renderUserTable();
                     if (document.getElementById('masterPlanBody')) renderMasterPlanTable();
@@ -2738,6 +2833,7 @@
             if (id === 'master-parts') { currentPtPage = 1; renderMasterPartsTable(); }
             if (id === 'master-comp') { renderMasterCompTable(); }
             if (id === 'master-plan') { renderMasterPlanTable(); }
+            if (id === 'master-stock') { currentStockPage = 1; renderMasterStockTable(); }
             if (id === 'manage-users') { loadUsers(); }
         }
 
@@ -3427,6 +3523,85 @@
             }).join('');
         }
 
+        let currentStockPage = 1;
+        function renderMasterStockTable() {
+            const sBody = document.getElementById('masterStockBody');
+            if (!sBody) return;
+            
+            const q = (document.getElementById('stockSearch')?.value || '').toLowerCase();
+            const rawData = masterCache.stock || [];
+            
+            let filtered = rawData.filter(s => {
+                const searchStr = `${s.part_number} ${s.description} ${s.location} ${s.category_spare_part}`.toLowerCase();
+                return searchStr.includes(q);
+            });
+
+            // Calculate Totals
+            const totalItems = filtered.length;
+            const outOfStock = filtered.filter(s => (parseFloat(s.qty_final) || 0) <= 0).length;
+            const available = totalItems - outOfStock;
+            const totalValue = filtered.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0);
+
+            if (document.getElementById('stock-total-items')) document.getElementById('stock-total-items').textContent = totalItems;
+            if (document.getElementById('stock-out-items')) document.getElementById('stock-out-items').textContent = outOfStock;
+            if (document.getElementById('stock-avail-items')) document.getElementById('stock-avail-items').textContent = available;
+            if (document.getElementById('stock-total-value')) document.getElementById('stock-total-value').textContent = 'Rp ' + totalValue.toLocaleString('id-ID');
+
+            const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+            if (currentStockPage > totalPages) currentStockPage = totalPages;
+            if (currentStockPage < 1) currentStockPage = 1;
+            
+            const paged = filtered.slice((currentStockPage - 1) * ITEMS_PER_PAGE, currentStockPage * ITEMS_PER_PAGE);
+            if (document.getElementById('stockPageInfo')) document.getElementById('stockPageInfo').innerText = `${currentStockPage} / ${totalPages}`;
+            
+            if (paged.length === 0) {
+                sBody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Data stock tidak ditemukan.</td></tr>';
+                return;
+            }
+
+            sBody.innerHTML = paged.map(s => {
+                const qty = parseFloat(s.qty_final) || 0;
+                const qtyColor = qty <= 0 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
+                const amount = parseFloat(s.amount) || 0;
+                const safeDesc = (s.description || '').replace(/'/g, "\\'");
+                const safeUom = (s.uom || 'UNIT').replace(/'/g, "\\'");
+                
+                return `<tr class="border-b hover:bg-slate-50 transition-colors">
+                    <td class="p-4"><div class="font-black text-slate-800 uppercase text-xs">${s.part_number || '-'}</div><div class="text-[9px] text-slate-400 font-bold uppercase">${s.stock_code || ''}</div></td>
+                    <td class="p-4 text-xs font-medium text-slate-600 max-w-xs truncate" title="${s.description}">${s.description || '-'}</td>
+                    <td class="p-4 text-[10px] font-bold text-slate-500 uppercase">${s.category_spare_part || '-'}</td>
+                    <td class="p-4 text-center"><span class="px-3 py-1.5 rounded-lg font-black text-sm ${qtyColor}">${qty}</span></td>
+                    <td class="p-4 text-[10px] font-black text-slate-400 uppercase">${s.uom || 'UNIT'}</td>
+                    <td class="p-4 font-bold text-slate-600 text-xs">${s.location || '-'}</td>
+                    <td class="p-4 text-right font-mono text-xs font-black text-slate-700">Rp ${amount.toLocaleString('id-ID')}</td>
+                    <td class="p-4 text-center">
+                        <button type="button" onclick="addPartToWO('${s.part_number}', '${safeDesc}', '${safeUom}')" 
+                            class="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white flex flex-col items-center justify-center rounded-2xl px-3 py-2 font-black text-[9px] leading-tight transition-all active:scale-90 border border-emerald-100 shadow-sm mx-auto" title="Tambah ke WO">
+                            <span class="text-base leading-none mb-0.5">+</span>
+                            <span class="leading-none">KE</span>
+                            <span class="leading-none">WO</span>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function changeStockPage(dir) {
+            currentStockPage += dir;
+            renderMasterStockTable();
+        }
+        
+        window.exportStockToExcel = function() {
+            const data = masterCache.stock || [];
+            if (data.length === 0) return Swal.fire('Info', 'Data stock masih kosong.', 'info');
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, "Stock_Inventory");
+            XLSX.writeFile(wb, `Stock_Inventory_${new Date().toLocaleDateString()}.xlsx`);
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Export Berhasil!', showConfirmButton: false, timer: 2000 });
+        }
+
         function renderMasterCompTable() {
             const cBody = document.getElementById('masterCompBody');
             if (!cBody) return;
@@ -3846,6 +4021,7 @@
                 'master-equip': 'Equipments',
                 'master-parts': 'Spareparts',
                 'master-comp': 'Komponen',
+                'master-stock': 'Stock Inventory',
                 'manage-users': 'Kelola User',
                 'pengaturan': 'Pengaturan Tema'
             };
@@ -4048,12 +4224,41 @@
         function autoFillPart(input) {
             if (!input || !input.value) return;
             const val = String(input.value).trim().toUpperCase();
+            
+            // 1. Cari di Master Parts (Standard)
             const p = (partsDictCache || []).find(x => x.part_number && String(x.part_number).trim().toUpperCase() === val);
-            if (p) {
-                const tr = input.closest('tr');
-                if (tr) {
+            
+            // 2. Cari di Master Stock (Integrasi Logistic)
+            const s = (masterCache.stock || []).find(x => x.part_number && String(x.part_number).trim().toUpperCase() === val);
+            
+            const tr = input.closest('tr');
+            if (tr) {
+                if (p) {
                     if (tr.querySelector('.part-desc')) tr.querySelector('.part-desc').value = p.description || '';
                     if (tr.querySelector('.part-uom')) tr.querySelector('.part-uom').value = p.uom || '';
+                } else if (s) {
+                    if (tr.querySelector('.part-desc')) tr.querySelector('.part-desc').value = s.description || '';
+                    if (tr.querySelector('.part-uom')) tr.querySelector('.part-uom').value = s.uom || '';
+                }
+
+                // Visualisasi Stock Check
+                if (s) {
+                    const stockQty = parseFloat(s.qty_final) || 0;
+                    const remInput = tr.querySelector('.part-rem');
+                    if (remInput) {
+                        if (stockQty <= 0) {
+                            remInput.value = `[OUT OF STOCK]`;
+                            remInput.classList.add('text-red-600', 'font-black');
+                            Swal.fire({
+                                toast: true, position: 'top-end', icon: 'error',
+                                title: `Peringatan: Stock Kosong untuk ${val}`,
+                                showConfirmButton: false, timer: 3000
+                            });
+                        } else {
+                            remInput.placeholder = `Tersedia: ${stockQty} ${s.uom}`;
+                            remInput.classList.remove('text-red-600', 'font-black');
+                        }
+                    }
                 }
             }
         }
@@ -4309,6 +4514,48 @@
                 endLoading();
                 console.error("Migration Error:", e);
                 Swal.fire('Gagal', 'Terjadi kesalahan saat migrasi: ' + e.message, 'error');
+            }
+        }
+
+        async function migrateStockToFirebase() {
+            if (!db) return Swal.fire('Error', 'Firebase belum aktif.', 'error');
+
+            const result = await Swal.fire({
+                title: 'Migrasikan Data Stock?',
+                html: 'Sistem akan mengambil data ketersediaan barang terbaru dari <b>Logistic System (Google Sheets)</b>.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sinkronkan Stock!'
+            });
+
+            if (!result.isConfirmed) return;
+            startLoading("MENGAMBIL DATA STOCK DARI GOOGLE SHEETS...");
+
+            try {
+                const res = await fetchGAS("syncStockToFirebase");
+                if (!res || !res.success) throw new Error(res.message || "Gagal mengambil data stock");
+
+                startLoading("MEMPERBARUI DATA STOCK DI FIREBASE...");
+                
+                const updates = {};
+                res.data.forEach(item => {
+                    if (item.part_number) {
+                        let safeId = String(item.part_number).replace(/[\.\#\$\[\]\/]/g, "-");
+                        updates['master_stock/' + safeId] = {
+                            ...item,
+                            last_update: new Date().toISOString()
+                        };
+                    }
+                });
+
+                await db.ref().update(updates);
+                endLoading();
+                Swal.fire('Sukses', 'Data Stock berhasil disinkronkan ke Firebase!', 'success');
+                globalDataSync();
+            } catch (e) {
+                endLoading();
+                console.error("Stock Migration Error:", e);
+                Swal.fire('Gagal', 'Kesalahan migrasi stock: ' + e.message, 'error');
             }
         }
 
