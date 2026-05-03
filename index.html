@@ -2840,61 +2840,73 @@
         // ==========================================
         function globalDataSync() {
             startLoading("LOADING FROM FIREBASE...");
-            db.ref().once('value').then((snapshot) => {
+            
+            // OPTIMASI: Pecah fetch root menjadi parallel fetch per node
+            // Ini jauh lebih cepat di Firebase RTDB dibandingkan fetch root node (/)
+            const nodes = [
+                'master_equip', 'master_parts', 'plan_alat', 'master_comp', 
+                'users', 'master_mekanik', 'master_pelapor', 'mechanic_activity', 
+                'daily_hm', 'service_history', 'master_stock', 'work_orders', 'backlogs'
+            ];
+
+            const promises = nodes.map(node => db.ref(node).once('value'));
+
+            Promise.all(promises).then((snapshots) => {
                 endLoading();
-                if (snapshot.exists()) {
-                    const fb = snapshot.val();
+                
+                const fb = {};
+                snapshots.forEach((snap, i) => {
+                    fb[nodes[i]] = snap.val();
+                });
 
-                    // Tarik langsung dari Firebase, ubah dari JSON Object ke Array
-                    // PERBAIKAN: Pisahkan Master Equip dan Plan Alat agar tidak UNDEFINED
-                    masterCache.equip = fb.master_equip ? Object.values(fb.master_equip) : [];
-                    masterCache.parts = fb.master_parts ? Object.values(fb.master_parts) : [];
-                    masterCache.planAlat = fb.plan_alat ? Object.values(fb.plan_alat) : [];
-                    masterCache.components = fb.master_comp ? Object.values(fb.master_comp) : [];
-                    masterCache.usersData = fb.users ? Object.values(fb.users) : [];
-                    masterCache.mekanikList = fb.master_mekanik ? Object.values(fb.master_mekanik) : [];
-                    masterCache.pelaporList = fb.master_pelapor ? Object.values(fb.master_pelapor) : [];
-                    masterCache.activities = fb.mechanic_activity ? Object.values(fb.mechanic_activity) : [];
-                    masterCache.dailyHM = fb.daily_hm ? Object.values(fb.daily_hm) : [];
-                    masterCache.serviceHistory = fb.service_history ? Object.values(fb.service_history) : [];
-                    masterCache.stock = fb.master_stock ? Object.values(fb.master_stock) : [];
+                // Tarik langsung dari Firebase, ubah dari JSON Object ke Array
+                masterCache.equip = fb.master_equip ? Object.values(fb.master_equip) : [];
+                masterCache.parts = fb.master_parts ? Object.values(fb.master_parts) : [];
+                masterCache.planAlat = fb.plan_alat ? Object.values(fb.plan_alat) : [];
+                masterCache.components = fb.master_comp ? Object.values(fb.master_comp) : [];
+                masterCache.usersData = fb.users ? Object.values(fb.users) : [];
+                masterCache.mekanikList = fb.master_mekanik ? Object.values(fb.master_mekanik) : [];
+                masterCache.pelaporList = fb.master_pelapor ? Object.values(fb.master_pelapor) : [];
+                masterCache.activities = fb.mechanic_activity ? Object.values(fb.mechanic_activity) : [];
+                masterCache.dailyHM = fb.daily_hm ? Object.values(fb.daily_hm) : [];
+                masterCache.serviceHistory = fb.service_history ? Object.values(fb.service_history) : [];
+                masterCache.stock = fb.master_stock ? Object.values(fb.master_stock) : [];
 
-                    woDataCache = fb.work_orders ? Object.values(fb.work_orders) : [];
-                    backlogCache = fb.backlogs ? Object.values(fb.backlogs) : [];
-                    partsDictCache = masterCache.stock; // Menggantikan masterCache.parts
-                    allUsersCache = masterCache.usersData;
+                woDataCache = fb.work_orders ? Object.values(fb.work_orders) : [];
+                backlogCache = fb.backlogs ? Object.values(fb.backlogs) : [];
+                partsDictCache = masterCache.stock;
+                allUsersCache = masterCache.usersData;
 
-                    // Load user access data - ambil dari GAS karena disimpan di UserAccess sheet
-                    fetchGAS('getAllUserAccess', {}, function (res) {
-                        if (res.success && res.data) {
-                            globalDataSync_userAccess = res.data;
-                            populateAccessUserList();
-                            if (currentUser) applyUserAccessVisibility();
-                        }
-                    });
+                // Load user access data - ambil dari GAS karena disimpan di UserAccess sheet
+                fetchGAS('getAllUserAccess', {}, function (res) {
+                    if (res.success && res.data) {
+                        globalDataSync_userAccess = res.data;
+                        populateAccessUserList();
+                        if (currentUser) applyUserAccessVisibility();
+                    }
+                });
 
-                    // Render UI
-                    const le = document.getElementById('listEquip');
-                    if (le) le.innerHTML = masterCache.planAlat.map(e => `<option value="${e.equip_no}">${e.model} - ${e.equip_no}</option>`).join('');
-                    const lp = document.getElementById('listParts');
-                    if (lp) lp.innerHTML = masterCache.stock.map(s => `<option value="${s.part_number}">${s.description} (Tersedia: ${s.qty_final} ${s.uom})</option>`).join('');
+                // Render UI
+                const le = document.getElementById('listEquip');
+                if (le) le.innerHTML = masterCache.planAlat.map(e => `<option value="${e.equip_no}">${e.model} - ${e.equip_no}</option>`).join('');
+                const lp = document.getElementById('listParts');
+                if (lp) lp.innerHTML = masterCache.stock.map(s => `<option value="${s.part_number}">${s.description} (Tersedia: ${s.qty_final} ${s.uom})</option>`).join('');
 
-                    populateDependentDropdowns();
+                populateDependentDropdowns();
 
-                    const pLwo = document.getElementById('page-list-wo'); if (pLwo && pLwo.classList.contains('active')) renderWOTable();
-                    const pDb = document.getElementById('page-dashboard'); if (pDb && pDb.classList.contains('active')) calculateKPIFrontEnd();
+                const pLwo = document.getElementById('page-list-wo'); if (pLwo && pLwo.classList.contains('active')) renderWOTable();
+                const pDb = document.getElementById('page-dashboard'); if (pDb && pDb.classList.contains('active')) calculateKPIFrontEnd();
 
-                    renderMasterEquipTable(); renderMasterPartsTable(); renderMasterCompTable(); renderMasterStockTable(); renderActivityTable(); prefillActivityForm();
-                    if (document.getElementById('serviceHistoryTableBody')) renderServiceHistoryTable();
-                    if (document.getElementById('userTableBody')) renderUserTable();
-                    if (document.getElementById('masterPlanBody')) renderMasterPlanTable();
+                renderMasterEquipTable(); renderMasterPartsTable(); renderMasterCompTable(); renderMasterStockTable(); renderActivityTable(); prefillActivityForm();
+                if (document.getElementById('serviceHistoryTableBody')) renderServiceHistoryTable();
+                if (document.getElementById('userTableBody')) renderUserTable();
+                if (document.getElementById('masterPlanBody')) renderMasterPlanTable();
 
-                    initFirebaseListeners();
-                } else {
-                    Swal.fire('Info', 'Database Firebase masih kosong. Silakan jalankan Migrasi.', 'info');
-                }
+                initFirebaseListeners();
             }).catch(err => {
-                endLoading(); Swal.fire('Koneksi Error', err.toString(), 'error');
+                endLoading();
+                console.error("Firebase Sync Error:", err);
+                Swal.fire('Koneksi Error', err.toString(), 'error');
             });
         }
 
@@ -6347,7 +6359,19 @@
                 confirmButtonColor: '#10b981'
             }).then(result => {
                 if (result.isConfirmed) {
-                    backupToGoogleSheets();
+                    startLoading("MENGAMBIL DATA DARI CLOUD...");
+                    fetchGAS("syncPartUsageFirebaseToSheet", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            globalDataSync();
+                        } else {
+                            Swal.fire('Gagal', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
                 }
             });
         }
