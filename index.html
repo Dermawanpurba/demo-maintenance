@@ -3968,7 +3968,9 @@
 
                 return `<tr class="hover:bg-slate-50 border-b transition-colors">
                     <td class="p-4"><div class="font-black text-base md:text-lg text-theme-accent uppercase">${unitNo}</div><div class="text-[9px] md:text-[10px] font-bold text-slate-500 mt-1 uppercase">HM: ${actualHM} | Tipe: ${i.unit_type || '-'}</div>${backlogBadge}</td>
-                    <td class="p-4 font-black text-slate-900 text-xs md:text-sm text-center">${i.no_wo}</td>
+                    <td class="p-4 font-black text-slate-900 text-xs md:text-sm text-center">
+                        <button onclick="editWO('${i.no_wo}')" class="text-blue-600 font-black hover:underline cursor-pointer">${i.no_wo}</button>
+                    </td>
                     <td class="p-4 py-5"><div class="text-xs font-bold text-red-700 bg-red-50/80 p-3 rounded-xl border border-red-100/50 line-clamp-2 leading-relaxed" title="${i.kendala || ''}">${kendalaText}</div></td>
                     <td class="p-4 text-xs md:text-sm text-center">${i.tgl_rusak || '-'} <br><span class="font-bold text-slate-500 text-[9px] md:text-[10px]"><i class="far fa-clock"></i> ${safeJamR}</span></td>
                     <td class="p-4 text-center"><span class="px-3 py-1.5 rounded-xl text-[9px] font-black shadow-sm ${stCol}">${i.status || 'OPEN'}</span></td>
@@ -4401,7 +4403,8 @@
             const no = noInput.value.trim().toUpperCase();
             const t = woDataCache.find(i => i.no_wo.toString().toUpperCase() === no);
             if (t) {
-                ['equip_no', 'brand', 'unit_type', 'hm_km', 'pm_service', 'sch_unsch', 'tgl_rusak', 'issue', 'failure_reason'].forEach(k => { const el = document.getElementById(k); if (el) el.value = t[k] || ""; });
+                ['equip_no', 'brand', 'unit_type', 'hm_km', 'pm_service', 'sch_unsch', 'tgl_rusak', 'failure_reason'].forEach(k => { const el = document.getElementById(k); if (el) el.value = t[k] || ""; });
+                if (document.getElementById('issue')) document.getElementById('issue').value = t.kendala || t.issue || "";
                 if (t.jam_rusak && t.jam_rusak.includes(':')) { const [h, m] = t.jam_rusak.split(':'); document.getElementById('jam_rusak_hh').value = h; document.getElementById('jam_rusak_mm').value = m; }
                 if (t.jam_selesai && t.jam_selesai.includes(':')) { const [h, m] = t.jam_selesai.split(':'); document.getElementById('jam_selesai_hh').value = h; document.getElementById('jam_selesai_mm').value = m; }
                 if (t.tgl_selesai) document.getElementById('tgl_selesai').value = t.tgl_selesai;
@@ -4424,6 +4427,15 @@
                 if (document.getElementById('wo_status_display')) document.getElementById('wo_status_display').innerText = 'STATUS: ' + (t.status || 'OPEN');
                 Swal.fire('Ditemukan', 'Data ditarik.', 'success');
             } else { Swal.fire('Info', 'Tidak ditemukan.', 'info'); }
+        }
+
+        function editWO(no) {
+            navigate('buat-wo', true);
+            const input = document.getElementById('no_wo');
+            if (input) {
+                input.value = no;
+                tarikDataWO();
+            }
         }
 
         async function handleSaveSettings(e) {
@@ -4830,7 +4842,7 @@
                 parts_json: JSON.stringify(partsData), // Parts diubah ke string JSON untuk RTDB
                 tech: document.getElementById('tech').value,
                 reported_by: document.getElementById('reported_by').value,
-                status: existingWO.status || 'OPEN',
+                status: (existingWO.status === 'OPEN' || !existingWO.status) ? 'PROGRESS' : existingWO.status,
                 action_log: actionLogData,
                 last_sync: new Date().toISOString()
             };
