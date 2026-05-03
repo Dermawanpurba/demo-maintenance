@@ -1920,6 +1920,9 @@
                                 <button onclick="syncFromPartUsageSheet()" class="bg-amber-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg">
                                     <i class="fas fa-cloud-upload-alt mr-2"></i> Sync dari Sheet ke Firebase
                                 </button>
+                                <button onclick="migratePartUsageToWO()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg">
+                                    <i class="fas fa-file-import mr-2"></i> Migrate to WorkOrder Sheet
+                                </button>
                                 <button onclick="runFullBackupUI()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
                                     <i class="fas fa-sync-alt mr-2"></i> Refresh Tampilan
                                 </button>
@@ -4512,43 +4515,132 @@
         function tarikDataWO() {
             const noInput = document.getElementById('no_wo');
             if (!noInput || !noInput.value) return Swal.fire('Perhatian', 'Ketik No WO dulu', 'warning');
+            
             const no = noInput.value.trim().toUpperCase();
-            const t = woDataCache.find(i => i.no_wo.toString().toUpperCase() === no);
+            console.log("Searching for WO:", no);
+
+            // Perbaikan Pencarian: Cek original ID maupun Sanitized ID (dots vs dashes)
+            const t = (woDataCache || []).find(i => {
+                if (!i || !i.no_wo) return false;
+                const originalNo = String(i.no_wo).toUpperCase();
+                const sanitizedNo = originalNo.replace(/[\.\#\$\[\]\/]/g, "-");
+                const searchNo = no.replace(/[\.\#\$\[\]\/]/g, "-");
+                return originalNo === no || sanitizedNo === searchNo;
+            });
+
             if (t) {
-                ['equip_no', 'brand', 'unit_type', 'hm_km', 'pm_service', 'sch_unsch', 'tgl_rusak', 'failure_reason'].forEach(k => { const el = document.getElementById(k); if (el) el.value = t[k] || ""; });
-                if (document.getElementById('issue')) document.getElementById('issue').value = t.kendala || t.issue || "";
-                if (t.jam_rusak && t.jam_rusak.includes(':')) { const [h, m] = t.jam_rusak.split(':'); document.getElementById('jam_rusak_hh').value = h; document.getElementById('jam_rusak_mm').value = m; }
-                if (t.jam_selesai && t.jam_selesai.includes(':')) { const [h, m] = t.jam_selesai.split(':'); document.getElementById('jam_selesai_hh').value = h; document.getElementById('jam_selesai_mm').value = m; }
-                if (t.tgl_selesai) document.getElementById('tgl_selesai').value = t.tgl_selesai;
+                console.log("WO Found:", t);
+                // Mapping Field secara robust
+                const mapping = {
+                    'equip_no': ['equip_no', 'equipno'],
+                    'brand': ['brand'],
+                    'unit_type': ['unit_type', 'unittype'],
+                    'hm_km': ['hm_km', 'hmkm', 'hm'],
+                    'pm_service': ['pm_service', 'pmservice'],
+                    'sch_unsch': ['sch_unsch', 'schunsch'],
+                    'tgl_rusak': ['tgl_rusak', 'tglrusak'],
+                    'failure_reason': ['failure_reason', 'failurereason']
+                };
+
+                Object.keys(mapping).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        let val = "";
+                        for (let key of mapping[id]) {
+                            if (t[key] !== undefined && t[key] !== null && String(t[key]).trim() !== '') {
+                                val = t[key];
+                                break;
+                            }
+                        }
+                        el.value = val;
+                    }
+                });
+
+                // Deskripsi Masalah / Issue
+                if (document.getElementById('issue')) {
+                    document.getElementById('issue').value = t.kendala || t.issue || t.problem || "";
+                }
+
+                // Waktu Rusak
+                if (t.jam_rusak && String(t.jam_rusak).includes(':')) {
+                    const [h, m] = String(t.jam_rusak).split(':');
+                    if (document.getElementById('jam_rusak_hh')) document.getElementById('jam_rusak_hh').value = h.trim().padStart(2, '0');
+                    if (document.getElementById('jam_rusak_mm')) document.getElementById('jam_rusak_mm').value = m.trim().padStart(2, '0');
+                }
+
+                // Data Penyelesaian
+                if (t.tgl_selesai) {
+                    const el = document.getElementById('tgl_selesai');
+                    if (el) el.value = t.tgl_selesai;
+                }
+                if (t.jam_selesai && String(t.jam_selesai).includes(':')) {
+                    const [h, m] = String(t.jam_selesai).split(':');
+                    if (document.getElementById('jam_selesai_hh')) document.getElementById('jam_selesai_hh').value = h.trim().padStart(2, '0');
+                    if (document.getElementById('jam_selesai_mm')) document.getElementById('jam_selesai_mm').value = m.trim().padStart(2, '0');
+                }
+
                 if (document.getElementById('reported_by') && t.reported_by) document.getElementById('reported_by').value = t.reported_by;
                 if (document.getElementById('tech') && t.tech) document.getElementById('tech').value = t.tech;
-                if (document.getElementById('major_comp') && t.major_comp) { document.getElementById('major_comp').value = t.major_comp; updateMinorComp(); }
-                if (document.getElementById('minor_comp') && t.minor_comp) { document.getElementById('minor_comp').value = t.minor_comp; }
-
-                const tb = document.getElementById('partTableBody'); if (tb) tb.innerHTML = '';
-                if (t.parts_json) {
-                    try {
-                        JSON.parse(t.parts_json).forEach(p => {
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `<td class="py-3 text-center font-black text-slate-300 text-[10px]">${tb.children.length + 1}</td><td class="py-3 px-2"><input type="text" list="listParts" onchange="autoFillPart(this)" class="part-no w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-black text-xs uppercase" value="${p.no || ''}"></td><td class="py-3 px-2"><input type="text" class="part-desc w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px]" value="${p.desc || ''}"></td><td class="py-3 px-2"><input type="number" class="part-qty w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-center font-bold" value="${p.qty || '1'}"></td><td class="py-3 px-2"><input type="text" class="part-uom w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-center uppercase font-bold text-[10px]" value="${p.uom || ''}"></td><td class="py-3 px-2"><input type="text" class="part-rem w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px]" value="${p.rem || ''}"></td><td class="py-3 text-right"><button type="button" onclick="this.closest('tr').remove()" class="text-red-400 hover:text-red-600 px-2"><i class="fas fa-trash"></i></button></td>`;
-                            tb.appendChild(tr);
-                        });
-                    } catch (e) { }
+                
+                if (document.getElementById('major_comp') && (t.major_comp || t.majorcomponent)) {
+                    document.getElementById('major_comp').value = t.major_comp || t.majorcomponent;
+                    updateMinorComp();
+                    if (document.getElementById('minor_comp')) {
+                        document.getElementById('minor_comp').value = t.minor_comp || t.minorcomponent || "";
+                    }
                 }
-                if (tb && tb.children.length === 0) addPartRow();
-                if (document.getElementById('wo_status_display')) document.getElementById('wo_status_display').innerText = 'STATUS: ' + (t.status || 'OPEN');
-                Swal.fire('Ditemukan', 'Data ditarik.', 'success');
-            } else { Swal.fire('Info', 'Tidak ditemukan.', 'info'); }
-        }
 
-        function editWO(no) {
-            navigate('buat-wo', true);
-            const input = document.getElementById('no_wo');
-            if (input) {
-                input.value = no;
-                tarikDataWO();
+                // Parts Mapping
+                const tb = document.getElementById('partTableBody');
+                if (tb) {
+                    tb.innerHTML = '';
+                    let partsRaw = t.parts_json || t.parts || "[]";
+                    try {
+                        const pts = typeof partsRaw === 'string' ? JSON.parse(partsRaw) : partsRaw;
+                        if (Array.isArray(pts)) {
+                            pts.forEach(p => {
+                                const tr = document.createElement('tr');
+                                tr.innerHTML = `<td class="py-3 text-center font-black text-slate-300 text-[10px]">${tb.children.length + 1}</td><td class="py-3 px-2"><input type="text" list="listParts" onchange="autoFillPart(this)" class="part-no w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-black text-xs uppercase" value="${p.no || ''}"></td><td class="py-3 px-2"><input type="text" class="part-desc w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px]" value="${p.desc || ''}"></td><td class="py-3 px-2"><input type="number" class="part-qty w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-center font-bold" value="${p.qty || '1'}"></td><td class="py-3 px-2"><input type="text" class="part-uom w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-center uppercase font-bold text-[10px]" value="${p.uom || ''}"></td><td class="py-3 px-2"><input type="text" class="part-rem w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-[10px]" value="${p.rem || ''}"></td><td class="py-3 text-right"><button type="button" onclick="this.closest('tr').remove()" class="text-red-400 hover:text-red-600 px-2"><i class="fas fa-trash"></i></button></td>`;
+                                tb.appendChild(tr);
+                            });
+                        }
+                    } catch (e) { console.error("Error parsing parts JSON:", e); }
+                    if (tb.children.length === 0) addPartRow();
+                }
+
+                if (document.getElementById('wo_status_display')) {
+                    document.getElementById('wo_status_display').innerText = 'STATUS: ' + (t.status || 'OPEN');
+                }
+
+                // Trigger Auto-Fill Master Data if needed
+                if (t.equip_no) autoFillEquip(t.equip_no);
+
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Data WO ditarik!', showConfirmButton: false, timer: 1500 });
+            } else {
+                console.warn("WO not found in cache for ID:", no);
+                Swal.fire('Info', 'Data WO tidak ditemukan di cache lokal. Coba refresh atau sinkronkan data.', 'info');
             }
         }
+
+
+        function editWO(no) {
+            if (!no) return;
+            console.log("Navigating to edit WO:", no);
+            
+            navigate('buat-wo', true); // preventReset = true
+            
+            // Tunggu sebentar untuk memastikan DOM ter-update (meskipun synchronous, delay kecil membantu kestabilan UI)
+            setTimeout(() => {
+                const input = document.getElementById('no_wo');
+                if (input) {
+                    input.value = no;
+                    tarikDataWO();
+                } else {
+                    console.error("Input #no_wo not found after navigation!");
+                }
+            }, 50);
+        }
+
 
         async function handleSaveSettings(e) {
             e.preventDefault();
@@ -6259,6 +6351,33 @@
                         if (res.success) {
                             Swal.fire('Berhasil!', res.message, 'success');
                             globalDataSync();
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function migratePartUsageToWO() {
+            Swal.fire({
+                title: 'Migrasi ke WorkOrder Sheet?',
+                text: 'Semua data dari sheet "PartUsage" akan dikelompokkan dan dimasukkan ke kolom T (Parts_JSON) di sheet "WorkOrders" sesuai nomor WO.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Migrasikan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#2563eb'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("MIGRASI DATA KE WORKORDERS...");
+                    fetchGAS("migratePartUsageToWorkOrdersSheet", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
                         } else {
                             Swal.fire('Error', res.message, 'error');
                         }
