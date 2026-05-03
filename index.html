@@ -547,6 +547,12 @@
                             <i class="fas fa-paint-roller w-8 group-hover:scale-110 transition-transform"></i>
                             Pengaturan Tema
                         </button>
+                        <button onclick="navigate('systemlogs')"
+                            class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
+                            data-page="systemlogs">
+                            <i class="fas fa-history w-8 group-hover:scale-110 transition-transform"></i>
+                            System Logs
+                        </button>
                     </div>
                 </div>
             </nav>
@@ -2069,6 +2075,7 @@
                                         <option value="part-usage">Part Usage Log</option>
                                         <option value="manage-users">Kelola User</option>
                                         <option value="pengaturan">Pengaturan Tema</option>
+                                        <option value="systemlogs">System Logs</option>
                                     </select>
                                 </div>
                                 <div class="flex items-end">
@@ -2126,7 +2133,7 @@
                                 <div class="flex gap-4 md:gap-6 items-center">
                                     <select id="conf_color" class="w-full md:w-1/2 px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none text-sm shadow-sm" onchange="document.getElementById('conf_color_display').innerText = this.options[this.selectedIndex].text">
                                         <option value="#0f172a">Dark Mode (Hitam)</option>
-                                        <option value="#ffffff">Light Mode (Putih)</option>
+                                        <option value="#7f1d1d">Light Mode (Merah Tua)</option>
                                     </select>
                                     <div>
                                         <p
@@ -2142,6 +2149,8 @@
                                     KONFIGURASI</button>
                             </div>
                         </form>
+
+
 
                         <div
                             class="bg-red-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-red-100 mt-12 shadow-inner">
@@ -2175,6 +2184,47 @@
                             <button type="button" onclick="backupToGoogleSheets()"
                                 class="w-full bg-blue-600 text-white font-black py-3 md:py-4 rounded-xl md:rounded-2xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-all active:scale-95 text-xs uppercase tracking-widest"><i
                                     class="fas fa-cloud-download-alt mr-2"></i> Mulai Backup Data</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="page-systemlogs" class="page pb-12">
+                    <div class="max-w-6xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
+                        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <div>
+                                <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter">
+                                    <i class="fas fa-history mr-3"></i> System Activity Logs
+                                </h2>
+                                <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
+                                    Jejak audit aktifitas sistem dan pengguna
+                                </p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="syncLogsToFirebase()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/30">
+                                    <i class="fas fa-cloud-upload-alt mr-1"></i> Sync ke Firebase
+                                </button>
+                                <button onclick="loadSystemLogs()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30">
+                                    <i class="fas fa-sync-alt mr-1"></i> Refresh Logs
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 md:p-6">
+                            <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner bg-slate-50/50">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                        <tr>
+                                            <th class="p-4 w-16 text-center">No</th>
+                                            <th class="p-4">Timestamp</th>
+                                            <th class="p-4">Action</th>
+                                            <th class="p-4">Message</th>
+                                            <th class="p-4">User</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="systemLogsTableBody" class="text-xs font-medium text-slate-700 bg-white">
+                                        <tr><td colspan="5" class="p-10 text-center text-slate-400">Memuat data logs...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -2342,9 +2392,15 @@
                 <button onclick="closeBDModal()" class="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full text-white transition-colors relative z-10"><i class="fas fa-times"></i></button>
             </div>
             <form id="formBDAwal" onsubmit="handleSaveBDAwal(event)" class="p-4 md:p-6 space-y-4">
-                <div class="space-y-2">
-                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip No (Wajib)</label>
-                    <input type="text" id="bd_equip_no" list="listEquip" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-black uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" placeholder="Ketik Kode Unit" required>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip No (Wajib)</label>
+                        <input type="text" id="bd_equip_no" list="listEquip" onchange="autoFillBDEquip(this.value)" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-black uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" placeholder="Ketik Kode Unit" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">HM Saat Rusak</label>
+                        <input type="number" step="0.1" id="bd_hm" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" placeholder="HM Terakhir: 0">
+                    </div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
                     <div class="space-y-2 col-span-2">
@@ -2933,6 +2989,8 @@
             if (id === 'master-stock') { currentStockPage = 1; renderMasterStockTable(); }
             if (id === 'part-usage') { renderPartUsageTable(); }
             if (id === 'manage-users') { loadUsers(); }
+            if (id === 'pengaturan') { }
+            if (id === 'systemlogs') { loadSystemLogs(); }
         }
 
         function toggleSidebar() {
@@ -3022,6 +3080,49 @@
             const hms = (masterCache.dailyHM || []).filter(h => String(h.equip_no).toUpperCase() === equipNo.toUpperCase());
             if (hms.length === 0) return 0;
             return Math.max(...hms.map(h => parseFloat(h.hm_akhir) || 0));
+        }
+
+        function loadSystemLogs() {
+            const tbody = document.getElementById('systemLogsTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-400">Mencoba menarik data logs dari server...</td></tr>';
+            
+            fetchGAS("getSystemLogs", {}).then(res => {
+                if (res.success) {
+                    const logs = JSON.parse(res.payload || "[]");
+                    if (logs.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-400">Belum ada jejak audit tersimpan.</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = logs.map((l, i) => {
+                        const userClass = l.user === 'SYSTEM' ? 'bg-slate-100 text-slate-600' : 'bg-blue-50 text-blue-700';
+                        const actionClass = l.action.toLowerCase().includes('error') ? 'text-red-600 font-black' : 'text-slate-900 font-bold';
+                        return `
+                        <tr class="hover:bg-slate-50 border-b border-slate-100 transition-colors">
+                            <td class="p-4 text-center font-black text-slate-300 text-[10px]">${i + 1}</td>
+                            <td class="p-4 font-bold text-slate-500 text-[10px]"><i class="far fa-clock mr-1"></i> ${l.timestamp}</td>
+                            <td class="p-4 ${actionClass} text-[11px] uppercase">${l.action}</td>
+                            <td class="p-4 text-slate-600 italic font-medium max-w-xs truncate" title="${l.message}">${l.message}</td>
+                            <td class="p-4"><span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase shadow-sm ${userClass}">${l.user}</span></td>
+                        </tr>`;
+                    }).join('');
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-red-400">Gagal memuat: ' + res.message + '</td></tr>';
+                }
+            });
+        }
+
+        function syncLogsToFirebase() {
+            startLoading("Sinkronisasi Logs ke Firebase...");
+            fetchGAS("syncSystemLogsToFirebase", {}).then(res => {
+                endLoading();
+                if (res.success) {
+                    Swal.fire('Berhasil', res.message, 'success');
+                    loadSystemLogs();
+                } else {
+                    Swal.fire('Gagal', res.message, 'error');
+                }
+            });
         }
 
         window.showKPIAudit = function (type) {
@@ -4319,6 +4420,17 @@
             const actualHM = getActualHM(target);
             if (document.getElementById('hm_km') && actualHM > 0) {
                 document.getElementById('hm_km').value = actualHM;
+                showToast("HM Terakhir Unit " + target + ": " + actualHM, "info");
+            }
+        }
+
+        function autoFillBDEquip(val) {
+            if (!val) return;
+            const actualHM = getActualHM(val.trim().toUpperCase());
+            const hmInput = document.getElementById('bd_hm');
+            if (hmInput && actualHM > 0) {
+                hmInput.value = actualHM;
+                showToast("HM Terakhir Unit " + val.toUpperCase() + ": " + actualHM, "info");
             }
         }
 
@@ -5922,6 +6034,7 @@
             const payload = {
                 no_wo: noIdInput,
                 equip_no: document.getElementById('bd_equip_no').value.toUpperCase(),
+                hm_km: document.getElementById('bd_hm').value || 0,
                 kendala: document.getElementById('bd_problem').value,
                 tgl_rusak: document.getElementById('bd_tgl').value,
                 jam_rusak: document.getElementById('bd_jam').value,
