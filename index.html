@@ -2008,6 +2008,7 @@
                                     Access</label>
                                 <select id="u_role"
                                     class="w-full px-4 py-3 md:py-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-theme-accent outline-none font-bold shadow-sm cursor-pointer text-sm">
+                                    <option value="IT helpdesk">IT helpdesk</option>
                                     <option value="SPV Planner">SPV Planner</option>
                                     <option value="Admin Plant">Admin Plant</option>
                                     <option value="Mekanik">Mekanik</option>
@@ -2765,12 +2766,18 @@
                     }
                 }
 
+            } else if (r === 'IT HELPDESK') {
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "System Administrator 👋";
+                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Full access enabled. You can manage users, sync data, and perform system migrations.";
+                if (nAd) nAd.style.display = 'block';
             } else {
                 // SPV PLANNER / ADMIN PLANT
                 const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Welcome back, " + dN.innerText + "!";
                 const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Pantau metrik KPI, WO Terbuka, Backlog, dan ketersediaan alat secara Real-Time.";
                 if (nAd) nAd.style.display = r.includes('PLANNER') ? 'block' : 'none';
             }
+
+            applyITRestrictions();
 
             // Restore sidebar preferences setelah role-based visibility selesai
             restoreSidebarPreferences();
@@ -2961,6 +2968,12 @@
         // UI & NAVIGATION FUNCTIONS
         // ==========================================
         function navigate(id, preventReset = false) {
+            // Guard for IT-only pages
+            if ((id === 'manage-users' || id === 'systemlogs' || id === 'pengaturan') && !checkITAccess()) {
+                Swal.fire('Ditolak', 'Hanya IT Helpdesk yang dapat mengakses fitur ini.', 'error');
+                return;
+            }
+
             if (window.innerWidth < 768) {
                 const sb = document.getElementById('sidebar'); if (sb) sb.classList.remove('open');
                 const sbo = document.getElementById('sidebarOverlay'); if (sbo) sbo.classList.remove('active');
@@ -3067,6 +3080,71 @@
             }
         }
 
+        function checkITAccess() {
+            if (!currentUser) return false;
+            return (currentUser.role || '').toUpperCase() === 'IT HELPDESK';
+        }
+
+        window.applyITRestrictions = function () {
+            const isIT = checkITAccess();
+            
+            // 1. Hide/Show System Logs & Manage Users menu in sidebar
+            const btnLogs = document.querySelector('[data-page="systemlogs"]');
+            if (btnLogs) btnLogs.style.display = isIT ? 'flex' : 'none';
+
+            const btnUsers = document.querySelector('[data-page="manage-users"]');
+            if (btnUsers) btnUsers.style.display = isIT ? 'flex' : 'none';
+
+            // 2. Hide/Show Generate ID & Sync buttons across pages
+            const sensitiveButtons = [
+                // Input Service
+                { onclick: 'runGenerateServiceIDs()', page: 'input-service' },
+                { onclick: 'runSyncServiceToFirebase()', page: 'input-service' },
+                // Activity Log
+                { onclick: 'runGenerateActivityIDs()', page: 'aktifitas' },
+                { onclick: 'runSyncActivityToFirebase()', page: 'aktifitas' },
+                // Backlog
+                { onclick: 'runGenerateBacklogIDs()', page: 'backlog' },
+                { onclick: 'runSyncBacklogToFirebase()', page: 'backlog' },
+                // Daily HM
+                { onclick: 'runGenerateHMIDs()', page: 'daily-hm' },
+                { onclick: 'runSyncHMToFirebase()', page: 'daily-hm' },
+                // Monitoring & Part Usage
+                { onclick: 'runFullBackupUI()', page: 'list-wo' },
+                { onclick: 'runPartUsageImport()', page: 'list-wo' },
+                { onclick: 'syncFromPartUsageSheet()', page: 'list-wo' },
+                { onclick: 'migratePartUsageToWO()', page: 'list-wo' },
+                // System Logs
+                { onclick: 'syncLogsToFirebase()', page: 'systemlogs' }
+            ];
+
+            sensitiveButtons.forEach(btnInfo => {
+                const buttons = document.querySelectorAll(`button[onclick^="${btnInfo.onclick}"]`);
+                buttons.forEach(btn => {
+                    btn.style.display = isIT ? 'block' : 'none';
+                });
+            });
+
+            // 3. Hide Migration & Backup sections in Pengaturan
+            // We'll look for the containers based on their content since they don't have IDs
+            const settingsPage = document.getElementById('page-pengaturan');
+            if (settingsPage && !isIT) {
+                const migrationSections = settingsPage.querySelectorAll('.bg-red-50, .bg-amber-50, .bg-blue-50');
+                migrationSections.forEach(section => {
+                    if (section.innerHTML.includes('Cloud Migration') || 
+                        section.innerHTML.includes('Stock Migration') || 
+                        section.innerHTML.includes('Backup Firebase')) {
+                        section.style.display = 'none';
+                    }
+                });
+            } else if (settingsPage && isIT) {
+                const migrationSections = settingsPage.querySelectorAll('.bg-red-50, .bg-amber-50, .bg-blue-50');
+                migrationSections.forEach(section => {
+                    section.style.display = 'block';
+                });
+            }
+        }
+
         function startLoading(t) {
             const lt = document.getElementById('loadingText'); if (lt) lt.innerText = t || "Processing...";
             const lo = document.getElementById('loadingOverlay'); if (lo) lo.classList.remove('hidden');
@@ -3116,6 +3194,7 @@
         }
 
         function syncLogsToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             startLoading("Sinkronisasi Logs ke Firebase...");
             fetchGAS("syncSystemLogsToFirebase", {}).then(res => {
                 endLoading();
@@ -4662,6 +4741,7 @@
         }
 
         async function migrateToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             if (!db) return Swal.fire('Error', 'Firebase belum aktif.', 'error');
 
             const result = await Swal.fire({
@@ -4833,6 +4913,7 @@
         }
 
         async function migrateStockToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             if (!db) return Swal.fire('Error', 'Firebase belum aktif.', 'error');
 
             const result = await Swal.fire({
@@ -6148,6 +6229,7 @@
         }
 
         function backupToGoogleSheets() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             startLoading("MENGIRIM DATA...");
             db.ref().once('value').then(snapshot => {
                 const allData = snapshot.val();
@@ -6238,6 +6320,7 @@
         }
 
         function runFullBackupUI() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Refresh Data?',
                 text: 'Sistem akan menarik ulang data dari database untuk memastikan tampilan log sesuai dengan Work Order terbaru.',
@@ -6253,6 +6336,7 @@
         }
 
         function runPartUsageImport() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Import ke Google Sheet?',
                 text: 'Data penggunaan part akan dikirim dan dimigrasikan ke sheet "PartUsage" di Google Spreadsheet.',
@@ -6310,6 +6394,7 @@
         }
 
         function runGenerateBacklogIDs() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Generate ID Random?',
                 text: 'Sistem akan memeriksa sheet "Backlog" dan mengisi ID yang kosong secara otomatis. Ini membantu data agar bisa terbaca di Firebase.',
@@ -6335,6 +6420,7 @@
             });
         }
         function syncFromPartUsageSheet() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Sync dari Sheet ke Firebase?',
                 text: 'Sistem akan membaca isi sheet "PartUsage" dan mengupdate data Parts di Firebase sesuai No WO. Pastikan format kolom tidak berubah.',
@@ -6363,6 +6449,7 @@
         }
 
         function migratePartUsageToWO() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Migrasi ke WorkOrder Sheet?',
                 text: 'Semua data dari sheet "PartUsage" akan dikelompokkan dan dimasukkan ke kolom T (Parts_JSON) di sheet "WorkOrders" sesuai nomor WO.',
@@ -6389,6 +6476,7 @@
             });
         }
         function runSyncBacklogToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Sinkronkan Backlog?',
                 text: 'Semua data di sheet "Backlog" akan dikirim ke Firebase. Ini akan menimpa data di Firebase dengan data dari Spreadsheet.',
@@ -6417,6 +6505,7 @@
         }
 
         function runGenerateServiceIDs() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Generate ID & Timestamp?',
                 text: 'Sistem akan mengisi ID dan Waktu Input yang kosong pada sheet "ServiceHistory".',
@@ -6443,6 +6532,7 @@
         }
 
         function runSyncServiceToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Sync Service ke Firebase?',
                 text: 'Semua riwayat service di spreadsheet akan dikirim ke database Firebase.',
@@ -6470,6 +6560,7 @@
             });
         }
         function runGenerateHMIDs() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Generate ID & Timestamp?',
                 text: 'Sistem akan mengisi ID dan Waktu Input yang kosong pada sheet "DailyHM".',
@@ -6496,6 +6587,7 @@
         }
 
         function runSyncHMToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Sync HM ke Firebase?',
                 text: 'Semua data Hour Meter di spreadsheet akan dikirim ke database Firebase.',
@@ -6524,6 +6616,7 @@
         }
 
         function runGenerateActivityIDs() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Generate ID & Timestamp?',
                 text: 'Sistem akan mengisi ID dan Waktu Input yang kosong pada sheet "MechanicActivity".',
@@ -6550,6 +6643,7 @@
         }
 
         function runSyncActivityToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
             Swal.fire({
                 title: 'Sync Aktifitas ke Firebase?',
                 text: 'Semua data laporan aktifitas di spreadsheet akan dikirim ke database Firebase.',
