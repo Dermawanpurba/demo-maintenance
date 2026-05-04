@@ -2872,8 +2872,8 @@
                 masterCache.serviceHistory = fb.service_history ? Object.values(fb.service_history) : [];
                 masterCache.stock = fb.master_stock ? Object.values(fb.master_stock) : [];
 
-                woDataCache = fb.work_orders ? Object.values(fb.work_orders) : [];
-                backlogCache = fb.backlogs ? Object.values(fb.backlogs) : [];
+                woDataCache = fb.work_orders ? Object.keys(fb.work_orders).map(key => ({ ...fb.work_orders[key], no_wo: fb.work_orders[key].no_wo || key })) : [];
+                backlogCache = fb.backlogs ? Object.keys(fb.backlogs).map(key => ({ ...fb.backlogs[key], id: fb.backlogs[key].id || key })) : [];
                 partsDictCache = masterCache.stock;
                 allUsersCache = masterCache.usersData;
 
@@ -2917,18 +2917,20 @@
             db.ref('work_orders').on('value', (snapshot) => {
                 if (snapshot.exists()) {
                     const fbData = snapshot.val();
-                    // FIX: Hapus cache di frontend jika data di Firebase sudah tidak ada
-                    woDataCache = woDataCache.filter(w => fbData[w.no_wo]);
+                    // FIX: Hapus cache di frontend jika data di Firebase sudah tidak ada (Gunakan filter aman)
+                    woDataCache = woDataCache.filter(w => w.no_wo && fbData[w.no_wo]);
 
                     Object.keys(fbData).forEach(key => {
+                        let item = fbData[key];
+                        if (!item.no_wo) item.no_wo = key; // Ensure no_wo exists in object
+
                         let idx = woDataCache.findIndex(w => w.no_wo === key);
-                        if (idx > -1) { woDataCache[idx] = { ...woDataCache[idx], ...fbData[key] }; }
-                        else { woDataCache.unshift(fbData[key]); }
+                        if (idx > -1) { woDataCache[idx] = { ...woDataCache[idx], ...item }; }
+                        else { woDataCache.unshift(item); }
                     });
                     calculateKPIFrontEnd();
                     const pLwo = document.getElementById('page-list-wo'); if (pLwo && pLwo.classList.contains('active')) renderWOTable();
                 } else {
-                    // FIX: Render ulang jika semua data di Firebase dihapus
                     woDataCache = [];
                     calculateKPIFrontEnd();
                     const pLwo = document.getElementById('page-list-wo'); if (pLwo && pLwo.classList.contains('active')) renderWOTable();
@@ -2939,18 +2941,20 @@
                 if (snapshot.exists()) {
                     const fbData = snapshot.val();
                     // FIX: Sinkronisasi pembersihan cache
-                    backlogCache = backlogCache.filter(b => fbData[b.id]);
+                    backlogCache = backlogCache.filter(b => b.id && fbData[b.id]);
 
                     Object.keys(fbData).forEach(key => {
+                        let item = fbData[key];
+                        if (!item.id) item.id = key;
+
                         let idx = backlogCache.findIndex(b => b.id === key);
-                        if (idx > -1) backlogCache[idx] = { ...backlogCache[idx], ...fbData[key] };
-                        else backlogCache.unshift(fbData[key]);
+                        if (idx > -1) backlogCache[idx] = { ...backlogCache[idx], ...item };
+                        else backlogCache.unshift(item);
                     });
                     const pBl = document.getElementById('page-backlog'); if (pBl && pBl.classList.contains('active')) renderBacklogTable();
                     const pLwo = document.getElementById('page-list-wo'); if (pLwo && pLwo.classList.contains('active')) renderWOTable();
                     calculateKPIFrontEnd();
                 } else {
-                    // FIX: Kosongkan jika Firebase kosong
                     backlogCache = [];
                     const pBl = document.getElementById('page-backlog'); if (pBl && pBl.classList.contains('active')) renderBacklogTable();
                 }
@@ -6262,6 +6266,15 @@
 
             let flatParts = [];
             woDataCache.forEach(wo => {
+                const getVal = (keys) => {
+                    for (let k of keys) if (wo[k] !== undefined && wo[k] !== null && String(wo[k]).trim() !== '') return wo[k];
+                    return "";
+                };
+
+                const equip_no = getVal(['equip_no', 'equipno', 'Equip_No']);
+                const tgl_rusak = getVal(['tgl_rusak', 'tglrusak', 'Tgl_Rusak']);
+                const status = getVal(['status', 'Status', 'Status_WO']) || 'OPEN';
+
                 let parts = [];
                 try {
                     if (wo.parts_json) parts = JSON.parse(wo.parts_json);
@@ -6273,14 +6286,14 @@
                         if (p.no || p.desc) {
                             flatParts.push({
                                 no_wo: wo.no_wo,
-                                equip_no: wo.equip_no,
-                                tgl_rusak: wo.tgl_rusak,
+                                equip_no: equip_no,
+                                tgl_rusak: tgl_rusak,
                                 part_no: p.no,
                                 desc: p.desc,
                                 qty: p.qty,
                                 uom: p.uom,
                                 rem: p.rem,
-                                status: wo.status
+                                status: status
                             });
                         }
                     });
