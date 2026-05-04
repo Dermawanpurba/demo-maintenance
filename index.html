@@ -3596,13 +3596,21 @@
                         return start <= filterEnd;
                     });
 
+                    // Urutkan berdasarkan waktu mulai terbaru agar status mengacu pada data terkini (Sesuai Logika Cloud Migration)
+                    wosAsOfEnd.sort((a, b) => {
+                        const startA = new Date(`${a.tgl_rusak}T${a.jam_rusak || '00:00'}`);
+                        const startB = new Date(`${b.tgl_rusak}T${b.jam_rusak || '00:00'}`);
+                        return startB - startA;
+                    });
+
                     let isBD = false;
-                    for (let w of wosAsOfEnd) {
-                        if (w.status !== 'CLOSED' || !w.tgl_selesai) {
-                            isBD = true; break;
+                    if (wosAsOfEnd.length > 0) {
+                        const latestW = wosAsOfEnd[0];
+                        if (latestW.status !== 'CLOSED' || !latestW.tgl_selesai) {
+                            isBD = true;
                         } else {
-                            const end = new Date(`${w.tgl_selesai}T${w.jam_selesai || '00:00'}`);
-                            if (end > filterEnd) { isBD = true; break; }
+                            const end = new Date(`${latestW.tgl_selesai}T${latestW.jam_selesai || '00:00'}`);
+                            if (end > filterEnd) { isBD = true; }
                         }
                     }
                     if (isBD) { boardData[model].bd.push(unitNo); } else { boardData[model].rfu.push(unitNo); }
