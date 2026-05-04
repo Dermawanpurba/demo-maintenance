@@ -1151,6 +1151,7 @@
                                         <th class="p-4 md:p-6 text-center w-32">ACTUAL HM</th>
                                         <th class="p-4 md:p-6 text-center w-32">ACTUAL DATE</th>
                                         <th class="p-4 md:p-6 text-center w-32">DEVIASI HM</th>
+                                        <th class="p-4 md:p-6 text-center w-24">AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody id="serviceHistoryTableBody"
@@ -1517,6 +1518,7 @@
                                             <th class="p-4 md:p-5 text-right">HM AKHIR</th>
                                             <th class="p-4 md:p-5 text-right text-theme-accent">TOTAL HM</th>
                                             <th class="p-4 md:p-5 text-center">DEVIASI</th>
+                                            <th class="p-4 md:p-5 text-center">AKSI</th>
                                         </tr>
                                     </thead>
                                     <tbody id="dailyHmTableBody"
@@ -1627,6 +1629,7 @@
                                         <th class="p-4 md:p-5 text-center">LAST SERVICE</th>
                                         <th class="p-4 md:p-5 text-center">NEXT SERVICE (+250)</th>
                                         <th class="p-4 md:p-5 text-center">STATUS (Real-Time)</th>
+                                        <th class="p-4 md:p-5 text-center w-16">AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody id="masterPlanBody" class="divide-y divide-slate-50"></tbody>
@@ -3941,9 +3944,36 @@
 
                 if (statusFilter !== 'ALL' && statusRaw !== statusFilter) return;
                 count++;
-                html += `<tr class="border-b hover:bg-slate-50"><td class="p-4"><div class="font-black uppercase">${unitNo}</div><div class="text-[10px] text-slate-400 font-bold uppercase">${p.model || '-'}</div></td><td class="p-4 text-center border-l border-slate-100"><div class="font-black text-theme-accent text-lg">${p.plan_hours_per_month}<span class="text-[10px] text-slate-400 ml-1">h/Bln</span></div><div class="text-[9px] font-bold text-blue-400 mt-1">${p.plan_pa || 85}% PA</div></td><td class="p-4 text-center border-l border-slate-100"><div class="font-black text-xs">${lastDate}</div><div class="text-[10px] font-bold text-slate-400 mt-1">HM: ${lastHM}</div></td><td class="p-4 text-center border-l border-slate-100"><div class="font-black text-amber-600 text-xl">${nextHM}</div><div class="text-[9px] text-slate-500 mt-1">Sisa: ${remainingText}</div></td><td class="p-4 text-center border-l border-slate-100"><div class="mb-3">${statusBadge}</div><div class="text-[10px] text-slate-500 font-bold uppercase">HM Aktual: <span class="text-theme-main font-black">${actualHM > 0 ? actualHM : '-'}</span></div></td></tr>`;
+                const isIT = checkITAccess();
+                let deleteBtn = isIT ? `<button onclick="handleDeletePlan('${unitNo}')" class="text-red-500 hover:text-red-700 ml-2" title="Hapus Plan"><i class="fas fa-trash-alt"></i></button>` : '';
+                
+                html += `<tr class="border-b hover:bg-slate-50">
+                    <td class="p-4">
+                        <div class="font-black uppercase">${unitNo}</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">${p.model || '-'}</div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        <div class="font-black text-theme-accent text-lg">${p.plan_hours_per_month}<span class="text-[10px] text-slate-400 ml-1">h/Bln</span></div>
+                        <div class="text-[9px] font-bold text-blue-400 mt-1">${p.plan_pa || 85}% PA</div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        <div class="font-black text-xs">${lastDate}</div>
+                        <div class="text-[10px] font-bold text-slate-400 mt-1">HM: ${lastHM}</div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        <div class="font-black text-amber-600 text-xl">${nextHM}</div>
+                        <div class="text-[9px] text-slate-500 mt-1">Sisa: ${remainingText}</div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        <div class="mb-3">${statusBadge}</div>
+                        <div class="text-[10px] text-slate-500 font-bold uppercase">HM Aktual: <span class="text-theme-main font-black">${actualHM > 0 ? actualHM : '-'}</span></div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        ${deleteBtn || '-'}
+                    </td>
+                </tr>`;
             });
-            if (count === 0) pb.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold">Tidak ada data.</td></tr>'; else pb.innerHTML = html;
+            if (count === 0) pb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">Tidak ada data.</td></tr>'; else pb.innerHTML = html;
         }
 
         function renderDailyHMTable() {
@@ -3989,7 +4019,7 @@
             const hmPageInfo = document.getElementById('hmPageInfo');
             if (hmPageInfo) hmPageInfo.innerText = `${currentHmPage} / ${totalPages}`;
 
-            if (paged.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">Kosong.</td></tr>'; return; }
+            if (paged.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Kosong.</td></tr>'; return; }
 
             tbody.innerHTML = paged.map(h => {
                 let devBadge = '-';
@@ -4000,13 +4030,13 @@
                     else devBadge = `<span class="px-2 py-1 bg-red-100 text-red-700 rounded-md text-[9px] font-black animate-pulse border border-red-200">${d.toFixed(1)}</span>`;
                 } else { devBadge = `<span class="text-slate-300 text-[9px] font-bold">Data Awal</span>`; }
 
-                const tgl = h.tanggal || '-';
-                const eq = h.equip_no || h.equipno || '-';
-                const hmA = h.hm_awal || h.hmawal || '0';
-                const hmK = h.hm_akhir || h.hmakhir || '0';
-                const tot = h.total_hm || h.totalhm || '0';
+                const isIT = checkITAccess();
+                let deleteBtn = '-';
+                if (isIT) {
+                    deleteBtn = `<button onclick="handleDeleteHM('${h.id}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl mx-auto" title="Hapus HM"><i class="fas fa-trash text-[10px]"></i></button>`;
+                }
 
-                return `<tr class="border-b hover:bg-slate-50"><td class="p-4 font-bold text-slate-500 text-xs">${tgl}</td><td class="p-4 font-black uppercase text-slate-800">${eq}</td><td class="p-4 text-right font-mono text-sm">${hmA}</td><td class="p-4 text-right font-mono text-sm">${hmK}</td><td class="p-4 text-right font-black text-theme-accent text-sm">${tot} h</td><td class="p-4 text-center">${devBadge}</td></tr>`;
+                return `<tr class="border-b hover:bg-slate-50"><td class="p-4 font-bold text-slate-500 text-xs">${tgl}</td><td class="p-4 font-black uppercase text-slate-800">${eq}</td><td class="p-4 text-right font-mono text-sm">${hmA}</td><td class="p-4 text-right font-mono text-sm">${hmK}</td><td class="p-4 text-right font-black text-theme-accent text-sm">${tot} h</td><td class="p-4 text-center">${devBadge}</td><td class="p-4 text-center">${deleteBtn}</td></tr>`;
             }).join('');
         }
 
@@ -4086,7 +4116,7 @@
                 const safeId = a.id ? a.id : 'undefined';
 
                 let actionBtn = '-';
-                if (isPlanner) {
+                if (checkITAccess()) {
                     actionBtn = `<button onclick="deleteActivity('${safeId}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl mx-auto" title="Hapus Aktifitas"><i class="fas fa-trash text-[10px]"></i></button>`;
                 }
 
@@ -4166,7 +4196,7 @@
 
                 let actionButtons = `<button onclick="printWO('${i.no_wo}')" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-xl hover:bg-slate-900 hover:text-white" title="Cetak WO"><i class="fas fa-print text-xs"></i></button>`;
                 if (isPlanner || isPlant) actionButtons += `<button onclick="updateStatus('${i.no_wo}')" class="w-8 h-8 flex items-center justify-center bg-amber-500 hover:bg-amber-600 text-white rounded-xl shadow-sm" title="Update Status"><i class="fas fa-tasks text-xs"></i></button>`;
-                if (isPlanner) actionButtons += `<button onclick="handleDeleteWO('${i.no_wo}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl" title="Hapus WO"><i class="fas fa-trash text-xs"></i></button>`;
+                if (checkITAccess()) actionButtons += `<button onclick="handleDeleteWO('${i.no_wo}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl" title="Hapus WO"><i class="fas fa-trash text-xs"></i></button>`;
 
                 const safeJamR = formatTimeOnly(i.jam_rusak);
 
@@ -4249,7 +4279,7 @@
                                 <span class="px-4 py-1.5 rounded-lg text-[9px] font-black cursor-pointer ${stCol}" onclick="updateBacklogStatus('${b.id}')" title="Ubah status">${b.status || 'OPEN'}</span>
                             </td>
                             <td class="p-4 text-right">
-                                <button onclick="deleteBacklog('${b.id}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl ml-auto"><i class="fas fa-trash"></i></button>
+                                ${checkITAccess() ? `<button onclick="deleteBacklog('${b.id}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl ml-auto"><i class="fas fa-trash"></i></button>` : '-'}
                             </td>
                         </tr>`;
             }).join('');
@@ -4983,6 +5013,7 @@
         async function handleSaveActivity(e) {
             e.preventDefault();
             if (isSavingAct) return;
+            isSavingAct = true;
 
             const btn = e.target.querySelector('button[type="submit"]');
             const oldText = btn ? btn.innerText : "";
@@ -5015,7 +5046,6 @@
                 btn.disabled = true;
                 btn.innerText = "MENYIMPAN...";
             }
-            isSavingAct = true;
 
             startLoading("SAVING ACTIVITY TO FIREBASE...");
 
@@ -5114,6 +5144,7 @@
         async function handleSaveWO(e) {
             e.preventDefault();
             if (isSavingWO) return;
+            isSavingWO = true;
 
             const btn = e.target.querySelector('button[type="submit"]');
             const oldText = btn ? btn.innerText : "";
@@ -5183,7 +5214,6 @@
                 btn.disabled = true;
                 btn.innerText = "MENYIMPAN...";
             }
-            isSavingWO = true;
 
             startLoading("MENYIMPAN WO KE FIREBASE...");
 
@@ -5213,6 +5243,7 @@
         async function handleSaveDailyHM(e) {
             e.preventDefault();
             if (isSavingHM) return;
+            isSavingHM = true;
 
             const btn = e.target.querySelector('button[type="submit"]');
             const oldText = btn ? btn.innerText : "";
@@ -5229,7 +5260,6 @@
                 btn.disabled = true;
                 btn.innerText = "MENYIMPAN...";
             }
-            isSavingHM = true;
 
             startLoading("SAVING HM TO FIREBASE...");
 
@@ -5777,6 +5807,92 @@
             });
         }
 
+        async function handleDeleteHM(id) {
+            const result = await Swal.fire({
+                title: 'Hapus Data HM?',
+                text: "Data HM ini akan dihapus permanen dari Server & Cloud.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonColor: '#ef4444'
+            });
+
+            if (result.isConfirmed) {
+                startLoading("MENGHAPUS DATA HM...");
+                try {
+                    const res = await fetchGAS("deleteDailyHM", { id: id });
+                    if (res.success) {
+                        await db.ref('daily_hm/' + id).remove();
+                        Swal.fire('Terhapus!', 'Data Daily HM berhasil dihapus.', 'success');
+                        globalDataSync();
+                    } else {
+                        throw new Error(res.message);
+                    }
+                } catch (err) {
+                    Swal.fire('Error', err.toString(), 'error');
+                } finally {
+                    endLoading();
+                }
+            }
+        }
+
+        async function handleDeleteService(id) {
+            const result = await Swal.fire({
+                title: 'Hapus Riwayat Service?',
+                text: "Riwayat service ini akan dihapus permanen.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonColor: '#ef4444'
+            });
+
+            if (result.isConfirmed) {
+                startLoading("MENGHAPUS DATA SERVICE...");
+                try {
+                    const res = await fetchGAS("deleteServiceHistory", { id: id });
+                    if (res.success) {
+                        await db.ref('service_history/' + id).remove();
+                        Swal.fire('Terhapus!', 'Data riwayat service berhasil dihapus.', 'success');
+                        globalDataSync();
+                    } else {
+                        throw new Error(res.message);
+                    }
+                } catch (err) {
+                    Swal.fire('Error', err.toString(), 'error');
+                } finally {
+                    endLoading();
+                }
+            }
+        }
+
+        async function handleDeletePlan(equipNo) {
+            const result = await Swal.fire({
+                title: 'Hapus Plan Alat?',
+                text: `Hapus seluruh plan service untuk unit ${equipNo}?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonColor: '#ef4444'
+            });
+
+            if (result.isConfirmed) {
+                startLoading("MENGHAPUS PLAN...");
+                try {
+                    const res = await fetchGAS("deletePlan", { equip_no: equipNo });
+                    if (res.success) {
+                        Swal.fire('Terhapus!', 'Plan alat berhasil dihapus.', 'success');
+                        globalDataSync();
+                    } else {
+                        throw new Error(res.message);
+                    }
+                } catch (err) {
+                    Swal.fire('Error', err.toString(), 'error');
+                } finally {
+                    endLoading();
+                }
+            }
+        }
+
         function deleteBacklog(id) {
             Swal.fire({
                 title: 'Hapus Backlog?',
@@ -5993,7 +6109,7 @@
             let data = [...(masterCache.serviceHistory || [])].reverse(); // Urutkan dari yang terbaru
 
             if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">Belum ada riwayat service terdaftar.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Belum ada riwayat service terdaftar.</td></tr>';
                 return;
             }
 
@@ -6009,6 +6125,12 @@
 
                 const safeEquip = d.equip_no || '-';
 
+                const isIT = checkITAccess();
+                let deleteBtn = '-';
+                if (isIT) {
+                    deleteBtn = `<button onclick="handleDeleteService('${d.id}')" class="w-8 h-8 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-600 hover:text-white rounded-xl mx-auto" title="Hapus Service"><i class="fas fa-trash text-[10px]"></i></button>`;
+                }
+
                 return `<tr class="border-b hover:bg-slate-50 transition-colors">
                             <td class="p-4">
                                 <button type="button" onclick="navigate('master-plan'); setTimeout(() => { document.getElementById('filterPlan').value = '${safeEquip}'; renderMasterPlanTable(); }, 100);" class="font-black uppercase text-theme-main bg-slate-100 hover:bg-theme-main hover:text-white px-3 py-2 rounded-lg transition-all shadow-sm text-xs cursor-pointer flex items-center gap-2 border border-slate-200 hover:border-theme-main group">
@@ -6020,6 +6142,7 @@
                             <td class="p-4 text-center font-black text-emerald-700 bg-emerald-50/30 text-sm">${d.actual_hm || '-'}</td>
                             <td class="p-4 text-center font-bold text-slate-600 bg-emerald-50/30 text-xs uppercase tracking-widest">${d.actual_date || '-'}</td>
                             <td class="p-4 text-center">${devBadge}</td>
+                            <td class="p-4 text-center">${deleteBtn}</td>
                         </tr>`;
             }).join('');
         }
@@ -6311,6 +6434,7 @@
         async function handleSaveBDAwal(e) {
             e.preventDefault();
             if (isSavingBD) return;
+            isSavingBD = true;
 
             const btn = e.target.querySelector('button[type="submit"]');
             const oldText = btn ? btn.innerText : "";
@@ -6337,7 +6461,6 @@
                 btn.disabled = true;
                 btn.innerText = "MENYIMPAN...";
             }
-            isSavingBD = true;
 
             startLoading("MENYIMPAN LAPORAN BD AWAL...");
             try {
@@ -6450,9 +6573,7 @@
                         </span>
                     </td>
                     <td class="p-4 text-center">
-                        <button onclick="deletePartFromUsage('${p.no_wo}', '${p.part_no}')" class="text-red-500 hover:text-red-700 transition-colors">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        ${checkITAccess() ? `<button onclick="deletePartFromUsage('${p.no_wo}', '${p.part_no}')" class="text-red-500 hover:text-red-700 transition-colors"><i class="fas fa-trash-alt"></i></button>` : '-'}
                     </td>
                 </tr>
             `).join('');
