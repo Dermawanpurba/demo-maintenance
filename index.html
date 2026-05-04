@@ -4979,8 +4979,14 @@
             }
         }
 
+        let isSavingAct = false;
         async function handleSaveActivity(e) {
             e.preventDefault();
+            if (isSavingAct) return;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const oldText = btn ? btn.innerText : "";
+
             const checkedMechanics = Array.from(document.querySelectorAll('input[name="mechanic_check"]:checked')).map(cb => cb.value);
             if (checkedMechanics.length === 0) return Swal.fire('Perhatian', 'Harap pilih minimal 1 mekanik yang melakukan aktifitas.', 'warning');
 
@@ -5004,6 +5010,12 @@
             });
 
             if(!isValid) return Swal.fire('Perhatian', 'Semua kolom Work Order dan Deskripsi pada setiap aktivitas wajib diisi.', 'warning');
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "MENYIMPAN...";
+            }
+            isSavingAct = true;
 
             startLoading("SAVING ACTIVITY TO FIREBASE...");
 
@@ -5042,6 +5054,12 @@
                 endLoading();
                 console.error("Save Activity Error:", err);
                 Swal.fire('Error Database', err.toString(), 'error');
+            } finally {
+                isSavingAct = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = oldText;
+                }
             }
         }
 
@@ -5092,8 +5110,13 @@
             return prefix + nextSeq;
         }
 
+        let isSavingWO = false;
         async function handleSaveWO(e) {
             e.preventDefault();
+            if (isSavingWO) return;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const oldText = btn ? btn.innerText : "";
 
             // 1. Kumpulkan Data Spareparts dari Tabel Form
             const partsData = [];
@@ -5156,6 +5179,12 @@
                 last_sync: new Date().toISOString()
             };
 
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "MENYIMPAN...";
+            }
+            isSavingWO = true;
+
             startLoading("MENYIMPAN WO KE FIREBASE...");
 
             try {
@@ -5171,11 +5200,23 @@
                 endLoading();
                 console.error("Firebase Save WO Error:", err);
                 Swal.fire('Error Database', 'Gagal menyimpan ke Firebase: ' + err.message, 'error');
+            } finally {
+                isSavingWO = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = oldText;
+                }
             }
         }
 
+        let isSavingHM = false;
         async function handleSaveDailyHM(e) {
             e.preventDefault();
+            if (isSavingHM) return;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const oldText = btn ? btn.innerText : "";
+
             const eq = document.getElementById('hm_equip_no').value.toUpperCase().trim();
             const hmAwal = parseFloat(document.getElementById('hm_awal').value);
             const hmAkhir = parseFloat(document.getElementById('hm_akhir').value);
@@ -5183,6 +5224,12 @@
 
             if (hmAkhir < hmAwal) return Swal.fire('Error', 'HM Akhir tidak boleh lebih kecil dari HM Awal!', 'error');
             if (!eq || !tgl) return Swal.fire('Error', 'Lengkapi data Unit dan Tanggal!', 'error');
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "MENYIMPAN...";
+            }
+            isSavingHM = true;
 
             startLoading("SAVING HM TO FIREBASE...");
 
@@ -5218,18 +5265,33 @@
                 document.getElementById('dailyHmForm').reset();
                 document.getElementById('hm_tanggal').value = getShiftDate();
 
-                // Tidak perlu memanggil globalDataSync() karena listener (db.ref('daily_hm').on) 
-                // akan otomatis mendeteksi perubahan dan merender ulang tabel HM dan Papan Dashboard.
-
             } catch (err) {
                 endLoading();
                 console.error("Save Daily HM Error:", err);
                 Swal.fire('Gagal Simpan', 'Sistem gagal mengirim data ke Cloud: ' + err.toString(), 'error');
+            } finally {
+                isSavingHM = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = oldText;
+                }
             }
         }
 
+        let isSavingBL = false;
         async function handleSaveBacklog(e) {
             e.preventDefault();
+            if (isSavingBL) return;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const oldText = btn ? btn.innerText : "";
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "MENYIMPAN...";
+            }
+            isSavingBL = true;
+
             startLoading("SAVING TO FIREBASE...");
 
             // Buat ID unik di frontend
@@ -5255,6 +5317,12 @@
             } catch (err) {
                 endLoading();
                 Swal.fire('Error Firebase', err.toString(), 'error');
+            } finally {
+                isSavingBL = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = oldText;
+                }
             }
         }
 
@@ -5872,8 +5940,14 @@
             }
         }
 
-        function handleSaveServiceInput(e) {
+        let isSavingSvc = false;
+        async function handleSaveServiceInput(e) {
             e.preventDefault();
+            if (isSavingSvc) return;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const oldText = btn ? btn.innerText : "";
+
             const payload = {
                 equip_no: document.getElementById('svc_equip_no').value.toUpperCase(),
                 plan_hm: document.getElementById('svc_plan_hm').value,
@@ -5882,8 +5956,15 @@
                 actual_date: document.getElementById('svc_actual_date').value
             };
 
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "MENYIMPAN...";
+            }
+            isSavingSvc = true;
+
             startLoading("MENYIMPAN & SINKRONISASI DATA...");
-            fetchGAS("saveServiceHistory", payload).then(res => {
+            try {
+                const res = await fetchGAS("saveServiceHistory", payload);
                 endLoading();
                 if (res.success) {
                     Swal.fire('Berhasil!', res.message, 'success');
@@ -5893,9 +5974,16 @@
                 } else {
                     Swal.fire('Error', res.message, 'error');
                 }
-            }).catch(err => {
-                endLoading(); Swal.fire('Error', err.toString(), 'error');
-            });
+            } catch (err) {
+                endLoading();
+                Swal.fire('Error', err.toString(), 'error');
+            } finally {
+                isSavingSvc = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = oldText;
+                }
+            }
         }
 
         function renderServiceHistoryTable() {
@@ -6219,8 +6307,14 @@
             if (modal) modal.classList.add('hidden');
         }
 
+        let isSavingBD = false;
         async function handleSaveBDAwal(e) {
             e.preventDefault();
+            if (isSavingBD) return;
+
+            const btn = e.target.querySelector('button[type="submit"]');
+            const oldText = btn ? btn.innerText : "";
+
             let noIdInput = document.getElementById('bd_no_id').value.trim().toUpperCase();
             if (!noIdInput) {
                 noIdInput = generateNextWONumber();
@@ -6239,6 +6333,12 @@
                 last_sync: new Date().toISOString()
             };
 
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "MENYIMPAN...";
+            }
+            isSavingBD = true;
+
             startLoading("MENYIMPAN LAPORAN BD AWAL...");
             try {
                 await db.ref('work_orders/' + noIdInput).set(payload);
@@ -6249,6 +6349,12 @@
                 endLoading();
                 console.error("Save BD Awal Error:", err);
                 Swal.fire('Error', err.toString(), 'error');
+            } finally {
+                isSavingBD = false;
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = oldText;
+                }
             }
         }
 
