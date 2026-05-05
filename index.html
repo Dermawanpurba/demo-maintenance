@@ -4542,12 +4542,47 @@
             minors.forEach(m => { minorSel.innerHTML += `<option value="${m}">${m}</option>`; });
         }
 
+        /**
+         * Real-time Validation against Firebase (Bulletproof for Production)
+         * Gunakan ini sebelum proses SIMPAN untuk memastikan data terbaru dari server.
+         */
+        async function validateUnitLock(equipNo, currentWoNo = "") {
+            if (!equipNo) return null;
+            const target = String(equipNo).trim().toUpperCase();
+            
+            try {
+                // Fetch data terbaru dari Firebase node 'work_orders'
+                // Kita gunakan query filter by equip_no jika memungkinkan, namun jika tidak, ambil snapshot dan filter di client
+                const snapshot = await db.ref('work_orders').once('value');
+                if (!snapshot.exists()) return null;
+                
+                const allWOs = snapshot.val();
+                const activeWO = Object.keys(allWOs).find(key => {
+                    const w = allWOs[key];
+                    return String(w.equip_no).trim().toUpperCase() === target && 
+                           String(w.status).toUpperCase() !== 'CLOSED' && 
+                           (w.no_wo || key) !== currentWoNo;
+                });
+                
+                return activeWO ? (allWOs[activeWO].no_wo || activeWO) : null;
+            } catch (err) {
+                console.error("Lock Validation Error:", err);
+                // Jika gagal query, fallback ke cache lokal
+                return checkActiveBreakdown(equipNo, currentWoNo);
+            }
+        }
+
         function checkActiveBreakdown(equipNo, currentWoNo = "") {
             if (!equipNo) return null;
             const target = String(equipNo).trim().toUpperCase();
+            
+            if (!woDataCache || woDataCache.length === 0) {
+                console.warn("Validation Warning: woDataCache is empty. Real-time check is recommended.");
+            }
+
             const activeWO = (woDataCache || []).find(w => 
                 String(w.equip_no).trim().toUpperCase() === target && 
-                w.status !== 'CLOSED' && 
+                String(w.status).toUpperCase() !== 'CLOSED' && 
                 w.no_wo !== currentWoNo
             );
             return activeWO ? activeWO.no_wo : null;
@@ -5254,11 +5289,16 @@
                 last_sync: new Date().toISOString()
             };
 
-            // --- FINAL LOCK CHECK BEFORE SAVE ---
-            const activeWoNo = checkActiveBreakdown(payload.equip_no, noWoInput);
+            // --- FINAL LOCK CHECK BEFORE SAVE (Real-time Firebase Query) ---
+            const activeWoNo = await validateUnitLock(payload.equip_no, noWoInput);
             if (activeWoNo) {
                 isSavingWO = false;
-                return Swal.fire('Gagal Simpan', `Unit ${payload.equip_no} sudah memiliki WO aktif (${activeWoNo}).`, 'error');
+                return Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Simpan',
+                    text: `Unit ${payload.equip_no} sudah memiliki WO aktif (${activeWoNo}). Harap selesaikan WO sebelumnya (CLOSED) sebelum membuat yang baru.`,
+                    footer: '<span class="text-xs text-red-500 font-bold">Catatan: Jika WO tersebut sudah selesai tapi masih muncul, pastikan statusnya sudah CLOSED.</span>'
+                });
             }
 
             if (btn) {
