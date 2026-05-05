@@ -4542,9 +4542,37 @@
             minors.forEach(m => { minorSel.innerHTML += `<option value="${m}">${m}</option>`; });
         }
 
+        function checkActiveBreakdown(equipNo, currentWoNo = "") {
+            if (!equipNo) return null;
+            const target = String(equipNo).trim().toUpperCase();
+            const activeWO = (woDataCache || []).find(w => 
+                String(w.equip_no).trim().toUpperCase() === target && 
+                w.status !== 'CLOSED' && 
+                w.no_wo !== currentWoNo
+            );
+            return activeWO ? activeWO.no_wo : null;
+        }
+
         function autoFillEquip(val) {
             if (!val) return;
             const target = String(val).trim().toUpperCase();
+
+            // --- LOCK DOUBLE WO CHECK ---
+            const currentWoNo = document.getElementById('no_wo')?.value.trim().toUpperCase() || "";
+            const activeWoNo = checkActiveBreakdown(target, currentWoNo);
+            if (activeWoNo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Unit Breakdown!',
+                    text: `Unit ${target} sudah memiliki WO aktif (${activeWoNo}). Selesaikan WO tersebut terlebih dahulu sebelum membuat yang baru.`,
+                    confirmButtonColor: '#0f172a'
+                });
+                if (document.getElementById('equip_no')) document.getElementById('equip_no').value = "";
+                if (document.getElementById('brand')) document.getElementById('brand').value = "";
+                if (document.getElementById('unit_type')) document.getElementById('unit_type').value = "";
+                return;
+            }
+
             const unit = (masterCache.equip || []).find(e => String(e.equip_no).trim().toUpperCase() === target);
 
             if (unit) {
@@ -4562,11 +4590,27 @@
 
         function autoFillBDEquip(val) {
             if (!val) return;
-            const actualHM = getActualHM(val.trim().toUpperCase());
+            const target = val.trim().toUpperCase();
+
+            // --- LOCK DOUBLE WO CHECK ---
+            const activeWoNo = checkActiveBreakdown(target);
+            if (activeWoNo) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Unit Breakdown!',
+                    text: `Unit ${target} sudah memiliki WO aktif (${activeWoNo}). Tidak dapat membuat laporan BD ganda.`,
+                    confirmButtonColor: '#ef4444'
+                });
+                if (document.getElementById('bd_equip_no')) document.getElementById('bd_equip_no').value = "";
+                if (document.getElementById('bd_hm')) document.getElementById('bd_hm').value = "";
+                return;
+            }
+
+            const actualHM = getActualHM(target);
             const hmInput = document.getElementById('bd_hm');
             if (hmInput && actualHM > 0) {
                 hmInput.value = actualHM;
-                showToast("HM Terakhir Unit " + val.toUpperCase() + ": " + actualHM, "info");
+                showToast("HM Terakhir Unit " + target + ": " + actualHM, "info");
             }
         }
 
@@ -5209,6 +5253,13 @@
                 action_log: actionLogData,
                 last_sync: new Date().toISOString()
             };
+
+            // --- FINAL LOCK CHECK BEFORE SAVE ---
+            const activeWoNo = checkActiveBreakdown(payload.equip_no, noWoInput);
+            if (activeWoNo) {
+                isSavingWO = false;
+                return Swal.fire('Gagal Simpan', `Unit ${payload.equip_no} sudah memiliki WO aktif (${activeWoNo}).`, 'error');
+            }
 
             if (btn) {
                 btn.disabled = true;
@@ -6456,6 +6507,13 @@
                 status: 'OPEN',
                 last_sync: new Date().toISOString()
             };
+
+            // --- FINAL LOCK CHECK BEFORE SAVE ---
+            const activeWoNo = checkActiveBreakdown(payload.equip_no, noIdInput);
+            if (activeWoNo) {
+                isSavingBD = false;
+                return Swal.fire('Gagal Simpan', `Unit ${payload.equip_no} sudah memiliki WO aktif (${activeWoNo}).`, 'error');
+            }
 
             if (btn) {
                 btn.disabled = true;
