@@ -5769,7 +5769,7 @@
                         tgl_selesai: tg,
                         jam_selesai: jm,
                         action_log: actionLogJson,
-                        raw: { prob, act, mek, cat, unitNo: existingWO.equip_no }
+                        raw: { prob, act, mek, cat, unitNo: existingWO.equip_no, hm: existingWO.hm_km }
                     };
                 }
             });
@@ -5809,6 +5809,7 @@
                             let waText = `*STATUS: READY*\n`;
                             waText += `*NO ID:* ${r.unitNo}\n`;
                             waText += `*WO:* ${noWo}\n`;
+                            waText += `*HM:* ${r.hm || '-'}\n`;
                             waText += `*JAM:* ${formValues.jam_selesai}\n`;
                             waText += `*TANGGAL:* ${formatTgl}\n`;
                             waText += `*PROBLEM:* ${r.prob}\n`;
