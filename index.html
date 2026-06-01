@@ -22,13 +22,33 @@
         }
 
         /* Dynamic Theme Colors for Sidebar */
-        #sidebar .text-white { color: var(--theme-text) !important; }
-        #sidebar .text-white\/80 { color: color-mix(in srgb, var(--theme-text) 80%, transparent) !important; }
-        #sidebar .text-white\/60 { color: color-mix(in srgb, var(--theme-text) 60%, transparent) !important; }
-        #sidebar .text-white\/40 { color: color-mix(in srgb, var(--theme-text) 40%, transparent) !important; }
-        #sidebar .bg-white\/10 { background-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important; }
-        #sidebar .hover\:bg-white\/10:hover { background-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important; }
-        #sidebar .border-white\/10 { border-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important; }
+        #sidebar .text-white {
+            color: var(--theme-text) !important;
+        }
+
+        #sidebar .text-white\/80 {
+            color: color-mix(in srgb, var(--theme-text) 80%, transparent) !important;
+        }
+
+        #sidebar .text-white\/60 {
+            color: color-mix(in srgb, var(--theme-text) 60%, transparent) !important;
+        }
+
+        #sidebar .text-white\/40 {
+            color: color-mix(in srgb, var(--theme-text) 40%, transparent) !important;
+        }
+
+        #sidebar .bg-white\/10 {
+            background-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important;
+        }
+
+        #sidebar .hover\:bg-white\/10:hover {
+            background-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important;
+        }
+
+        #sidebar .border-white\/10 {
+            border-color: color-mix(in srgb, var(--theme-text) 10%, transparent) !important;
+        }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -403,7 +423,8 @@
                     <div class="text-sm font-black tracking-tighter uppercase company-display-name">WOSys ERP</div>
                     <div class="text-[9px] text-white/40 font-bold uppercase tracking-widest">Maintenance Hub</div>
                 </div>
-                <button onclick="toggleSidebar()" class="md:hidden w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg hover:bg-white/20">
+                <button onclick="toggleSidebar()"
+                    class="md:hidden w-8 h-8 flex items-center justify-center bg-white/10 rounded-lg hover:bg-white/20">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -502,11 +523,6 @@
                             <i class="fas fa-truck-pickup w-8 group-hover:scale-110 transition-transform"></i>
                             Equipments
                         </button>
-                        <button onclick="navigate('master-parts')"
-                            class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
-                            data-page="master-parts">
-                            <i class="fas fa-cogs w-8 group-hover:scale-110 transition-transform"></i> Spareparts
-                        </button>
                         <button onclick="navigate('master-comp')"
                             class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
                             data-page="master-comp">
@@ -515,12 +531,15 @@
                         <button onclick="navigate('master-stock')"
                             class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
                             data-page="master-stock">
-                            <i class="fas fa-boxes w-8 group-hover:scale-110 transition-transform text-amber-300"></i> Stock Inventory
+                            <i class="fas fa-boxes w-8 group-hover:scale-110 transition-transform text-amber-300"></i>
+                            Stock Inventory
                         </button>
                         <button onclick="navigate('part-usage')"
                             class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
                             data-page="part-usage">
-                            <i class="fas fa-file-invoice w-8 group-hover:scale-110 transition-transform text-indigo-400"></i> Part Usage Log
+                            <i
+                                class="fas fa-file-invoice w-8 group-hover:scale-110 transition-transform text-indigo-400"></i>
+                            Part Usage Log
                         </button>
                     </div>
                 </div>
@@ -575,7 +594,14 @@
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative no-print h-screen bg-slate-50 pb-20 w-full">
+        <main
+            class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative no-print h-screen bg-slate-50 pb-20 w-full transition-all duration-300">
+            <!-- Sidebar Desktop Toggle Button -->
+            <button onclick="toggleSidebarDesktop()"
+                class="hidden md:flex absolute left-4 top-4 z-30 w-10 h-10 items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-all shadow-md active:scale-95 no-print"
+                title="Toggle Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="max-w-[1440px] mx-auto">
 
                 <section id="page-dashboard" class="page active pb-12">
@@ -644,7 +670,8 @@
                             <div class="flex justify-between items-start mb-3 md:mb-4 relative z-10">
                                 <div
                                     class="w-10 h-10 md:w-14 md:h-14 bg-slate-900 text-white rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-lg md:text-2xl shadow-lg">
-                                    <i class="fas fa-percentage"></i></div>
+                                    <i class="fas fa-percentage"></i>
+                                </div>
                                 <span
                                     class="px-2 py-1 md:px-3 md:py-1.5 bg-slate-100 text-slate-500 rounded-lg md:rounded-xl text-[8px] md:text-[9px] font-black tracking-widest border border-slate-200 mr-6"
                                     id="badgeTargetPA">>85%</span>
@@ -663,7 +690,8 @@
                             <div class="flex justify-between items-start mb-3 md:mb-4 relative z-10">
                                 <div
                                     class="w-10 h-10 md:w-14 md:h-14 bg-red-50 text-red-500 rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-lg md:text-2xl shadow-inner">
-                                    <i class="fas fa-tools"></i></div>
+                                    <i class="fas fa-tools"></i>
+                                </div>
                                 <span
                                     class="px-2 py-1 md:px-3 md:py-1.5 bg-red-50 text-red-500 rounded-lg md:rounded-xl text-[8px] md:text-[9px] font-black tracking-widest border border-red-100 mr-6">MTTR</span>
                             </div>
@@ -681,7 +709,8 @@
                             <div class="flex justify-between items-start mb-3 md:mb-4 relative z-10">
                                 <div
                                     class="w-10 h-10 md:w-14 md:h-14 bg-blue-50 text-blue-600 rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-lg md:text-2xl shadow-inner">
-                                    <i class="fas fa-clock"></i></div>
+                                    <i class="fas fa-clock"></i>
+                                </div>
                                 <span
                                     class="px-2 py-1 md:px-3 md:py-1.5 bg-blue-50 text-blue-600 rounded-lg md:rounded-xl text-[8px] md:text-[9px] font-black tracking-widest border border-blue-100 mr-6">MTBF</span>
                             </div>
@@ -697,7 +726,8 @@
                             <div class="flex justify-between items-start mb-3 md:mb-4 relative z-10">
                                 <div
                                     class="w-10 h-10 md:w-14 md:h-14 bg-amber-50 text-amber-500 rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-lg md:text-2xl shadow-inner">
-                                    <i class="fas fa-clipboard-list"></i></div>
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
                                 <span
                                     class="px-2 py-1 md:px-3 md:py-1.5 bg-amber-50 text-amber-600 rounded-lg md:rounded-xl text-[8px] md:text-[9px] font-black tracking-widest border border-amber-100">PENDING</span>
                             </div>
@@ -711,7 +741,8 @@
 
                     <h3
                         class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest mb-4 ml-2 mt-8 md:mt-10">
-                        <i class="fas fa-th-large text-theme-accent mr-2"></i> Unit Status Board</h3>
+                        <i class="fas fa-th-large text-theme-accent mr-2"></i> Unit Status Board
+                    </h3>
                     <div
                         class="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-slate-100 mb-8">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
@@ -909,7 +940,8 @@
                                 <div class="space-y-4">
                                     <h3
                                         class="text-[10px] font-black text-red-600 uppercase tracking-widest border-b border-red-200 pb-2">
-                                        <i class="fas fa-clock mr-1"></i> Waktu Breakdown</h3>
+                                        <i class="fas fa-clock mr-1"></i> Waktu Breakdown
+                                    </h3>
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
                                             <label
@@ -959,7 +991,8 @@
                                 <div class="space-y-4">
                                     <h3
                                         class="text-[10px] font-black text-red-600 uppercase tracking-widest border-b border-red-200 pb-2">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i> Deskripsi Kendala</h3>
+                                        <i class="fas fa-exclamation-triangle mr-1"></i> Deskripsi Kendala
+                                    </h3>
                                     <div>
                                         <label
                                             class="text-[9px] font-black uppercase text-slate-500 tracking-widest mb-1 block">Problem
@@ -1057,14 +1090,21 @@
                 <!-- INJEKSI PAGE INPUT SERVICE -->
                 <section id="page-input-service" class="page pb-12">
                     <div class="max-w-6xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div
+                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-wrench mr-3 text-emerald-500"></i> Input Service Tracker</h2>
                             <div class="flex flex-wrap gap-2">
-                                <button onclick="runGenerateServiceIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                <button onclick="globalDataSync()"
+                                    class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                                <button onclick="runGenerateServiceIDs()"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
                                     <i class="fas fa-fingerprint mr-2"></i> Generate ID & Time
                                 </button>
-                                <button onclick="runSyncServiceToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                <button onclick="runSyncServiceToFirebase()"
+                                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
                                     <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
                                 </button>
                             </div>
@@ -1092,7 +1132,8 @@
                             <div class="md:col-span-2 bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-4">
                                 <h3
                                     class="text-[10px] font-black text-blue-600 uppercase tracking-widest border-b border-blue-200 pb-2">
-                                    <i class="fas fa-calendar-alt mr-1"></i> Target / Plan Service</h3>
+                                    <i class="fas fa-calendar-alt mr-1"></i> Target / Plan Service
+                                </h3>
                                 <div class="space-y-2">
                                     <label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Plan HM
                                         (Target)</label>
@@ -1114,7 +1155,8 @@
                                 class="md:col-span-2 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100 space-y-4">
                                 <h3
                                     class="text-[10px] font-black text-emerald-600 uppercase tracking-widest border-b border-emerald-200 pb-2">
-                                    <i class="fas fa-check-circle mr-1"></i> Actual Eksekusi</h3>
+                                    <i class="fas fa-check-circle mr-1"></i> Actual Eksekusi
+                                </h3>
                                 <div class="space-y-2">
                                     <label class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Actual
                                         HM (Saat Service)</label>
@@ -1163,14 +1205,21 @@
 
                 <section id="page-aktifitas" class="page pb-12">
                     <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div
+                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-hard-hat mr-3 text-orange-500"></i> Laporan Aktifitas Mekanik</h2>
                             <div class="flex flex-wrap gap-2">
-                                <button onclick="runGenerateActivityIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                <button onclick="globalDataSync()"
+                                    class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                                <button onclick="runGenerateActivityIDs()"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
                                     <i class="fas fa-fingerprint mr-2"></i> Generate ID & Time
                                 </button>
-                                <button onclick="runSyncActivityToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                <button onclick="runSyncActivityToFirebase()"
+                                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
                                     <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
                                 </button>
                             </div>
@@ -1187,25 +1236,29 @@
                             class="mb-10 bg-slate-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-slate-200 shadow-inner">
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6">
                                 <div class="space-y-2 md:col-span-1">
-                                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Tanggal</label>
+                                    <label
+                                        class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Tanggal</label>
                                     <input type="date" id="act_tgl"
                                         class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
                                         required>
                                 </div>
                                 <div class="space-y-2 md:col-span-3">
-                                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Pilih Mekanik / Team (Bisa Lebih Dari 1)</label>
+                                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Pilih
+                                        Mekanik / Team (Bisa Lebih Dari 1)</label>
                                     <div id="act_mekanik_container"
                                         class="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white border border-slate-200 rounded-xl p-4 max-h-32 overflow-y-auto shadow-sm">
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Dynamic Activity Rows -->
                             <div class="space-y-4">
                                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                                    <h3 class="text-[10px] font-black text-slate-600 uppercase tracking-widest"><i class="fas fa-list mr-1"></i> Rincian Aktivitas</h3>
+                                    <h3 class="text-[10px] font-black text-slate-600 uppercase tracking-widest"><i
+                                            class="fas fa-list mr-1"></i> Rincian Aktivitas</h3>
                                     <button type="button" onclick="addActivityRow()"
-                                        class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-md hover:opacity-90 active:scale-95 transition-all"><i class="fas fa-plus mr-1"></i> Tambah Aktivitas</button>
+                                        class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-[9px] font-black uppercase tracking-widest shadow-md hover:opacity-90 active:scale-95 transition-all"><i
+                                            class="fas fa-plus mr-1"></i> Tambah Aktivitas</button>
                                 </div>
                                 <div id="act_details_container" class="space-y-4">
                                     <!-- Rows added dynamically via JS -->
@@ -1214,7 +1267,8 @@
 
                             <div class="mt-6">
                                 <button type="submit"
-                                    class="w-full bg-orange-500 text-white font-black py-4 rounded-xl md:rounded-2xl shadow-xl active:scale-95 transition-transform uppercase tracking-widest text-[11px] hover:bg-orange-600">SIMPAN LAPORAN AKTIFITAS TEAM</button>
+                                    class="w-full bg-orange-500 text-white font-black py-4 rounded-xl md:rounded-2xl shadow-xl active:scale-95 transition-transform uppercase tracking-widest text-[11px] hover:bg-orange-600">SIMPAN
+                                    LAPORAN AKTIFITAS TEAM</button>
                             </div>
                         </form>
 
@@ -1286,8 +1340,8 @@
                                         class="hidden md:inline">Sync</span></button>
                                 <button onclick="openBDModal()"
                                     class="px-5 py-3 md:px-6 md:py-3 bg-red-500 text-white rounded-xl md:rounded-2xl font-black text-[9px] md:text-[10px] tracking-widest shadow-lg hover:bg-red-600 transition-all uppercase"><i
-                                        class="fas fa-plus md:mr-2"></i> <span
-                                        class="hidden md:inline">Laporan BD Awal</span></button>
+                                        class="fas fa-plus md:mr-2"></i> <span class="hidden md:inline">Laporan BD
+                                        Awal</span></button>
                             </div>
                         </div>
                     </div>
@@ -1300,7 +1354,8 @@
                                 Sync</p>
                             <p class="font-medium opacity-90 leading-relaxed">Tabel ini tersinkronisasi langsung dengan
                                 <b>Data HM Aktual</b> dan <b>Backlog</b>. Klik pada badge Backlog (jika ada) untuk
-                                memastikan mekanik mengeksekusi kendala tambahan saat unit di-service.</p>
+                                memastikan mekanik mengeksekusi kendala tambahan saat unit di-service.
+                            </p>
                         </div>
                     </div>
 
@@ -1329,14 +1384,21 @@
 
                 <section id="page-backlog" class="page pb-12">
                     <div class="max-w-6xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div
+                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-clipboard-check mr-3 text-amber-500"></i> Backlog Management</h2>
                             <div class="flex flex-wrap gap-2">
-                                <button onclick="runGenerateBacklogIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                <button onclick="globalDataSync()"
+                                    class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                                <button onclick="runGenerateBacklogIDs()"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
                                     <i class="fas fa-fingerprint mr-2"></i> Generate ID
                                 </button>
-                                <button onclick="runSyncBacklogToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                <button onclick="runSyncBacklogToFirebase()"
+                                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
                                     <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
                                 </button>
                             </div>
@@ -1422,14 +1484,21 @@
 
                 <section id="page-daily-hm" class="page pb-12">
                     <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div
+                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-tachometer-alt mr-3"></i> Input Daily HM</h2>
                             <div class="flex flex-wrap gap-2">
-                                <button onclick="runGenerateHMIDs()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                <button onclick="globalDataSync()"
+                                    class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                                <button onclick="runGenerateHMIDs()"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
                                     <i class="fas fa-fingerprint mr-2"></i> Generate ID & Time
                                 </button>
-                                <button onclick="runSyncHMToFirebase()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                <button onclick="runSyncHMToFirebase()"
+                                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
                                     <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
                                 </button>
                             </div>
@@ -1535,6 +1604,12 @@
                             class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-calendar-alt mr-3"></i> Plan Alat & Service</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="globalDataSync()"
+                                    class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                            </div>
                         </div>
                         <div
                             class="bg-emerald-50 border border-emerald-200 p-4 md:p-5 rounded-2xl mb-8 text-emerald-800 text-[10px] md:text-xs font-medium leading-relaxed shadow-sm">
@@ -1643,9 +1718,15 @@
                         <div class="flex justify-between items-center mb-8 border-b pb-6">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-truck-pickup mr-3"></i> Master Equipment</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="globalDataSync()"
+                                    class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                            </div>
                         </div>
                         <form id="equipForm" onsubmit="handleSaveEquip(event)"
-                            class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10 bg-slate-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-slate-200 shadow-inner">
+                            class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-10 bg-slate-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-slate-200 shadow-inner">
                             <div class="space-y-2">
                                 <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip
                                     No</label>
@@ -1667,8 +1748,17 @@
                                     class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
                                     placeholder="Tipe Unit" required>
                             </div>
-                            <button type="submit"
-                                class="md:col-span-3 bg-theme-main text-white font-black py-4 rounded-xl md:rounded-2xl active:scale-95 transition-all uppercase tracking-[0.2em] text-[10px] md:text-xs shadow-xl mt-2">Tambah
+                            <div class="space-y-2">
+                                <label
+                                    class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Kepemilikan</label>
+                                <select id="m_equip_status"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm">
+                                    <option value="OWN">Milik Sendiri</option>
+                                    <option value="RENTAL">Rental</option>
+                                </select>
+                            </div>
+                            <button type="submit" id="btnSaveEquip"
+                                class="md:col-span-4 bg-theme-main text-white font-black py-4 rounded-xl md:rounded-2xl active:scale-95 transition-all uppercase tracking-[0.2em] text-[10px] md:text-xs shadow-xl mt-2">Tambah
                                 Equipment</button>
                         </form>
                         <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -1692,98 +1782,60 @@
                                         class="fas fa-chevron-right"></i></button>
                             </div>
                         </div>
-                        <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
-                            <table class="w-full text-left text-sm min-w-[500px]">
-                                <thead
-                                    class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
-                                    <tr>
-                                        <th class="p-4 md:p-6">EQUIP NO</th>
-                                        <th class="p-4 md:p-6">BRAND</th>
-                                        <th class="p-4 md:p-6">TYPE</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="masterEquipBody" class="divide-y divide-slate-50 font-medium text-slate-700">
-                                </tbody>
-                            </table>
+                        <!-- Tab Switcher for Equipment -->
+                        <div class="flex border-b border-slate-100 mb-6 gap-2 no-print">
+                            <button onclick="switchEquipTab('own')" id="tab-equip-own"
+                                class="px-6 py-3 border-b-2 border-theme-main font-black text-xs md:text-sm text-theme-main uppercase tracking-widest transition-all">
+                                <i class="fas fa-folder mr-1.5 text-blue-500"></i> Milik Sendiri
+                            </button>
+                            <button onclick="switchEquipTab('rental')" id="tab-equip-rental"
+                                class="px-6 py-3 border-b-2 border-transparent font-black text-xs md:text-sm text-slate-400 hover:text-slate-600 uppercase tracking-widest transition-all">
+                                <i class="fas fa-key mr-1.5 text-amber-500"></i> Rental
+                            </button>
+                        </div>
+
+                        <!-- Containers for tables -->
+                        <div id="container-equip-own" class="equip-tab-content">
+                            <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
+                                <table class="w-full text-left text-sm min-w-[500px]">
+                                    <thead
+                                        class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                                        <tr>
+                                            <th class="p-4 md:p-6">EQUIP NO</th>
+                                            <th class="p-4 md:p-6">BRAND</th>
+                                            <th class="p-4 md:p-6">TYPE</th>
+                                            <th class="p-4 md:p-6 text-right">AKSI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="masterEquipBody"
+                                        class="divide-y divide-slate-50 font-medium text-slate-700">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="container-equip-rental" class="equip-tab-content hidden">
+                            <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
+                                <table class="w-full text-left text-sm min-w-[500px]">
+                                    <thead
+                                        class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                                        <tr>
+                                            <th class="p-4 md:p-6">EQUIP NO</th>
+                                            <th class="p-4 md:p-6">BRAND</th>
+                                            <th class="p-4 md:p-6">TYPE</th>
+                                            <th class="p-4 md:p-6 text-right">AKSI</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="masterEquipRentalBody"
+                                        class="divide-y divide-slate-50 font-medium text-slate-700">
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                <section id="page-master-parts" class="page pb-12">
-                    <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex justify-between items-center mb-8 border-b pb-6">
-                            <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
-                                    class="fas fa-cogs mr-3"></i> Master Parts</h2>
-                        </div>
 
-                        <form id="partMasterForm" onsubmit="handleSavePart(event)"
-                            class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10 bg-slate-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-slate-200 shadow-inner">
-                            <div class="space-y-2">
-                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Part
-                                    Number</label>
-                                <input type="text" id="m_part_no"
-                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold font-mono uppercase focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
-                                    placeholder="P/N" required>
-                            </div>
-                            <div class="space-y-2">
-                                <label
-                                    class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Description</label>
-                                <input type="text" id="m_part_desc"
-                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
-                                    placeholder="Nama Barang" required>
-                            </div>
-                            <div class="space-y-2">
-                                <label
-                                    class="text-[9px] font-black uppercase text-slate-500 tracking-widest">UOM</label>
-                                <input type="text" id="m_part_uom"
-                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
-                                    placeholder="EA/PC/SET" required>
-                            </div>
-                            <button type="submit"
-                                class="md:col-span-3 bg-theme-main text-white font-black py-4 rounded-xl md:rounded-2xl active:scale-95 transition-all uppercase tracking-[0.2em] text-[10px] md:text-xs shadow-xl mt-2">Tambah
-                                Sparepart</button>
-                        </form>
-
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                            <div class="relative w-full md:w-96">
-                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                <input type="text" id="filterParts"
-                                    onkeyup="resetPagination('parts'); renderMasterPartsTable()"
-                                    class="w-full pl-12 pr-5 py-3 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-theme-accent font-medium text-xs md:text-sm shadow-sm"
-                                    placeholder="Ketik Part No / Desc...">
-                            </div>
-
-                            <div
-                                class="flex items-center space-x-1 md:space-x-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
-                                <button onclick="changePtPage(-1)"
-                                    class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-200 transition-all font-black"><i
-                                        class="fas fa-chevron-left"></i></button>
-                                <span
-                                    class="text-[9px] md:text-[11px] font-black px-2 md:px-4 text-slate-500 flex items-center whitespace-nowrap tracking-widest"
-                                    id="partPageInfo">1 / 1</span>
-                                <button onclick="changePtPage(1)"
-                                    class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-200 transition-all font-black"><i
-                                        class="fas fa-chevron-right"></i></button>
-                            </div>
-                        </div>
-
-                        <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
-                            <table class="w-full text-left text-sm min-w-[600px]">
-                                <thead
-                                    class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
-                                    <tr>
-                                        <th class="p-4 md:p-6 w-1/4">PART NO</th>
-                                        <th class="p-4 md:p-6 w-1/2">DESCRIPTION</th>
-                                        <th class="p-4 md:p-6 w-1/4">UOM</th>
-                                        <th class="p-4 md:p-6 text-right">AKSI</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="masterPartsBody" class="divide-y divide-slate-50 font-medium text-slate-700">
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
 
                 <section id="page-master-comp" class="page pb-12">
                     <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
@@ -1835,25 +1887,29 @@
                         </div>
                     </div>
                 </section>
-                
+
                 <section id="page-master-stock" class="page pb-12">
                     <div class="max-w-7xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6 gap-4">
+                        <div
+                            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
                                     class="fas fa-boxes mr-3 text-amber-500"></i> Stock Inventory (Logistik)</h2>
                             <div class="flex space-x-2">
-                                <button onclick="migrateStockToFirebase()" class="bg-amber-100 text-amber-700 font-bold px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-amber-200 transition-all">
+                                <button onclick="migrateStockToFirebase()"
+                                    class="bg-amber-100 text-amber-700 font-bold px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-amber-200 transition-all">
                                     <i class="fas fa-sync-alt mr-1"></i> Sync from Sheet
                                 </button>
-                                <button onclick="exportStockToExcel()" class="bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all">
+                                <button onclick="exportStockToExcel()"
+                                    class="bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all">
                                     <i class="fas fa-file-excel mr-1"></i> Export
                                 </button>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Items</p>
+                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Items
+                                </p>
                                 <p class="text-xl font-black text-slate-700" id="stock-total-items">0</p>
                             </div>
                             <div class="bg-red-50 p-4 rounded-2xl border border-red-100">
@@ -1864,25 +1920,24 @@
                                 <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Available</p>
                                 <p class="text-xl font-black text-blue-700" id="stock-avail-items">0</p>
                             </div>
-                            <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-                                <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Stock Value</p>
-                                <p class="text-xl font-black text-emerald-700" id="stock-total-value">Rp 0</p>
-                            </div>
                         </div>
 
                         <div class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
                             <div class="relative w-full md:max-w-md group">
-                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-theme-accent transition-colors"></i>
+                                <i
+                                    class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-theme-accent transition-colors"></i>
                                 <input type="text" id="stockSearch" oninput="renderMasterStockTable()"
                                     class="w-full pl-12 pr-5 py-3 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-theme-accent font-medium text-xs md:text-sm shadow-sm"
                                     placeholder="Cari Part Number / Deskripsi / Lokasi...">
                             </div>
 
-                            <div class="flex items-center space-x-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+                            <div
+                                class="flex items-center space-x-2 bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
                                 <button onclick="changeStockPage(-1)"
                                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-200 transition-all font-black"><i
                                         class="fas fa-chevron-left"></i></button>
-                                <span class="text-[10px] font-black px-4 text-slate-500 tracking-widest" id="stockPageInfo">1 / 1</span>
+                                <span class="text-[10px] font-black px-4 text-slate-500 tracking-widest"
+                                    id="stockPageInfo">1 / 1</span>
                                 <button onclick="changeStockPage(1)"
                                     class="w-8 h-8 rounded-lg bg-slate-50 text-slate-600 hover:bg-slate-200 transition-all font-black"><i
                                         class="fas fa-chevron-right"></i></button>
@@ -1891,15 +1946,14 @@
 
                         <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
                             <table class="w-full text-left text-sm min-w-[1000px]">
-                                <thead class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                                <thead
+                                    class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
                                     <tr>
                                         <th class="p-4 md:p-6">PART NUMBER</th>
                                         <th class="p-4 md:p-6">DESCRIPTION</th>
                                         <th class="p-4 md:p-6">CATEGORY</th>
                                         <th class="p-4 md:p-6 text-center">QTY FINAL</th>
-                                        <th class="p-4 md:p-6">UOM</th>
-                                        <th class="p-4 md:p-6">LOCATION</th>
-                                        <th class="p-4 md:p-6 text-right">AMOUNT</th>
+                                        <th class="p-4 md:p-6">SATUAN</th>
                                         <th class="p-4 md:p-6 text-center">AKSI</th>
                                     </tr>
                                 </thead>
@@ -1912,29 +1966,35 @@
 
                 <section id="page-part-usage" class="page pb-12">
                     <div class="max-w-6xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                        <div
+                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter">
                                 <i class="fas fa-history mr-3 text-indigo-500"></i> Log Penggunaan Part
                             </h2>
                             <div class="flex flex-wrap gap-2">
-                                <button onclick="runPartUsageImport()" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                <button onclick="runPartUsageImport()"
+                                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
                                     <i class="fas fa-file-export mr-2"></i> Import ke Google Sheet "PartUsage"
                                 </button>
-                                <button onclick="syncFromPartUsageSheet()" class="bg-amber-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg">
+                                <button onclick="syncFromPartUsageSheet()"
+                                    class="bg-amber-500 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg">
                                     <i class="fas fa-cloud-upload-alt mr-2"></i> Sync dari Sheet ke Firebase
                                 </button>
-                                <button onclick="migratePartUsageToWO()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg">
+                                <button onclick="migratePartUsageToWO()"
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg">
                                     <i class="fas fa-file-import mr-2"></i> Migrate to WorkOrder Sheet
                                 </button>
-                                <button onclick="runFullBackupUI()" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
+                                <button onclick="runFullBackupUI()"
+                                    class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg">
                                     <i class="fas fa-sync-alt mr-2"></i> Refresh Tampilan
                                 </button>
                             </div>
                         </div>
 
-                        <div class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl mb-8 text-indigo-800 text-[10px] md:text-xs font-medium leading-relaxed">
-                            <i class="fas fa-info-circle text-indigo-500 mr-1"></i> 
-                            Halaman ini menampilkan jabaran material (parts) yang diminta melalui Work Order. 
+                        <div
+                            class="bg-indigo-50 border border-indigo-200 p-4 rounded-2xl mb-8 text-indigo-800 text-[10px] md:text-xs font-medium leading-relaxed">
+                            <i class="fas fa-info-circle text-indigo-500 mr-1"></i>
+                            Halaman ini menampilkan jabaran material (parts) yang diminta melalui Work Order.
                             Data ini sinkron dengan sheet <b>PartUsage</b> di Google Sheets.
                         </div>
 
@@ -1946,7 +2006,8 @@
                                     placeholder="Cari No WO / Part Number / Unit...">
                             </div>
                             <div class="flex items-center gap-4 w-full md:w-auto">
-                                <select id="sortPartUsage" onchange="renderPartUsageTable()" class="px-4 py-3 border border-slate-200 rounded-xl font-bold text-slate-600 outline-none text-sm shadow-sm">
+                                <select id="sortPartUsage" onchange="renderPartUsageTable()"
+                                    class="px-4 py-3 border border-slate-200 rounded-xl font-bold text-slate-600 outline-none text-sm shadow-sm">
                                     <option value="desc">Terbaru</option>
                                     <option value="asc">Terlama</option>
                                 </select>
@@ -1955,7 +2016,8 @@
 
                         <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm bg-white">
                             <table class="w-full text-left text-sm min-w-[1000px]">
-                                <thead class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                                <thead
+                                    class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
                                     <tr>
                                         <th class="p-4">NO WO / UNIT</th>
                                         <th class="p-4">TGL RUSAK</th>
@@ -1968,7 +2030,8 @@
                                         <th class="p-4 text-center">AKSI</th>
                                     </tr>
                                 </thead>
-                                <tbody id="partUsageTableBody" class="divide-y divide-slate-50 font-medium text-slate-700">
+                                <tbody id="partUsageTableBody"
+                                    class="divide-y divide-slate-50 font-medium text-slate-700">
                                 </tbody>
                             </table>
                         </div>
@@ -2064,7 +2127,8 @@
                                     <label
                                         class="text-[9px] md:text-[10px] font-black uppercase text-slate-500 tracking-widest">Tambah
                                         Menu Akses</label>
-                                    <select id="access_feature" multiple title="Tahan CTRL untuk memilih beberapa menu sekaligus"
+                                    <select id="access_feature" multiple
+                                        title="Tahan CTRL untuk memilih beberapa menu sekaligus"
                                         class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-theme-accent outline-none font-bold shadow-sm cursor-pointer text-sm h-32">
                                         <option value="" disabled>-- Pilih Menu (Bisa Banyak) --</option>
                                         <option value="dashboard">KPI Dashboard</option>
@@ -2076,7 +2140,6 @@
                                         <option value="daily-hm">Input Daily HM</option>
                                         <option value="master-plan">Plan Alat & Service</option>
                                         <option value="master-equip">Equipments</option>
-                                        <option value="master-parts">Spareparts</option>
                                         <option value="master-comp">Komponen</option>
                                         <option value="master-stock">Stock Inventory</option>
                                         <option value="part-usage">Part Usage Log</option>
@@ -2138,7 +2201,9 @@
                                     class="block text-[10px] md:text-[11px] font-black text-slate-500 mb-3 md:mb-4 uppercase tracking-widest">Warna
                                     Tema Aplikasi</label>
                                 <div class="flex gap-4 md:gap-6 items-center">
-                                    <select id="conf_color" class="w-full md:w-1/2 px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none text-sm shadow-sm" onchange="document.getElementById('conf_color_display').innerText = this.options[this.selectedIndex].text">
+                                    <select id="conf_color"
+                                        class="w-full md:w-1/2 px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none text-sm shadow-sm"
+                                        onchange="document.getElementById('conf_color_display').innerText = this.options[this.selectedIndex].text">
                                         <option value="#0f172a">Dark Mode (Hitam)</option>
                                         <option value="#7f1d1d">Light Mode (Merah Tua)</option>
                                     </select>
@@ -2146,7 +2211,8 @@
                                         <p
                                             class="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-widest mb-1">
                                             Mode Terpilih</p>
-                                        <p class="text-sm md:text-base font-black text-slate-700" id="conf_color_display">Dark Mode (Hitam)</p>
+                                        <p class="text-sm md:text-base font-black text-slate-700"
+                                            id="conf_color_display">Dark Mode (Hitam)</p>
                                     </div>
                                 </div>
                             </div>
@@ -2176,7 +2242,9 @@
                             class="bg-amber-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-amber-100 mt-6 shadow-inner">
                             <h3 class="text-sm md:text-base font-black text-amber-700 uppercase tracking-widest mb-2"><i
                                     class="fas fa-boxes mr-2"></i> Stock Migration (Integrasi Logistic)</h3>
-                            <p class="text-[10px] md:text-xs text-amber-600/80 font-bold mb-6 leading-relaxed">Migrasikan data stock terbaru dari sheet Logistic ke Firebase untuk keperluan validasi ketersediaan barang saat pembuatan Work Order.</p>
+                            <p class="text-[10px] md:text-xs text-amber-600/80 font-bold mb-6 leading-relaxed">
+                                Migrasikan data stock terbaru dari sheet Logistic ke Firebase untuk keperluan validasi
+                                ketersediaan barang saat pembuatan Work Order.</p>
                             <button type="button" onclick="migrateStockToFirebase()"
                                 class="w-full bg-amber-600 text-white font-black py-3 md:py-4 rounded-xl md:rounded-2xl shadow-lg shadow-amber-500/30 hover:bg-amber-700 transition-all active:scale-95 text-xs uppercase tracking-widest"><i
                                     class="fas fa-sync-alt mr-2"></i> Sinkronisasi Stock ke Firebase</button>
@@ -2202,23 +2270,28 @@
                                 <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter">
                                     <i class="fas fa-history mr-3"></i> System Activity Logs
                                 </h2>
-                                <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
+                                <p
+                                    class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
                                     Jejak audit aktifitas sistem dan pengguna
                                 </p>
                             </div>
                             <div class="flex gap-2">
-                                <button onclick="syncLogsToFirebase()" class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/30">
+                                <button onclick="syncLogsToFirebase()"
+                                    class="bg-amber-500 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-600 transition-all shadow-lg shadow-amber-500/30">
                                     <i class="fas fa-cloud-upload-alt mr-1"></i> Sync ke Firebase
                                 </button>
-                                <button onclick="loadSystemLogs()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30">
+                                <button onclick="loadSystemLogs()"
+                                    class="bg-blue-600 text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/30">
                                     <i class="fas fa-sync-alt mr-1"></i> Refresh Logs
                                 </button>
                             </div>
                         </div>
                         <div class="p-4 md:p-6">
-                            <div class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner bg-slate-50/50">
+                            <div
+                                class="overflow-x-auto border border-slate-200 rounded-2xl shadow-inner bg-slate-50/50">
                                 <table class="w-full text-left border-collapse">
-                                    <thead class="bg-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                    <thead
+                                        class="bg-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-600">
                                         <tr>
                                             <th class="p-4 w-16 text-center">No</th>
                                             <th class="p-4">Timestamp</th>
@@ -2228,7 +2301,10 @@
                                         </tr>
                                     </thead>
                                     <tbody id="systemLogsTableBody" class="text-xs font-medium text-slate-700 bg-white">
-                                        <tr><td colspan="5" class="p-10 text-center text-slate-400">Memuat data logs...</td></tr>
+                                        <tr>
+                                            <td colspan="5" class="p-10 text-center text-slate-400">Memuat data logs...
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -2391,56 +2467,83 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <!-- Modal Laporan BD Awal -->
-    <div id="modalBDAwal" class="fixed inset-0 bg-slate-900/80 z-[9999] hidden flex flex-col items-center justify-center backdrop-blur-md transition-all">
+    <div id="modalBDAwal"
+        class="fixed inset-0 bg-slate-900/80 z-[9999] hidden flex flex-col items-center justify-center backdrop-blur-md transition-all">
         <div class="bg-white w-full max-w-lg rounded-2xl md:rounded-[2rem] shadow-2xl overflow-hidden animate-slideUp">
             <div class="bg-red-500 p-4 md:p-6 flex justify-between items-center relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 text-white opacity-10 text-6xl transform rotate-12"><i class="fas fa-tools"></i></div>
-                <h3 class="text-white font-black text-sm md:text-lg uppercase tracking-widest relative z-10"><i class="fas fa-file-signature mr-2"></i> Input Laporan BD Awal</h3>
-                <button onclick="closeBDModal()" class="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full text-white transition-colors relative z-10"><i class="fas fa-times"></i></button>
+                <div class="absolute -right-6 -top-6 text-white opacity-10 text-6xl transform rotate-12"><i
+                        class="fas fa-tools"></i></div>
+                <h3 class="text-white font-black text-sm md:text-lg uppercase tracking-widest relative z-10"><i
+                        class="fas fa-file-signature mr-2"></i> Input Laporan BD Awal</h3>
+                <button onclick="closeBDModal()"
+                    class="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/40 rounded-full text-white transition-colors relative z-10"><i
+                        class="fas fa-times"></i></button>
             </div>
             <form id="formBDAwal" onsubmit="handleSaveBDAwal(event)" class="p-4 md:p-6 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-2">
-                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip No (Wajib)</label>
-                        <input type="text" id="bd_equip_no" list="listEquip" onchange="autoFillBDEquip(this.value)" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-black uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" placeholder="Ketik Kode Unit" required>
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip No
+                            (Wajib)</label>
+                        <input type="text" id="bd_equip_no" list="listEquip" onchange="autoFillBDEquip(this.value)"
+                            class="w-full px-4 py-3 border border-slate-200 rounded-xl font-black uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm"
+                            placeholder="Ketik Kode Unit" required>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">HM Saat Rusak</label>
-                        <input type="number" step="0.1" id="bd_hm" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" placeholder="HM Terakhir: 0">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">HM Saat
+                            Rusak</label>
+                        <input type="number" step="0.1" id="bd_hm"
+                            class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm"
+                            placeholder="HM Terakhir: 0">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-3">
                     <div class="space-y-2 col-span-2">
-                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest" title="Kosongkan untuk otomatis">No ID / No WO</label>
-                        <input type="text" id="bd_no_id" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-slate-50" placeholder="Kosongkan u/ otomatis">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest"
+                            title="Kosongkan untuk otomatis">No ID / No WO</label>
+                        <input type="text" id="bd_no_id"
+                            class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-slate-50"
+                            placeholder="Kosongkan u/ otomatis">
                     </div>
                     <div class="space-y-2 col-span-1">
-                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest" title="Ketik urutan WO terakhir di database untuk memperbaiki urutan otomatis jika salah">Set Akhir</label>
-                        <input type="number" id="bd_last_seq" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-yellow-50 text-center" placeholder="Auto" oninput="saveManualSeq(this.value)">
+                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest"
+                            title="Ketik urutan WO terakhir di database untuk memperbaiki urutan otomatis jika salah">Set
+                            Akhir</label>
+                        <input type="number" id="bd_last_seq"
+                            class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm bg-yellow-50 text-center"
+                            placeholder="Auto" oninput="saveManualSeq(this.value)">
                     </div>
                 </div>
                 <small id="bd_next_wo_info" class="text-[10px] font-bold text-red-500 block mt-1 ml-1"></small>
-            </div>
-                <div class="space-y-2">
-                    <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Problem / Kendala Awal</label>
-                    <textarea id="bd_problem" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-red-400 outline-none resize-none h-20 text-sm shadow-sm" placeholder="Deskripsi kendala kerusakan..." required></textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Tgl BD</label>
-                        <input type="date" id="bd_tgl" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" required>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Jam BD</label>
-                        <input type="time" id="bd_jam" class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm" required>
-                    </div>
-                </div>
-                <div class="pt-4 border-t border-slate-100 flex gap-3">
-                    <button type="button" onclick="closeBDModal()" class="flex-1 py-3 bg-slate-100 text-slate-600 font-black rounded-xl uppercase tracking-widest text-[10px] hover:bg-slate-200 transition-colors">Batal</button>
-                    <button type="submit" class="flex-1 py-3 bg-red-500 text-white font-black rounded-xl uppercase tracking-widest text-[10px] shadow-lg shadow-red-500/30 hover:bg-red-600 transition-colors">Simpan Laporan</button>
-                </div>
-            </form>
         </div>
+        <div class="space-y-2">
+            <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Problem / Kendala Awal</label>
+            <textarea id="bd_problem"
+                class="w-full px-4 py-3 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-red-400 outline-none resize-none h-20 text-sm shadow-sm"
+                placeholder="Deskripsi kendala kerusakan..." required></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Tgl BD</label>
+                <input type="date" id="bd_tgl"
+                    class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm"
+                    required>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Jam BD</label>
+                <input type="time" id="bd_jam"
+                    class="w-full px-4 py-3 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-red-400 outline-none text-sm shadow-sm"
+                    required>
+            </div>
+        </div>
+        <div class="pt-4 border-t border-slate-100 flex gap-3">
+            <button type="button" onclick="closeBDModal()"
+                class="flex-1 py-3 bg-slate-100 text-slate-600 font-black rounded-xl uppercase tracking-widest text-[10px] hover:bg-slate-200 transition-colors">Batal</button>
+            <button type="submit"
+                class="flex-1 py-3 bg-red-500 text-white font-black rounded-xl uppercase tracking-widest text-[10px] shadow-lg shadow-red-500/30 hover:bg-red-600 transition-colors">Simpan
+                Laporan</button>
+        </div>
+        </form>
+    </div>
     </div>
 
     <script>
@@ -2741,7 +2844,7 @@
                 const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Pantau status Work Order, Backlog, Laporan Aktifitas, dan Monitoring.";
 
                 const btnPlan = document.querySelector('[data-page="master-plan"]'); if (btnPlan) btnPlan.style.display = 'none';
-                const btnParts = document.querySelector('[data-page="master-parts"]'); if (btnParts) btnParts.style.display = 'none';
+
                 const btnComp = document.querySelector('[data-page="master-comp"]'); if (btnComp) btnComp.style.display = 'none';
                 const btnStock = document.querySelector('[data-page="master-stock"]'); if (btnStock) btnStock.style.display = 'none';
                 const btnBuatWo = document.querySelector('[data-page="buat-wo"]'); if (btnBuatWo) btnBuatWo.style.display = 'none';
@@ -2842,13 +2945,13 @@
         // HYBRID DATA SYNC
         // ==========================================
         function globalDataSync() {
-            startLoading("LOADING FROM FIREBASE...");
-            
+            startLoading("mohon di tunggu sebentar");
+
             // OPTIMASI: Pecah fetch root menjadi parallel fetch per node
             // Ini jauh lebih cepat di Firebase RTDB dibandingkan fetch root node (/)
             const nodes = [
-                'master_equip', 'master_parts', 'plan_alat', 'master_comp', 
-                'users', 'master_mekanik', 'master_pelapor', 'mechanic_activity', 
+                'master_equip', 'plan_alat', 'master_comp',
+                'users', 'master_mekanik', 'master_pelapor', 'mechanic_activity',
                 'daily_hm', 'service_history', 'master_stock', 'work_orders', 'backlogs'
             ];
 
@@ -2856,7 +2959,7 @@
 
             Promise.all(promises).then((snapshots) => {
                 endLoading();
-                
+
                 const fb = {};
                 snapshots.forEach((snap, i) => {
                     fb[nodes[i]] = snap.val();
@@ -2864,7 +2967,7 @@
 
                 // Tarik langsung dari Firebase, ubah dari JSON Object ke Array
                 masterCache.equip = fb.master_equip ? Object.values(fb.master_equip) : [];
-                masterCache.parts = fb.master_parts ? Object.values(fb.master_parts) : [];
+                masterCache.parts = [];
                 masterCache.planAlat = fb.plan_alat ? Object.values(fb.plan_alat) : [];
                 masterCache.components = fb.master_comp ? Object.values(fb.master_comp) : [];
                 masterCache.usersData = fb.users ? Object.values(fb.users) : [];
@@ -2900,7 +3003,7 @@
                 const pLwo = document.getElementById('page-list-wo'); if (pLwo && pLwo.classList.contains('active')) renderWOTable();
                 const pDb = document.getElementById('page-dashboard'); if (pDb && pDb.classList.contains('active')) calculateKPIFrontEnd();
 
-                renderMasterEquipTable(); renderMasterPartsTable(); renderMasterCompTable(); renderMasterStockTable(); renderActivityTable(); prefillActivityForm();
+                renderMasterEquipTable(); renderMasterCompTable(); renderMasterStockTable(); renderActivityTable(); prefillActivityForm();
                 if (document.getElementById('serviceHistoryTableBody')) renderServiceHistoryTable();
                 if (document.getElementById('userTableBody')) renderUserTable();
                 if (document.getElementById('masterPlanBody')) renderMasterPlanTable();
@@ -2988,7 +3091,12 @@
         // ==========================================
         function navigate(id, preventReset = false) {
             // Guard for IT-only pages
-            if ((id === 'manage-users' || id === 'systemlogs' || id === 'pengaturan') && !checkITAccess()) {
+            const isPlanner = currentUser && (currentUser.role || '').toUpperCase().includes('PLANNER');
+            if (id === 'pengaturan' && !(checkITAccess() || isPlanner)) {
+                Swal.fire('Ditolak', 'Hanya IT Helpdesk atau Planner yang dapat mengakses fitur ini.', 'error');
+                return;
+            }
+            if ((id === 'manage-users' || id === 'systemlogs') && !checkITAccess()) {
                 Swal.fire('Ditolak', 'Hanya IT Helpdesk yang dapat mengakses fitur ini.', 'error');
                 return;
             }
@@ -3018,7 +3126,7 @@
                 const hmTgl = document.getElementById('hm_tanggal'); if (hmTgl) hmTgl.value = getShiftDate();
             }
             if (id === 'master-equip') { currentEqPage = 1; renderMasterEquipTable(); }
-            if (id === 'master-parts') { currentPtPage = 1; renderMasterPartsTable(); }
+
             if (id === 'master-comp') { renderMasterCompTable(); }
             if (id === 'master-plan') { renderMasterPlanTable(); }
             if (id === 'master-stock') { currentStockPage = 1; renderMasterStockTable(); }
@@ -3031,6 +3139,15 @@
         function toggleSidebar() {
             const sb = document.getElementById('sidebar'); if (sb) sb.classList.toggle('open');
             const sbo = document.getElementById('sidebarOverlay'); if (sbo) sbo.classList.toggle('active');
+        }
+
+        function toggleSidebarDesktop() {
+            const sb = document.getElementById('sidebar');
+            if (sb) {
+                sb.classList.toggle('md:w-64');
+                sb.classList.toggle('md:w-0');
+                sb.classList.toggle('md:overflow-hidden');
+            }
         }
 
         // Toggle Menu Group dengan localStorage persistence
@@ -3106,7 +3223,7 @@
 
         window.applyITRestrictions = function () {
             const isIT = checkITAccess();
-            
+
             // 1. Hide/Show System Logs & Manage Users menu in sidebar
             const btnLogs = document.querySelector('[data-page="systemlogs"]');
             if (btnLogs) btnLogs.style.display = isIT ? 'flex' : 'none';
@@ -3150,8 +3267,8 @@
             if (settingsPage && !isIT) {
                 const migrationSections = settingsPage.querySelectorAll('.bg-red-50, .bg-amber-50, .bg-blue-50');
                 migrationSections.forEach(section => {
-                    if (section.innerHTML.includes('Cloud Migration') || 
-                        section.innerHTML.includes('Stock Migration') || 
+                    if (section.innerHTML.includes('Cloud Migration') ||
+                        section.innerHTML.includes('Stock Migration') ||
                         section.innerHTML.includes('Backup Firebase')) {
                         section.style.display = 'none';
                     }
@@ -3186,7 +3303,7 @@
             const tbody = document.getElementById('systemLogsTableBody');
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="5" class="p-10 text-center text-slate-400">Mencoba menarik data logs dari server...</td></tr>';
-            
+
             fetchGAS("getSystemLogs", {}).then(res => {
                 if (res.success) {
                     const logs = JSON.parse(res.payload || "[]");
@@ -3787,58 +3904,88 @@
         // ==========================================
         // RENDER TABLES
         // ==========================================
-        function changeEqPage(dir) { currentEqPage += dir; renderMasterEquipTable(); }
-        function changePtPage(dir) { currentPtPage += dir; renderMasterPartsTable(); }
-        function changeHmPage(dir) { currentHmPage += dir; renderDailyHMTable(); }
-        function changeMonPage(dir) { currentMonPage += dir; renderWOTable(); }
-        function resetPagination(type) { if (type === 'equip') currentEqPage = 1; if (type === 'parts') currentPtPage = 1; if (type === 'hm') currentHmPage = 1; if (type === 'monitoring') currentMonPage = 1; }
+        function switchEquipTab(type) {
+            document.querySelectorAll('.equip-tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-equip-own').className = `px-6 py-3 border-b-2 font-black text-xs md:text-sm uppercase tracking-widest transition-all ${type === 'own' ? 'border-theme-main text-theme-main' : 'border-transparent text-slate-400 hover:text-slate-600'}`;
+            document.getElementById('tab-equip-rental').className = `px-6 py-3 border-b-2 font-black text-xs md:text-sm uppercase tracking-widest transition-all ${type === 'rental' ? 'border-theme-main text-theme-main' : 'border-transparent text-slate-400 hover:text-slate-600'}`;
+            if (type === 'own') document.getElementById('container-equip-own').classList.remove('hidden');
+            if (type === 'rental') document.getElementById('container-equip-rental').classList.remove('hidden');
+        }
+
+        let editEquipNo = null;
+        function editEquip(equipNo, brand, type, status) {
+            editEquipNo = equipNo;
+            document.getElementById('m_equip_no').value = equipNo;
+            document.getElementById('m_equip_no').readOnly = true;
+            document.getElementById('m_brand').value = brand;
+            document.getElementById('m_equip_type').value = type;
+            document.getElementById('m_equip_status').value = status || 'OWN';
+            const btn = document.getElementById('btnSaveEquip');
+            if (btn) btn.innerText = "UPDATE EQUIPMENT";
+            document.getElementById('equipForm').scrollIntoView({ behavior: 'smooth' });
+        }
 
         function renderMasterEquipTable() {
             const eBody = document.getElementById('masterEquipBody');
-            if (!eBody) return;
+            const rBody = document.getElementById('masterEquipRentalBody');
+            if (!eBody || !rBody) return;
             const qE = document.getElementById('filterEquip')?.value.toLowerCase() || '';
             let filteredE = (masterCache.equip || []).filter(e => String(e.equip_no || '').toLowerCase().includes(qE) || String(e.brand || '').toLowerCase().includes(qE));
+
+            let ownEquips = filteredE.filter(e => (e.status || 'OWN') === 'OWN');
+            let rentalEquips = filteredE.filter(e => e.status === 'RENTAL');
+
             const totalPages = Math.ceil(filteredE.length / ITEMS_PER_PAGE) || 1;
             if (currentEqPage > totalPages) currentEqPage = totalPages; if (currentEqPage < 1) currentEqPage = 1;
-            const paged = filteredE.slice((currentEqPage - 1) * ITEMS_PER_PAGE, currentEqPage * ITEMS_PER_PAGE);
             if (document.getElementById('equipPageInfo')) document.getElementById('equipPageInfo').innerText = `${currentEqPage} / ${totalPages}`;
-            if (paged.length === 0) { eBody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-400 font-bold">Data kosong.</td></tr>'; return; }
-            eBody.innerHTML = paged.map(e => `<tr class="border-b hover:bg-slate-50"><td class="p-4 font-black uppercase text-slate-800">${e.equip_no}</td><td class="p-4 uppercase">${e.brand}</td><td class="p-4 uppercase text-theme-accent font-bold">${e.unit_type}</td></tr>`).join('');
-        }
 
-        function renderMasterPartsTable() {
-            const pBody = document.getElementById('masterPartsBody');
-            if (!pBody) return;
-            const qP = document.getElementById('filterParts')?.value.toLowerCase() || '';
-            let filteredP = (masterCache.parts || []).filter(p => String(p.part_number || '').toLowerCase().includes(qP) || String(p.description || '').toLowerCase().includes(qP));
-            const totalPages = Math.ceil(filteredP.length / ITEMS_PER_PAGE) || 1;
-            if (currentPtPage > totalPages) currentPtPage = totalPages; if (currentPtPage < 1) currentPtPage = 1;
-            const paged = filteredP.slice((currentPtPage - 1) * ITEMS_PER_PAGE, currentPtPage * ITEMS_PER_PAGE);
-            if (document.getElementById('partPageInfo')) document.getElementById('partPageInfo').innerText = `${currentPtPage} / ${totalPages}`;
-            if (paged.length === 0) { pBody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400 font-bold">Data kosong.</td></tr>'; return; }
-            pBody.innerHTML = paged.map(pt => {
-                const safeDesc = (pt.description || '').replace(/'/g, "\\'");
-                return `<tr class="border-b hover:bg-slate-50">
-                        <td class="p-4 font-black uppercase text-slate-800">${pt.part_number}</td>
-                        <td class="p-4">${pt.description}</td>
-                        <td class="p-4 font-black text-theme-accent uppercase">${pt.uom}</td>
+            if (ownEquips.length === 0) {
+                eBody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400 font-bold">Data kosong.</td></tr>';
+            } else {
+                eBody.innerHTML = ownEquips.map(e => {
+                    const safeBrand = (e.brand || '').replace(/'/g, "\\'");
+                    const safeType = (e.unit_type || '').replace(/'/g, "\\'");
+                    return `<tr class="border-b hover:bg-slate-50">
+                        <td class="p-4 font-black uppercase text-slate-800">${e.equip_no}</td>
+                        <td class="p-4 uppercase">${e.brand}</td>
+                        <td class="p-4 uppercase text-theme-accent font-bold">${e.unit_type}</td>
                         <td class="p-4 text-right">
-                            <button type="button" onclick="addPartToWO('${pt.part_number}', '${safeDesc}', '${pt.uom}')" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white px-3 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">
-                                <i class="fas fa-plus mr-1"></i> Ke WO
+                            <button type="button" onclick="editEquip('${e.equip_no}', '${safeBrand}', '${safeType}', 'OWN')" class="bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white px-3 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">
+                                <i class="fas fa-edit mr-1"></i> Edit
                             </button>
                         </td>
                     </tr>`;
-            }).join('');
+                }).join('');
+            }
+
+            if (rentalEquips.length === 0) {
+                rBody.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400 font-bold">Data kosong.</td></tr>';
+            } else {
+                rBody.innerHTML = rentalEquips.map(e => {
+                    const safeBrand = (e.brand || '').replace(/'/g, "\\'");
+                    const safeType = (e.unit_type || '').replace(/'/g, "\\'");
+                    return `<tr class="border-b hover:bg-slate-50">
+                        <td class="p-4 font-black uppercase text-slate-800">${e.equip_no}</td>
+                        <td class="p-4 uppercase">${e.brand}</td>
+                        <td class="p-4 uppercase text-theme-accent font-bold">${e.unit_type}</td>
+                        <td class="p-4 text-right">
+                            <button type="button" onclick="editEquip('${e.equip_no}', '${safeBrand}', '${safeType}', 'RENTAL')" class="bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white px-3 py-1.5 rounded-lg font-black text-[10px] uppercase tracking-widest transition-colors shadow-sm">
+                                <i class="fas fa-edit mr-1"></i> Edit
+                            </button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            }
         }
 
         let currentStockPage = 1;
         function renderMasterStockTable() {
             const sBody = document.getElementById('masterStockBody');
             if (!sBody) return;
-            
+
             const q = (document.getElementById('stockSearch')?.value || '').toLowerCase();
             const rawData = masterCache.stock || [];
-            
+
             let filtered = rawData.filter(s => {
                 const searchStr = `${s.part_number} ${s.description} ${s.location} ${s.category_spare_part}`.toLowerCase();
                 return searchStr.includes(q);
@@ -3858,30 +4005,27 @@
             const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
             if (currentStockPage > totalPages) currentStockPage = totalPages;
             if (currentStockPage < 1) currentStockPage = 1;
-            
+
             const paged = filtered.slice((currentStockPage - 1) * ITEMS_PER_PAGE, currentStockPage * ITEMS_PER_PAGE);
             if (document.getElementById('stockPageInfo')) document.getElementById('stockPageInfo').innerText = `${currentStockPage} / ${totalPages}`;
-            
+
             if (paged.length === 0) {
-                sBody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 font-bold">Data stock tidak ditemukan.</td></tr>';
+                sBody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">Data stock tidak ditemukan.</td></tr>';
                 return;
             }
 
             sBody.innerHTML = paged.map(s => {
                 const qty = parseFloat(s.qty_final) || 0;
                 const qtyColor = qty <= 0 ? 'text-red-600 bg-red-50' : 'text-emerald-600 bg-emerald-50';
-                const amount = parseFloat(s.amount) || 0;
                 const safeDesc = (s.description || '').replace(/'/g, "\\'");
                 const safeUom = (s.uom || 'UNIT').replace(/'/g, "\\'");
-                
+
                 return `<tr class="border-b hover:bg-slate-50 transition-colors">
                     <td class="p-4"><div class="font-black text-slate-800 uppercase text-xs">${s.part_number || '-'}</div><div class="text-[9px] text-slate-400 font-bold uppercase">${s.stock_code || ''}</div></td>
                     <td class="p-4 text-xs font-medium text-slate-600 max-w-xs truncate" title="${s.description}">${s.description || '-'}</td>
                     <td class="p-4 text-[10px] font-bold text-slate-500 uppercase">${s.category_spare_part || '-'}</td>
                     <td class="p-4 text-center"><span class="px-3 py-1.5 rounded-lg font-black text-sm ${qtyColor}">${qty}</span></td>
                     <td class="p-4 text-[10px] font-black text-slate-400 uppercase">${s.uom || 'UNIT'}</td>
-                    <td class="p-4 font-bold text-slate-600 text-xs">${s.location || '-'}</td>
-                    <td class="p-4 text-right font-mono text-xs font-black text-slate-700">Rp ${amount.toLocaleString('id-ID')}</td>
                     <td class="p-4 text-center">
                         <button type="button" onclick="addPartToWO('${s.part_number}', '${safeDesc}', '${safeUom}')" 
                             class="bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white flex flex-col items-center justify-center rounded-2xl px-3 py-2 font-black text-[9px] leading-tight transition-all active:scale-90 border border-emerald-100 shadow-sm mx-auto" title="Tambah ke WO">
@@ -3898,11 +4042,11 @@
             currentStockPage += dir;
             renderMasterStockTable();
         }
-        
-        window.exportStockToExcel = function() {
+
+        window.exportStockToExcel = function () {
             const data = masterCache.stock || [];
             if (data.length === 0) return Swal.fire('Info', 'Data stock masih kosong.', 'info');
-            
+
             const wb = XLSX.utils.book_new();
             const ws = XLSX.utils.json_to_sheet(data);
             XLSX.utils.book_append_sheet(wb, ws, "Stock_Inventory");
@@ -3946,7 +4090,7 @@
                 count++;
                 const isIT = checkITAccess();
                 let deleteBtn = isIT ? `<button onclick="handleDeletePlan('${unitNo}')" class="text-red-500 hover:text-red-700 ml-2" title="Hapus Plan"><i class="fas fa-trash-alt"></i></button>` : '';
-                
+
                 html += `<tr class="border-b hover:bg-slate-50">
                     <td class="p-4">
                         <div class="font-black uppercase">${unitNo}</div>
@@ -4356,7 +4500,7 @@
                 'daily-hm': 'Input Daily HM',
                 'master-plan': 'Plan Alat & Service',
                 'master-equip': 'Equipments',
-                'master-parts': 'Spareparts',
+
                 'master-comp': 'Komponen',
                 'master-stock': 'Stock Inventory',
                 'part-usage': 'Part Usage Log',
@@ -4490,7 +4634,7 @@
                 sels.forEach(sel => {
                     const currentVal = sel.value;
                     sel.innerHTML = options;
-                    if(currentVal) sel.value = currentVal;
+                    if (currentVal) sel.value = currentVal;
                 });
             }
         }
@@ -4549,21 +4693,21 @@
         async function validateUnitLock(equipNo, currentWoNo = "") {
             if (!equipNo) return null;
             const target = String(equipNo).trim().toUpperCase();
-            
+
             try {
                 // Fetch data terbaru dari Firebase node 'work_orders'
                 // Kita gunakan query filter by equip_no jika memungkinkan, namun jika tidak, ambil snapshot dan filter di client
                 const snapshot = await db.ref('work_orders').once('value');
                 if (!snapshot.exists()) return null;
-                
+
                 const allWOs = snapshot.val();
                 const activeWO = Object.keys(allWOs).find(key => {
                     const w = allWOs[key];
-                    return String(w.equip_no).trim().toUpperCase() === target && 
-                           String(w.status).toUpperCase() !== 'CLOSED' && 
-                           (w.no_wo || key) !== currentWoNo;
+                    return String(w.equip_no).trim().toUpperCase() === target &&
+                        String(w.status).toUpperCase() !== 'CLOSED' &&
+                        (w.no_wo || key) !== currentWoNo;
                 });
-                
+
                 return activeWO ? (allWOs[activeWO].no_wo || activeWO) : null;
             } catch (err) {
                 console.error("Lock Validation Error:", err);
@@ -4575,14 +4719,14 @@
         function checkActiveBreakdown(equipNo, currentWoNo = "") {
             if (!equipNo) return null;
             const target = String(equipNo).trim().toUpperCase();
-            
+
             if (!woDataCache || woDataCache.length === 0) {
                 console.warn("Validation Warning: woDataCache is empty. Real-time check is recommended.");
             }
 
-            const activeWO = (woDataCache || []).find(w => 
-                String(w.equip_no).trim().toUpperCase() === target && 
-                String(w.status).toUpperCase() !== 'CLOSED' && 
+            const activeWO = (woDataCache || []).find(w =>
+                String(w.equip_no).trim().toUpperCase() === target &&
+                String(w.status).toUpperCase() !== 'CLOSED' &&
                 w.no_wo !== currentWoNo
             );
             return activeWO ? activeWO.no_wo : null;
@@ -4652,13 +4796,13 @@
         function autoFillPart(input) {
             if (!input || !input.value) return;
             const val = String(input.value).trim().toUpperCase();
-            
+
             // 1. Cari di Master Parts (Standard)
             const p = (partsDictCache || []).find(x => x.part_number && String(x.part_number).trim().toUpperCase() === val);
-            
+
             // 2. Cari di Master Stock (Integrasi Logistic)
             const s = (masterCache.stock || []).find(x => x.part_number && String(x.part_number).trim().toUpperCase() === val);
-            
+
             const tr = input.closest('tr');
             if (tr) {
                 if (p) {
@@ -4716,7 +4860,7 @@
                 });
             }
             if (document.getElementById('act_tgl')) document.getElementById('act_tgl').value = getShiftDate();
-            
+
             const container = document.getElementById('act_details_container');
             if (container) {
                 container.innerHTML = '';
@@ -4727,7 +4871,7 @@
         function tarikDataWO() {
             const noInput = document.getElementById('no_wo');
             if (!noInput || !noInput.value) return Swal.fire('Perhatian', 'Ketik No WO dulu', 'warning');
-            
+
             const no = noInput.value.trim().toUpperCase();
             console.log("Searching for WO:", no);
 
@@ -4793,7 +4937,7 @@
 
                 if (document.getElementById('reported_by') && t.reported_by) document.getElementById('reported_by').value = t.reported_by;
                 if (document.getElementById('tech') && t.tech) document.getElementById('tech').value = t.tech;
-                
+
                 if (document.getElementById('major_comp') && (t.major_comp || t.majorcomponent)) {
                     document.getElementById('major_comp').value = t.major_comp || t.majorcomponent;
                     updateMinorComp();
@@ -4838,9 +4982,9 @@
         function editWO(no) {
             if (!no) return;
             console.log("Navigating to edit WO:", no);
-            
+
             navigate('buat-wo', true); // preventReset = true
-            
+
             // Tunggu sebentar untuk memastikan DOM ter-update (meskipun synchronous, delay kecil membantu kestabilan UI)
             setTimeout(() => {
                 const input = document.getElementById('no_wo');
@@ -5011,10 +5155,7 @@
                     updates['master_equip'] = {};
                     freshData.equip.forEach((e) => { if (e.equip_no) updates['master_equip'][String(e.equip_no).replace(/[\.\#\$\[\]\/]/g, "-")] = e; });
                 }
-                if (freshData.parts) {
-                    updates['master_parts'] = {};
-                    freshData.parts.forEach((p) => { if (p.part_number) updates['master_parts'][String(p.part_number).replace(/[\.\#\$\[\]\/]/g, "-")] = p; });
-                }
+
                 if (freshData.components) {
                     updates['master_comp'] = {};
                     freshData.components.forEach((c, i) => { updates['master_comp']['COMP_' + i] = c; });
@@ -5065,7 +5206,7 @@
                 if (!res || !res.success) throw new Error(res.message || "Gagal mengambil data stock");
 
                 startLoading("MEMPERBARUI DATA STOCK DI FIREBASE...");
-                
+
                 const updates = {};
                 res.data.forEach(item => {
                     if (item.part_number) {
@@ -5102,7 +5243,7 @@
 
             const tgl = document.getElementById('act_tgl').value;
             const rows = document.querySelectorAll('.activity-row');
-            
+
             if (rows.length === 0) return Swal.fire('Perhatian', 'Harap tambahkan minimal 1 aktivitas.', 'warning');
 
             const activitiesData = [];
@@ -5112,14 +5253,14 @@
                 const desc = row.querySelector('.act-row-desc').value;
                 const start = row.querySelector('.act-row-start').value || "00:00";
                 const end = row.querySelector('.act-row-end').value || "00:00";
-                
-                if(!wo || !desc) {
+
+                if (!wo || !desc) {
                     isValid = false;
                 }
                 activitiesData.push({ no_wo: wo, aktifitas: desc, jam_mulai: start, jam_selesai: end });
             });
 
-            if(!isValid) return Swal.fire('Perhatian', 'Semua kolom Work Order dan Deskripsi pada setiap aktivitas wajib diisi.', 'warning');
+            if (!isValid) return Swal.fire('Perhatian', 'Semua kolom Work Order dan Deskripsi pada setiap aktivitas wajib diisi.', 'warning');
 
             if (btn) {
                 btn.disabled = true;
@@ -5173,7 +5314,7 @@
         }
 
         function saveManualSeq(val) {
-            if(val && val.trim() !== '') {
+            if (val && val.trim() !== '') {
                 localStorage.setItem('manual_last_wo_seq', val);
             } else {
                 localStorage.removeItem('manual_last_wo_seq');
@@ -5513,14 +5654,20 @@
             const equipNo = document.getElementById('m_equip_no').value.toUpperCase().trim();
             const brand = document.getElementById('m_brand').value.toUpperCase().trim();
             const unitType = document.getElementById('m_equip_type').value.toUpperCase().trim();
+            const status = document.getElementById('m_equip_status').value;
 
             startLoading("SAVING TO FIREBASE...");
             const safeId = equipNo.replace(/[\.\#\$\[\]\/]/g, "-");
             try {
-                await db.ref('master_equip/' + safeId).set({ equip_no: equipNo, brand: brand, unit_type: unitType });
+                await db.ref('master_equip/' + safeId).set({ equip_no: equipNo, brand: brand, unit_type: unitType, status: status });
                 endLoading();
-                Swal.fire('Sukses', 'Equipment berhasil ditambahkan!', 'success');
+                Swal.fire('Sukses', 'Equipment berhasil disimpan!', 'success');
                 document.getElementById('equipForm').reset();
+                document.getElementById('m_equip_no').readOnly = false;
+                editEquipNo = null;
+                const btn = document.getElementById('btnSaveEquip');
+                if (btn) btn.innerText = "TAMBAH EQUIPMENT";
+                globalDataSync();
             } catch (err) { endLoading(); Swal.fire('Error', err.toString(), 'error'); }
         }
 
@@ -5670,7 +5817,7 @@
                 if (existingWO.action_log) {
                     savedLog = JSON.parse(existingWO.action_log);
                 }
-            } catch (e) {}
+            } catch (e) { }
 
             const currHM = savedLog.hm !== undefined ? savedLog.hm : (existingWO.hm_km || '');
 
@@ -6522,11 +6669,11 @@
                 modal.classList.remove('hidden');
                 document.getElementById('formBDAwal').reset();
                 document.getElementById('bd_tgl').value = getShiftDate();
-                
+
                 const savedSeq = localStorage.getItem('manual_last_wo_seq');
                 const lastSeqInput = document.getElementById('bd_last_seq');
                 if (lastSeqInput) lastSeqInput.value = savedSeq || "";
-                
+
                 updateNextWoInfo();
             }
         }
@@ -6629,7 +6776,7 @@
                 try {
                     if (wo.parts_json) parts = JSON.parse(wo.parts_json);
                     else if (wo.parts) parts = wo.parts;
-                } catch(e) {}
+                } catch (e) { }
 
                 if (Array.isArray(parts)) {
                     parts.forEach(p => {
@@ -6650,7 +6797,7 @@
                 }
             });
 
-            let filtered = flatParts.filter(p => 
+            let filtered = flatParts.filter(p =>
                 String(p.no_wo).toLowerCase().includes(filter) ||
                 String(p.equip_no).toLowerCase().includes(filter) ||
                 String(p.part_no).toLowerCase().includes(filter) ||
@@ -6753,13 +6900,13 @@
                 try {
                     const snapshot = await db.ref('work_orders/' + noWo).once('value');
                     if (!snapshot.exists()) throw new Error("Work Order tidak ditemukan");
-                    
+
                     const wo = snapshot.val();
                     let parts = [];
                     try {
                         if (wo.parts_json) parts = JSON.parse(wo.parts_json);
                         else if (wo.parts) parts = wo.parts;
-                    } catch(e) {}
+                    } catch (e) { }
 
                     const newParts = parts.filter(p => String(p.no) !== String(partNo));
 
