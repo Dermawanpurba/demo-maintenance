@@ -1679,13 +1679,19 @@
                                     class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
                                     placeholder="Contoh: 85" required value="85">
                             </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">MOHH</label>
+                                <input type="number" step="0.1" id="m_plan_mohh"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
+                                    placeholder="Contoh: 0" value="0">
+                            </div>
                             <input type="hidden" id="m_plan_kategori" value="PLANT ALAT">
  
                             <div class="md:col-span-4 mt-2">
                                 <button type="submit"
                                     class="w-full bg-theme-main text-white font-black py-4 md:py-4 rounded-xl md:rounded-2xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest text-[10px] md:text-xs">DAFTARKAN
                                     PLAN ALAT</button>
-                            </div> </div>
+                            </div>
                         </form>
 
                         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
@@ -4219,6 +4225,7 @@
                     <td class="p-4 text-center border-l border-slate-100">
                         <div class="font-black text-theme-accent text-lg">${p.plan_hours_per_month}<span class="text-[10px] text-slate-400 ml-1">h/Bln</span></div>
                         <div class="text-[9px] font-bold text-blue-400 mt-1">${p.plan_pa || 85}% PA</div>
+                        <div class="text-[9px] font-bold text-slate-500 mt-0.5">${p.mohh || 0} MOHH</div>
                     </td>
                     <td class="p-4 text-center border-l border-slate-100">
                         <div class="font-black text-theme-main text-lg">${ewh.toFixed(1)}<span class="text-[10px] text-slate-400 ml-1">h</span></div>
@@ -5880,18 +5887,15 @@
             const model = document.getElementById('m_plan_model').value.toUpperCase().trim();
             const planHours = parseFloat(document.getElementById('m_plan_hours').value) || 720;
             const planPa = parseFloat(document.getElementById('m_plan_pa').value) || 85;
-            const lastDate = document.getElementById('m_plan_last_date').value;
-            const lastHm = parseFloat(document.getElementById('m_plan_last_hm').value) || 0;
-            const nextHm = lastHm + 250;
+            const mohh = parseFloat(document.getElementById('m_plan_mohh')?.value || 0);
             const kategori = document.getElementById('m_plan_kategori').value;
 
             startLoading("SAVING TO FIREBASE...");
-            const safeId = equipNo.replace(/[\.\#\$\[\]\/]/g, "-");
+            const safeId = (equipNo + "_" + kategori).replace(/[\.\#\$\[\]\/]/g, "-");
             try {
                 await db.ref('plan_alat/' + safeId).set({
                     equip_no: equipNo, model: model, plan_hours_per_month: planHours, plan_pa: planPa,
-                    last_service_date: lastDate, last_service_hm: lastHm, next_service_hm: nextHm,
-                    kategori: kategori
+                    mohh: mohh, kategori: kategori
                 });
                 endLoading();
                 Swal.fire('Sukses', 'Plan Alat berhasil didaftarkan!', 'success');
@@ -5911,7 +5915,7 @@
             const kategori = document.getElementById('m_plan_kategori_service').value;
  
             startLoading("SAVING TO FIREBASE...");
-            const safeId = equipNo.replace(/[\.\#\$\[\]\/]/g, "-");
+            const safeId = (equipNo + "_" + kategori).replace(/[\.\#\$\[\]\/]/g, "-");
             try {
                 await db.ref('plan_alat/' + safeId).set({
                     equip_no: equipNo, model: model, plan_hours_per_month: planHours, plan_pa: planPa,
@@ -6493,7 +6497,7 @@
         function autoFillPlanService(unitNo) {
             if (!unitNo) return;
             const target = unitNo.trim().toUpperCase();
-            const plan = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === target);
+            const plan = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === target && (p.kategori || '').toUpperCase() === 'SERVICE');
 
             if (plan) {
                 // Tarik data Next Service HM sebagai Plan HM saat ini
@@ -6719,7 +6723,7 @@
                 b.status === 'OPEN'
             );
 
-            const plan = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === equipNo.toUpperCase());
+            const plan = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === equipNo.toUpperCase() && (p.kategori || '').toUpperCase() === 'SERVICE');
             let pmStatusHtml = '';
             if (plan) {
                 const actualHM = getActualHM(equipNo);
