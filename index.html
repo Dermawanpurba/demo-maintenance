@@ -6534,18 +6534,52 @@
             }
             isSavingSvc = true;
 
-            startLoading("MENYIMPAN & SINKRONISASI DATA...");
+            startLoading("MENYIMPAN DATA KE FIREBASE...");
             try {
-                const res = await fetchGAS("saveServiceHistory", payload);
+                // 1. Simpan ke Firebase secara instan (realtime)
+                const svcId = "SVC-" + new Date().getTime().toString().slice(-6);
+                const svcPayload = {
+                    id: svcId,
+                    equip_no: payload.equip_no,
+                    plan_hm: parseFloat(payload.plan_hm) || 0,
+                    plan_date: payload.plan_date || "",
+                    actual_hm: parseFloat(payload.actual_hm) || 0,
+                    actual_date: payload.actual_date || "",
+                    timestamp: new Date().toISOString()
+                };
+                
+                await db.ref('service_history/' + svcId).set(svcPayload);
+                
+                // 2. Update Plan Service di Firebase instan
+                const nextServiceHM = (parseFloat(payload.actual_hm) || 0) + 250;
+                const safeId = (payload.equip_no + "_SERVICE").replace(/[\.\#\$\[\]\/]/g, "-");
+                await db.ref('plan_alat/' + safeId).update({
+                    last_service_date: payload.actual_date,
+                    last_service_hm: parseFloat(payload.actual_hm) || 0,
+                    next_service_hm: nextServiceHM
+                });
+
+                // 3. Jalankan sinkronisasi Google Sheets di background (non-blocking)
+                fetchGAS("saveServiceHistory", payload);
+
                 endLoading();
-                if (res.success) {
-                    Swal.fire('Berhasil!', res.message, 'success');
-                    document.getElementById('serviceInputForm').reset();
-                    document.getElementById('svc_actual_date').value = getShiftDate();
-                    globalDataSync(); // Refresh seluruh data agar UI Plan Alat langsung berubah
-                } else {
-                    Swal.fire('Error', res.message, 'error');
+                Swal.fire('Berhasil!', 'Data Service Berhasil Disimpan & Disinkronisasi!', 'success');
+                document.getElementById('serviceInputForm').reset();
+                document.getElementById('svc_actual_date').value = getShiftDate();
+                
+                // Update local cache agar UI ter-update tanpa freeze reload
+                if (!masterCache.serviceHistory) masterCache.serviceHistory = [];
+                masterCache.serviceHistory.push(svcPayload);
+                
+                const localPlan = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === payload.equip_no && (p.kategori || '').toUpperCase() === 'SERVICE');
+                if (localPlan) {
+                    localPlan.last_service_date = payload.actual_date;
+                    localPlan.last_service_hm = parseFloat(payload.actual_hm) || 0;
+                    localPlan.next_service_hm = nextServiceHM;
                 }
+                
+                renderServiceHistoryTable();
+                renderMasterServiceTable();
             } catch (err) {
                 endLoading();
                 Swal.fire('Error', err.toString(), 'error');
