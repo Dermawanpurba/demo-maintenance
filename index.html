@@ -340,6 +340,21 @@
             letter-spacing: 0.15em;
             color: rgba(255, 255, 255, 0.5);
         }
+        #sidebar-toggle-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 50;
+            width: 2.5rem;
+            height: 2.5rem;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s;
+        }
+        #sidebar.md\:w-0 ~ main #sidebar-toggle-btn {
+            left: 2px;
+        }
+        #sidebar:not(.md\:w-0) ~ main #sidebar-toggle-btn {
+            left: 238px; /* 256px + 16px */
+        }
     </style>
 </head>
 
@@ -515,7 +530,11 @@
                             class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
                             data-page="master-plan">
                             <i class="fas fa-calendar-alt w-8 group-hover:scale-110 transition-transform"></i> Plan Alat
-                            & Service
+                        </button>
+                        <button onclick="navigate('plan-service')"
+                            class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
+                            data-page="plan-service">
+                            <i class="fas fa-truck w-8 group-hover:scale-110 transition-transform text-indigo-300"></i> Plan Service
                         </button>
                         <button onclick="navigate('master-equip')"
                             class="nav-btn w-full flex items-center p-3.5 rounded-xl hover:bg-white/10 text-white/80 text-sm font-bold transition-all group"
@@ -597,8 +616,8 @@
         <main
             class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative no-print h-screen bg-slate-50 pb-20 w-full transition-all duration-300">
             <!-- Sidebar Desktop Toggle Button -->
-            <button onclick="toggleSidebarDesktop()"
-                class="hidden md:flex absolute left-4 top-4 z-30 w-10 h-10 items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-all shadow-md active:scale-95 no-print"
+            <button onclick="toggleSidebarDesktop()" id="sidebar-toggle-btn"
+                class="hidden md:flex items-center justify-center bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-all shadow-md active:scale-95 no-print"
                 title="Toggle Sidebar">
                 <i class="fas fa-bars"></i>
             </button>
@@ -845,8 +864,14 @@
                         </div>
                     </div>
 
-                    <h3 class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest mb-4 ml-2"><i
-                            class="fas fa-table text-theme-accent mr-2"></i> Unit Performance Detail (By Group)</h3>
+                    <div class="flex justify-between items-center mb-4 ml-2 mr-2">
+                        <h3 class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest"><i
+                                class="fas fa-table text-theme-accent mr-2"></i> Unit Performance Detail (By Group)</h3>
+                        <button onclick="exportUnitPerformanceToExcel()"
+                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl font-black text-[10px] md:text-[11px] uppercase tracking-widest transition-all shadow-md active:scale-95 flex items-center gap-2">
+                            <i class="fas fa-file-excel text-sm"></i> Export Excel
+                        </button>
+                    </div>
                     <div id="unitGroupTablesContainer" class="space-y-8 mb-8">
                     </div>
 
@@ -1603,7 +1628,7 @@
                         <div
                             class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b pb-6 gap-4">
                             <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
-                                    class="fas fa-calendar-alt mr-3"></i> Plan Alat & Service</h2>
+                                    class="fas fa-calendar-alt mr-3"></i> Plan Alat</h2>
                             <div class="flex flex-wrap gap-2">
                                 <button onclick="globalDataSync()"
                                     class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
@@ -1642,8 +1667,7 @@
                                     placeholder="Misal: D85ESS-2" required>
                             </div>
                             <div class="space-y-2 md:col-span-2">
-                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Target HM
-                                    / Bln</label>
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Target HM / Bln</label>
                                 <input type="number" id="m_plan_hours"
                                     class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
                                     placeholder="Contoh: 720" required value="720">
@@ -1655,26 +1679,13 @@
                                     class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
                                     placeholder="Contoh: 85" required value="85">
                             </div>
-                            <div class="space-y-2 md:col-span-2">
-                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Tgl
-                                    Service Terakhir</label>
-                                <input type="date" id="m_plan_last_date"
-                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
-                                    required>
-                            </div>
-                            <div class="space-y-2 md:col-span-2">
-                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">HM Service
-                                    Terakhir</label>
-                                <input type="number" step="0.1" id="m_plan_last_hm"
-                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
-                                    placeholder="Contoh: 1250" required>
-                            </div>
-
+                            <input type="hidden" id="m_plan_kategori" value="PLANT ALAT">
+ 
                             <div class="md:col-span-4 mt-2">
                                 <button type="submit"
                                     class="w-full bg-theme-main text-white font-black py-4 md:py-4 rounded-xl md:rounded-2xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest text-[10px] md:text-xs">DAFTARKAN
-                                    PLAN & SERVICE TRACKER</button>
-                            </div>
+                                    PLAN ALAT</button>
+                            </div> </div>
                         </form>
 
                         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
@@ -1684,7 +1695,100 @@
                                     class="w-full pl-12 pr-5 py-3 md:py-3.5 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-theme-accent font-medium text-xs md:text-sm shadow-sm"
                                     placeholder="Cari Unit / Model...">
                             </div>
-                            <select id="filterStatusPlan" onchange="renderMasterPlanTable()"
+                        </div>
+
+                        <div class="overflow-x-auto shadow-sm rounded-2xl border border-slate-100">
+                            <table class="w-full text-left text-sm min-w-[700px]">
+                                <thead
+                                    class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
+                                    <tr>
+                                        <th class="p-4 md:p-5 w-48">EQUIP / MODEL</th>
+                                        <th class="p-4 md:p-5 text-center">TARGET HM / PA</th>
+                                        <th class="p-4 md:p-5 text-center">EFFECTIVE WORK HOURS (EWH)</th>
+                                        <th class="p-4 md:p-5 text-center w-16">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="masterPlanBody" class="divide-y divide-slate-50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+ 
+                <section id="page-plan-service" class="page pb-12">
+                    <div class="max-w-5xl mx-auto bg-white mobile-optim shadow-sm border border-slate-100">
+                        <div
+                            class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-6 gap-4">
+                            <h2 class="text-xl md:text-2xl font-black text-theme-main uppercase tracking-tighter"><i
+                                    class="fas fa-truck mr-3 text-indigo-500"></i> Plan Service</h2>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="globalDataSync()"
+                                    class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
+                                    <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                            </div>
+                        </div>
+ 
+                        <form id="planFormService" onsubmit="handleSavePlanService(event)"
+                            class="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-10 bg-slate-50 p-6 md:p-8 rounded-2xl md:rounded-[2rem] border border-slate-200 shadow-inner">
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Equip No</label>
+                                <input type="text" id="m_plan_equip_service" list="listEquip"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
+                                    placeholder="Ketik Equip" required>
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Model Alat</label>
+                                <input type="text" id="m_plan_model_service"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold uppercase focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
+                                    placeholder="Misal: Triton" required>
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Kategori Unit</label>
+                                <select id="m_plan_kategori_service"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm cursor-pointer" required>
+                                    <option value="SERVICE" selected>SERVICE</option>
+                                    <option value="PLANT ALAT">PLANT ALAT</option>
+                                </select>
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Target HM / Bln</label>
+                                <input type="number" id="m_plan_hours_service"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
+                                    placeholder="Contoh: 720" required value="720">
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Target PA (%)</label>
+                                <input type="number" step="0.1" id="m_plan_pa_service"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
+                                    placeholder="Contoh: 85" required value="85">
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Tgl Service Terakhir</label>
+                                <input type="date" id="m_plan_last_date_service"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
+                                    required>
+                            </div>
+                            <div class="space-y-2 md:col-span-2">
+                                <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">HM Service Terakhir</label>
+                                <input type="number" step="0.1" id="m_plan_last_hm_service"
+                                    class="w-full px-4 py-3 md:py-4 border border-slate-200 rounded-xl font-bold focus:ring-2 focus:ring-theme-accent outline-none shadow-sm text-sm"
+                                    placeholder="Contoh: 1250" required>
+                            </div>
+ 
+                            <div class="md:col-span-4 mt-2">
+                                <button type="submit"
+                                    class="w-full bg-theme-main text-white font-black py-4 md:py-4 rounded-xl md:rounded-2xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest text-[10px] md:text-xs">DAFTARKAN PLAN SERVICE</button>
+                            </div>
+                        </form>
+ 
+                        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-3">
+                            <div class="relative w-full md:w-80">
+                                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="filterServicePlan" onkeyup="renderMasterServiceTable()"
+                                    class="w-full pl-12 pr-5 py-3 md:py-3.5 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-theme-accent font-medium text-xs md:text-sm shadow-sm"
+                                    placeholder="Cari Unit / Model...">
+                            </div>
+                            <select id="filterStatusServicePlan" onchange="renderMasterServiceTable()"
                                 class="w-full md:w-auto px-5 py-3 md:py-3.5 border border-slate-200 rounded-xl md:rounded-2xl font-black text-slate-600 outline-none text-xs md:text-sm cursor-pointer">
                                 <option value="ALL">Tampilkan Semua Status</option>
                                 <option value="OVERDUE">🔴 OVERDUE SERVICE</option>
@@ -1693,7 +1797,7 @@
                                 <option value="WAITING">⚪ WAITING HM</option>
                             </select>
                         </div>
-
+ 
                         <div class="overflow-x-auto shadow-sm rounded-2xl border border-slate-100">
                             <table class="w-full text-left text-sm min-w-[900px]">
                                 <thead
@@ -1707,7 +1811,7 @@
                                         <th class="p-4 md:p-5 text-center w-16">AKSI</th>
                                     </tr>
                                 </thead>
-                                <tbody id="masterPlanBody" class="divide-y divide-slate-50"></tbody>
+                                <tbody id="masterServiceBody" class="divide-y divide-slate-50"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1944,17 +2048,17 @@
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm">
-                            <table class="w-full text-left text-sm min-w-[1000px]">
+                        <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm bg-white">
+                            <table class="w-full text-left text-sm table-fixed min-w-[800px]">
                                 <thead
                                     class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
                                     <tr>
-                                        <th class="p-4 md:p-6">PART NUMBER</th>
-                                        <th class="p-4 md:p-6">DESCRIPTION</th>
-                                        <th class="p-4 md:p-6">CATEGORY</th>
-                                        <th class="p-4 md:p-6 text-center">QTY FINAL</th>
-                                        <th class="p-4 md:p-6">SATUAN</th>
-                                        <th class="p-4 md:p-6 text-center">AKSI</th>
+                                        <th class="p-4 md:p-6 w-[20%]">PART NUMBER</th>
+                                        <th class="p-4 md:p-6 w-[40%]">DESCRIPTION</th>
+                                        <th class="p-4 md:p-6 w-[18%]">CATEGORY</th>
+                                        <th class="p-4 md:p-6 w-[10%] text-center">QTY FINAL</th>
+                                        <th class="p-4 md:p-6 w-[8%]">SATUAN</th>
+                                        <th class="p-4 md:p-6 w-[4%] text-center">AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody id="masterStockBody" class="divide-y divide-slate-50 font-medium text-slate-700">
@@ -2015,19 +2119,19 @@
                         </div>
 
                         <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm bg-white">
-                            <table class="w-full text-left text-sm min-w-[1000px]">
+                            <table class="w-full text-left text-sm table-fixed min-w-[800px]">
                                 <thead
                                     class="bg-slate-50 border-b border-slate-100 text-slate-400 font-black uppercase text-[10px] tracking-widest">
                                     <tr>
-                                        <th class="p-4">NO WO / UNIT</th>
-                                        <th class="p-4">TGL RUSAK</th>
-                                        <th class="p-4">PART NUMBER</th>
-                                        <th class="p-4">DESCRIPTION</th>
-                                        <th class="p-4 text-center">QTY</th>
-                                        <th class="p-4 text-center">UOM</th>
-                                        <th class="p-4">REMARK</th>
-                                        <th class="p-4 text-center">STATUS WO</th>
-                                        <th class="p-4 text-center">AKSI</th>
+                                        <th class="p-4 w-[15%]">NO WO / UNIT</th>
+                                        <th class="p-4 w-[10%]">TGL RUSAK</th>
+                                        <th class="p-4 w-[15%]">PART NUMBER</th>
+                                        <th class="p-4 w-[25%]">DESCRIPTION</th>
+                                        <th class="p-4 w-[6%] text-center">QTY</th>
+                                        <th class="p-4 w-[6%] text-center">UOM</th>
+                                        <th class="p-4 w-[13%]">REMARK</th>
+                                        <th class="p-4 w-[7%] text-center">STATUS WO</th>
+                                        <th class="p-4 w-[3%] text-center">AKSI</th>
                                     </tr>
                                 </thead>
                                 <tbody id="partUsageTableBody"
@@ -2844,6 +2948,7 @@
                 const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Pantau status Work Order, Backlog, Laporan Aktifitas, dan Monitoring.";
 
                 const btnPlan = document.querySelector('[data-page="master-plan"]'); if (btnPlan) btnPlan.style.display = 'none';
+                const btnSvcPlan = document.querySelector('[data-page="plan-service"]'); if (btnSvcPlan) btnSvcPlan.style.display = 'none';
 
                 const btnComp = document.querySelector('[data-page="master-comp"]'); if (btnComp) btnComp.style.display = 'none';
                 const btnStock = document.querySelector('[data-page="master-stock"]'); if (btnStock) btnStock.style.display = 'none';
@@ -3007,6 +3112,7 @@
                 if (document.getElementById('serviceHistoryTableBody')) renderServiceHistoryTable();
                 if (document.getElementById('userTableBody')) renderUserTable();
                 if (document.getElementById('masterPlanBody')) renderMasterPlanTable();
+                if (document.getElementById('masterServiceBody')) renderMasterServiceTable();
 
                 initFirebaseListeners();
             }).catch(err => {
@@ -3077,6 +3183,8 @@
 
                     const pMp = document.getElementById('page-master-plan');
                     if (pMp && pMp.classList.contains('active')) renderMasterPlanTable();
+                    const pSvc = document.getElementById('page-plan-service');
+                    if (pSvc && pSvc.classList.contains('active')) renderMasterServiceTable();
 
                     calculateKPIFrontEnd();
                 } else {
@@ -3129,6 +3237,7 @@
 
             if (id === 'master-comp') { renderMasterCompTable(); }
             if (id === 'master-plan') { renderMasterPlanTable(); }
+            if (id === 'plan-service') { renderMasterServiceTable(); }
             if (id === 'master-stock') { currentStockPage = 1; renderMasterStockTable(); }
             if (id === 'part-usage') { renderPartUsageTable(); }
             if (id === 'manage-users') { loadUsers(); }
@@ -3299,6 +3408,23 @@
             return Math.max(...hms.map(h => parseFloat(h.hm_akhir) || 0));
         }
 
+        function getUnitEWH(equipNo) {
+            if (!equipNo) return 0;
+            let startDateStr = document.getElementById('kpiStartDate') ? document.getElementById('kpiStartDate').value : '';
+            let endDateStr = document.getElementById('kpiEndDate') ? document.getElementById('kpiEndDate').value : '';
+            if (!startDateStr || !endDateStr) { startDateStr = getFirstDateOfMonth(); endDateStr = getShiftDate(); }
+            let total = 0;
+            (masterCache.dailyHM || []).forEach(hm => {
+                const eq = (hm.equip_no || hm.equipno || '').toUpperCase();
+                if (eq === equipNo.toUpperCase()) {
+                    if (hm.tanggal >= startDateStr && hm.tanggal <= endDateStr) {
+                        total += parseFloat(hm.total_hm) || 0;
+                    }
+                }
+            });
+            return total;
+        }
+
         function loadSystemLogs() {
             const tbody = document.getElementById('systemLogsTableBody');
             if (!tbody) return;
@@ -3419,30 +3545,35 @@
                 masterCache.planAlat.forEach(p => {
                     const unitNo = (p.equip_no || '').toUpperCase();
                     if (unitNo) {
-                        validEquipSet.add(unitNo);
-                        const monthlyPlan = parseInt(p.plan_hours_per_month) || 720;
-                        const dailyPlan = monthlyPlan / 30;
-                        const currentPlan = dailyPlan * daysInFilter;
-                        totalPlanHours += currentPlan;
-                        targetPAWeight += parseFloat(p.plan_pa) || 85;
-                        const lastHM = parseFloat(p.last_service_hm) || 0;
-                        const nextHM = parseFloat(p.next_service_hm) || (lastHM + 250);
-                        const actualHM = getActualHM(unitNo);
-                        const remainingHM = nextHM - actualHM;
+                        const isService = (p.kategori || '').toUpperCase() === 'SERVICE';
+                        let currentPlan = 0;
+                        if (!isService) {
+                            validEquipSet.add(unitNo);
+                            const monthlyPlan = parseInt(p.plan_hours_per_month) || 720;
+                            const dailyPlan = monthlyPlan / 30;
+                            currentPlan = dailyPlan * daysInFilter;
+                            totalPlanHours += currentPlan;
+                            targetPAWeight += parseFloat(p.plan_pa) || 85;
 
-                        window.kpiAuditRawData.pa.push({
-                            Equip_No: unitNo,
-                            Model: p.model || '-',
-                            Plan_Hours: currentPlan.toFixed(2),
-                            Target_PA: p.plan_pa || 85,
-                            Downtime_Hours: 0,
-                            Actual_PA: '100%'
-                        });
+                            window.kpiAuditRawData.pa.push({
+                                Equip_No: unitNo,
+                                Model: p.model || '-',
+                                Plan_Hours: currentPlan.toFixed(2),
+                                Target_PA: p.plan_pa || 85,
+                                Downtime_Hours: 0,
+                                Actual_PA: '100%'
+                            });
+                        } else {
+                            const lastHM = parseFloat(p.last_service_hm) || 0;
+                            const nextHM = parseFloat(p.next_service_hm) || (lastHM + 250);
+                            const actualHM = getActualHM(unitNo);
+                            const remainingHM = nextHM - actualHM;
 
-                        if (remainingHM <= 0 && actualHM > 0) countOverdue++;
-                        else if (remainingHM <= 50 && remainingHM > 0 && actualHM > 0) countMendekati++;
-                        else if (actualHM === 0) countWaiting++;
-                        else countAman++;
+                            if (remainingHM <= 0 && actualHM > 0) countOverdue++;
+                            else if (remainingHM <= 50 && remainingHM > 0 && actualHM > 0) countMendekati++;
+                            else if (actualHM === 0) countWaiting++;
+                            else countAman++;
+                        }
                     }
                 });
             }
@@ -3785,6 +3916,7 @@
             // ===========================================================================
 
             masterCache.planAlat.forEach(plan => {
+                if ((plan.kategori || '').toUpperCase() === 'SERVICE') return;
                 const unitNo = plan.equip_no.toUpperCase();
                 const modelAlias = (plan.model || "").toUpperCase();
 
@@ -3899,6 +4031,7 @@
                 </div>`;
             });
             container.innerHTML = html;
+            window.lastPerformanceGroups = groups;
         }
 
         // ==========================================
@@ -4022,7 +4155,7 @@
 
                 return `<tr class="border-b hover:bg-slate-50 transition-colors">
                     <td class="p-4"><div class="font-black text-slate-800 uppercase text-xs">${s.part_number || '-'}</div><div class="text-[9px] text-slate-400 font-bold uppercase">${s.stock_code || ''}</div></td>
-                    <td class="p-4 text-xs font-medium text-slate-600 max-w-xs truncate" title="${s.description}">${s.description || '-'}</td>
+                    <td class="p-4 text-xs font-medium text-slate-600 break-words whitespace-normal">${s.description || '-'}</td>
                     <td class="p-4 text-[10px] font-bold text-slate-500 uppercase">${s.category_spare_part || '-'}</td>
                     <td class="p-4 text-center"><span class="px-3 py-1.5 rounded-lg font-black text-sm ${qtyColor}">${qty}</span></td>
                     <td class="p-4 text-[10px] font-black text-slate-400 uppercase">${s.uom || 'UNIT'}</td>
@@ -4064,11 +4197,49 @@
         function renderMasterPlanTable() {
             const pb = document.getElementById('masterPlanBody');
             if (!pb) return;
-            if (!masterCache.planAlat || masterCache.planAlat.length === 0) { pb.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold">Belum ada Plan Alat terdaftar.</td></tr>'; return; }
+            if (!masterCache.planAlat || masterCache.planAlat.length === 0) { pb.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400 font-bold">Belum ada Plan Alat terdaftar.</td></tr>'; return; }
             const q = (document.getElementById('filterPlan')?.value || '').toLowerCase();
-            const statusFilter = document.getElementById('filterStatusPlan')?.value || 'ALL';
             let html = ''; let count = 0;
             masterCache.planAlat.forEach(p => {
+                if ((p.kategori || '').toUpperCase() === 'SERVICE') return;
+                const unitNo = (p.equip_no || '').toUpperCase();
+                const model = (p.model || '').toUpperCase();
+                if (q && !unitNo.toLowerCase().includes(q) && !model.toLowerCase().includes(q)) return;
+                count++;
+                const isIT = checkITAccess();
+                let deleteBtn = isIT ? `<button onclick="handleDeletePlan('${unitNo}')" class="text-red-500 hover:text-red-700 ml-2" title="Hapus Plan"><i class="fas fa-trash-alt"></i></button>` : '';
+
+                const categoryBadge = p.kategori ? `<span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200 ml-2">${p.kategori}</span>` : '';
+                const ewh = getUnitEWH(unitNo);
+                html += `<tr class="border-b hover:bg-slate-50">
+                    <td class="p-4">
+                        <div class="font-black uppercase flex items-center">${unitNo}${categoryBadge}</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">${p.model || '-'}</div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        <div class="font-black text-theme-accent text-lg">${p.plan_hours_per_month}<span class="text-[10px] text-slate-400 ml-1">h/Bln</span></div>
+                        <div class="text-[9px] font-bold text-blue-400 mt-1">${p.plan_pa || 85}% PA</div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        <div class="font-black text-theme-main text-lg">${ewh.toFixed(1)}<span class="text-[10px] text-slate-400 ml-1">h</span></div>
+                    </td>
+                    <td class="p-4 text-center border-l border-slate-100">
+                        ${deleteBtn || '-'}
+                    </td>
+                </tr>`;
+            });
+            if (count === 0) pb.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-slate-400 font-bold">Tidak ada data.</td></tr>'; else pb.innerHTML = html;
+        }
+ 
+        function renderMasterServiceTable() {
+            const pb = document.getElementById('masterServiceBody');
+            if (!pb) return;
+            if (!masterCache.planAlat || masterCache.planAlat.length === 0) { pb.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">Belum ada Plan Service terdaftar.</td></tr>'; return; }
+            const q = (document.getElementById('filterServicePlan')?.value || '').toLowerCase();
+            const statusFilter = document.getElementById('filterStatusServicePlan')?.value || 'ALL';
+            let html = ''; let count = 0;
+            masterCache.planAlat.forEach(p => {
+                if ((p.kategori || '').toUpperCase() !== 'SERVICE') return;
                 const unitNo = (p.equip_no || '').toUpperCase();
                 const model = (p.model || '').toUpperCase();
                 if (q && !unitNo.toLowerCase().includes(q) && !model.toLowerCase().includes(q)) return;
@@ -4077,23 +4248,24 @@
                 const nextHM = parseFloat(p.next_service_hm) || (lastHM + 250);
                 const actualHM = getActualHM(unitNo);
                 const remainingHM = nextHM - actualHM;
-
+ 
                 let statusRaw = 'AMAN';
                 let statusBadge = '<span class="px-4 py-2 bg-emerald-100 text-emerald-700 rounded-xl text-[9px] font-black border border-emerald-300">AMAN</span>';
                 let remainingText = `<span class="text-emerald-600 font-black ml-1">${remainingHM.toFixed(1)} h</span> lagi`;
-
+ 
                 if (remainingHM <= 0 && actualHM > 0) { statusRaw = 'OVERDUE'; statusBadge = '<span class="px-4 py-2 bg-red-100 text-red-700 rounded-xl text-[9px] font-black border border-red-300 animate-pulse">OVERDUE SERVICE!</span>'; remainingText = `<span class="text-red-600 font-black ml-1">Lewat ${Math.abs(remainingHM).toFixed(1)} h</span>`; }
                 else if (remainingHM <= 50 && remainingHM > 0 && actualHM > 0) { statusRaw = 'MENDEKATI'; statusBadge = '<span class="px-4 py-2 bg-amber-100 text-amber-700 rounded-xl text-[9px] font-black border border-amber-300">MENDEKATI</span>'; remainingText = `<span class="text-amber-600 font-black ml-1">${remainingHM.toFixed(1)} h</span> lagi`; }
                 else if (actualHM === 0) { statusRaw = 'WAITING'; statusBadge = '<span class="px-4 py-2 bg-slate-100 text-slate-500 rounded-xl text-[9px] font-black border border-slate-300">WAITING HM</span>'; remainingText = `<span class="text-slate-400 font-bold ml-1">Menunggu HM</span>`; }
-
+ 
                 if (statusFilter !== 'ALL' && statusRaw !== statusFilter) return;
                 count++;
                 const isIT = checkITAccess();
                 let deleteBtn = isIT ? `<button onclick="handleDeletePlan('${unitNo}')" class="text-red-500 hover:text-red-700 ml-2" title="Hapus Plan"><i class="fas fa-trash-alt"></i></button>` : '';
-
+ 
+                const categoryBadge = p.kategori ? `<span class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-700 border border-indigo-200 ml-2">${p.kategori}</span>` : '';
                 html += `<tr class="border-b hover:bg-slate-50">
                     <td class="p-4">
-                        <div class="font-black uppercase">${unitNo}</div>
+                        <div class="font-black uppercase flex items-center">${unitNo}${categoryBadge}</div>
                         <div class="text-[10px] text-slate-400 font-bold uppercase">${p.model || '-'}</div>
                     </td>
                     <td class="p-4 text-center border-l border-slate-100">
@@ -5711,17 +5883,44 @@
             const lastDate = document.getElementById('m_plan_last_date').value;
             const lastHm = parseFloat(document.getElementById('m_plan_last_hm').value) || 0;
             const nextHm = lastHm + 250;
+            const kategori = document.getElementById('m_plan_kategori').value;
 
             startLoading("SAVING TO FIREBASE...");
             const safeId = equipNo.replace(/[\.\#\$\[\]\/]/g, "-");
             try {
                 await db.ref('plan_alat/' + safeId).set({
                     equip_no: equipNo, model: model, plan_hours_per_month: planHours, plan_pa: planPa,
-                    last_service_date: lastDate, last_service_hm: lastHm, next_service_hm: nextHm
+                    last_service_date: lastDate, last_service_hm: lastHm, next_service_hm: nextHm,
+                    kategori: kategori
                 });
                 endLoading();
-                Swal.fire('Sukses', 'Plan Alat & Service berhasil didaftarkan!', 'success');
+                Swal.fire('Sukses', 'Plan Alat berhasil didaftarkan!', 'success');
                 document.getElementById('planForm').reset();
+            } catch (err) { endLoading(); Swal.fire('Error', err.toString(), 'error'); }
+        }
+ 
+        async function handleSavePlanService(e) {
+            e.preventDefault();
+            const equipNo = document.getElementById('m_plan_equip_service').value.toUpperCase().trim();
+            const model = document.getElementById('m_plan_model_service').value.toUpperCase().trim();
+            const planHours = parseFloat(document.getElementById('m_plan_hours_service').value) || 720;
+            const planPa = parseFloat(document.getElementById('m_plan_pa_service').value) || 85;
+            const lastDate = document.getElementById('m_plan_last_date_service').value;
+            const lastHm = parseFloat(document.getElementById('m_plan_last_hm_service').value) || 0;
+            const nextHm = lastHm + 250;
+            const kategori = document.getElementById('m_plan_kategori_service').value;
+ 
+            startLoading("SAVING TO FIREBASE...");
+            const safeId = equipNo.replace(/[\.\#\$\[\]\/]/g, "-");
+            try {
+                await db.ref('plan_alat/' + safeId).set({
+                    equip_no: equipNo, model: model, plan_hours_per_month: planHours, plan_pa: planPa,
+                    last_service_date: lastDate, last_service_hm: lastHm, next_service_hm: nextHm,
+                    kategori: kategori
+                });
+                endLoading();
+                Swal.fire('Sukses', 'Plan Service berhasil didaftarkan!', 'success');
+                document.getElementById('planFormService').reset();
             } catch (err) { endLoading(); Swal.fire('Error', err.toString(), 'error'); }
         }
         async function handleSaveUser(e) {
@@ -6401,14 +6600,14 @@
         }
         // --- FITUR KLIK GRAFIK PREDIKSI SERVICE (SHORTCUT KE MASTER PLAN) ---
         window.showServiceChartDetail = function (label) {
-            navigate('master-plan');
-            const filterSelect = document.getElementById('filterStatusPlan');
+            navigate('plan-service');
+            const filterSelect = document.getElementById('filterStatusServicePlan');
             if (filterSelect) {
                 if (label === 'WAITING HM') filterSelect.value = 'WAITING';
                 else filterSelect.value = label;
-                renderMasterPlanTable();
+                renderMasterServiceTable();
             }
-            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: `Filter Aktif: ${label}`, text: 'Tabel Plan Alat otomatis difilter', showConfirmButton: false, timer: 3000, timerProgressBar: true });
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: `Filter Aktif: ${label}`, text: 'Tabel Plan Service otomatis difilter', showConfirmButton: false, timer: 3000, timerProgressBar: true });
         };
 
         // --- FITUR POPUP AUDIT RUMUS TOP 5 BREAKDOWN ---
@@ -6663,6 +6862,43 @@
             Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Export Berhasil!', showConfirmButton: false, timer: 2000 });
         };
 
+        window.exportUnitPerformanceToExcel = function () {
+            const groups = window.lastPerformanceGroups;
+            if (!groups || Object.keys(groups).length === 0) {
+                return Swal.fire('Info', 'Data performance masih kosong atau belum dimuat.', 'info');
+            }
+
+            const exportData = [];
+            Object.keys(groups).sort().forEach(groupName => {
+                groups[groupName].forEach(u => {
+                    exportData.push({
+                        'Group/Type': groupName,
+                        'Unit No': u.unitNo,
+                        'Model': u.model || '-',
+                        'Plan PA (%)': parseFloat(u.planPa) || 0,
+                        'Act PA (%)': parseFloat(u.actPa) || 0,
+                        'MTTR (hours)': parseFloat(u.mttr) || 0,
+                        'MTBF (hours)': parseFloat(u.mtbf) || 0,
+                        'Total Breakdown (hours)': parseFloat(u.downtime) || 0,
+                        'BD Open (hours)': parseFloat(u.bdOpen) || 0,
+                        'BD Progress (hours)': parseFloat(u.bdProg) || 0,
+                        'BD Waiting Part (hours)': parseFloat(u.bdWait) || 0
+                    });
+                });
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            XLSX.utils.book_append_sheet(wb, ws, "Performance_Detail");
+            
+            const startDate = document.getElementById('kpiStartDate')?.value || '';
+            const endDate = document.getElementById('kpiEndDate')?.value || '';
+            const dateSuffix = startDate && endDate ? `_${startDate}_to_${endDate}` : `_${new Date().toLocaleDateString()}`;
+            
+            XLSX.writeFile(wb, `Unit_Performance_Detail${dateSuffix}.xlsx`);
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Export Berhasil!', showConfirmButton: false, timer: 2000 });
+        };
+
         function openBDModal() {
             const modal = document.getElementById('modalBDAwal');
             if (modal) {
@@ -6823,10 +7059,10 @@
                     <td class="p-4">
                         <div class="px-2 py-1 bg-slate-100 rounded text-[10px] font-black inline-block">${p.part_no}</div>
                     </td>
-                    <td class="p-4 text-xs font-medium text-slate-700">${p.desc}</td>
+                    <td class="p-4 text-xs font-medium text-slate-700 break-words whitespace-normal">${p.desc}</td>
                     <td class="p-4 text-center font-black text-theme-main">${p.qty}</td>
                     <td class="p-4 text-center text-[10px] font-bold text-slate-500 uppercase">${p.uom}</td>
-                    <td class="p-4 text-[10px] text-slate-500 italic">${p.rem || '-'}</td>
+                    <td class="p-4 text-[10px] text-slate-500 italic break-words whitespace-normal">${p.rem || '-'}</td>
                     <td class="p-4 text-center">
                         <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${p.status === 'CLOSED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}">
                             ${p.status}
