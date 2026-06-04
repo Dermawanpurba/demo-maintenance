@@ -1634,6 +1634,10 @@
                                     class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
                                     <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
                                 </button>
+                                <button onclick="runSyncPlanToFirebase()"
+                                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
+                                </button>
                             </div>
                         </div>
                         <div
@@ -1730,6 +1734,10 @@
                                 <button onclick="globalDataSync()"
                                     class="bg-sky-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-sky-700 transition-all shadow-lg">
                                     <i class="fas fa-sync-alt mr-2"></i> Sync/Reload
+                                </button>
+                                <button onclick="runSyncPlanToFirebase()"
+                                    class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-lg">
+                                    <i class="fas fa-cloud-upload-alt mr-2"></i> Sync ke Firebase
                                 </button>
                             </div>
                         </div>
@@ -2248,7 +2256,8 @@
                                         <option value="input-service">Input Service (PM)</option>
                                         <option value="list-wo">Monitoring Service</option>
                                         <option value="daily-hm">Input Daily HM</option>
-                                        <option value="master-plan">Plan Alat & Service</option>
+                                        <option value="master-plan">Plan Alat</option>
+                                        <option value="plan-service">Plan Service</option>
                                         <option value="master-equip">Equipments</option>
                                         <option value="master-comp">Komponen</option>
                                         <option value="master-stock">Stock Inventory</option>
@@ -3366,7 +3375,10 @@
                 { onclick: 'syncFromPartUsageSheet()', page: 'list-wo' },
                 { onclick: 'migratePartUsageToWO()', page: 'list-wo' },
                 // System Logs
-                { onclick: 'syncLogsToFirebase()', page: 'systemlogs' }
+                { onclick: 'syncLogsToFirebase()', page: 'systemlogs' },
+                // Plan Alat & Plan Service
+                { onclick: 'runSyncPlanToFirebase()', page: 'master-plan' },
+                { onclick: 'runSyncPlanToFirebase()', page: 'plan-service' }
             ];
 
             sensitiveButtons.forEach(btnInfo => {
@@ -5317,14 +5329,17 @@
                     freshData.planAlat.forEach(p => {
                         const eq = String(p.equip_no || p.equipno || '').toUpperCase();
                         if (!eq) return;
-                        let safeEq = eq.replace(/[\.\#\$\[\]\/]/g, "-");
+                        const rawKat = String(p.kategori || p.category || 'PLANT ALAT').trim().toUpperCase();
+                        const kat = (rawKat === 'PLANT ALAT' || rawKat === '') ? 'PLANT ALAT' : 'SERVICE';
+                        let safeEq = `${eq}_${kat}`.replace(/[\.\#\$\[\]\/]/g, "-");
                         updates['plan_alat'][safeEq] = {
                             equip_no: eq, model: p.model || '',
                             plan_hours_per_month: parseNum(p.plan_hours_per_month || p.planhourspermonth || 720),
                             plan_pa: parseNum(p.plan_pa || p.planpa || 85),
                             last_service_date: p.last_service_date || p.lastservicedate || '',
                             last_service_hm: parseNum(p.last_service_hm || p.lastservicehm),
-                            next_service_hm: parseNum(p.next_service_hm || p.nextservicehm)
+                            next_service_hm: parseNum(p.next_service_hm || p.nextservicehm),
+                            kategori: kat
                         };
                     });
                 }
@@ -7406,6 +7421,35 @@
                 if (result.isConfirmed) {
                     startLoading("SINKRONISASI DAILY HM...");
                     fetchGAS("syncDailyHMToFirebase", {}).then(res => {
+                        endLoading();
+                        if (res.success) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            globalDataSync();
+                        } else {
+                            Swal.fire('Error', res.message, 'error');
+                        }
+                    }).catch(err => {
+                        endLoading();
+                        Swal.fire('Error', err.toString(), 'error');
+                    });
+                }
+            });
+        }
+
+        function runSyncPlanToFirebase() {
+            if (!checkITAccess()) return Swal.fire('Ditolak', 'Hanya IT Helpdesk yang bisa melakukan ini.', 'error');
+            Swal.fire({
+                title: 'Sync Plan ke Firebase?',
+                text: 'Semua data Plan Alat & Plan Service di spreadsheet akan dikirim ke database Firebase.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sync!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10b981'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    startLoading("SINKRONISASI PLAN DATA...");
+                    fetchGAS("syncPlanToFirebase", {}).then(res => {
                         endLoading();
                         if (res.success) {
                             Swal.fire('Berhasil!', res.message, 'success');
