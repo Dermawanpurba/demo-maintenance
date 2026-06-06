@@ -681,7 +681,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
                         <div
                             class="kpi-card p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-200 flex flex-col relative overflow-hidden group">
                             <i class="fas fa-info-circle absolute top-4 right-4 text-slate-300 cursor-pointer hover:text-theme-accent text-lg opacity-0 group-hover:opacity-100 transition-opacity z-20"
@@ -700,6 +700,25 @@
                             <p
                                 class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 md:mt-3 relative z-10 line-clamp-1">
                                 Physical Availability</p>
+                        </div>
+
+                        <div
+                            class="kpi-card p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-200 flex flex-col relative overflow-hidden group">
+                            <i class="fas fa-info-circle absolute top-4 right-4 text-slate-300 cursor-pointer hover:text-theme-accent text-lg opacity-0 group-hover:opacity-100 transition-opacity z-20"
+                                onclick="showKPIAudit('ma')" title="Lihat Formula MA"></i>
+                            <div class="flex justify-between items-start mb-3 md:mb-4 relative z-10">
+                                <div
+                                    class="w-10 h-10 md:w-14 md:h-14 bg-slate-900 text-white rounded-xl md:rounded-[1.2rem] flex items-center justify-center text-lg md:text-2xl shadow-lg">
+                                    <i class="fas fa-wrench"></i>
+                                </div>
+                                <span
+                                    class="px-2 py-1 md:px-3 md:py-1.5 bg-slate-100 text-slate-500 rounded-lg md:rounded-xl text-[8px] md:text-[9px] font-black tracking-widest border border-slate-200 mr-6">MA</span>
+                            </div>
+                            <h3 class="text-3xl md:text-5xl font-black text-slate-800 relative z-10 tracking-tight"
+                                id="kpi-ma">0<span class="text-lg md:text-2xl text-slate-400">%</span></h3>
+                            <p
+                                class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 md:mt-3 relative z-10 line-clamp-1">
+                                Mechanical Availability</p>
                         </div>
 
                         <div
@@ -3482,6 +3501,8 @@
 
             if (type === 'pa') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">((Plan Hours - Downtime) / Plan Hours) * 100</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Plan Hours (Periode): <b class="text-blue-600">${d.planHours} Jam</b><br>• Total Downtime Hours: <b class="text-red-500">${d.downtime} Jam</b></div>`;
 
+            if (type === 'ma') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">(Uptime / (Uptime + Downtime)) * 100</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Uptime Hours (HM): <b class="text-emerald-600">${d.uptime} Jam</b><br>• Total Downtime Hours: <b class="text-red-500">${d.downtime} Jam</b></div>`;
+
             if (type === 'mttr') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">Total Downtime / Frekuensi Breakdown</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Downtime Hours: <b class="text-red-500">${d.downtime} Jam</b><br>• Frekuensi Breakdown (SCH + UNSCH): <b class="text-amber-600">${d.breakdowns}x Kerusakan</b></div>`;
 
             if (type === 'mtbf') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">Total Uptime Aktual / Frekuensi UNSCH</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Uptime Hours (HM): <b class="text-emerald-600">${d.uptime} Jam</b><br>• Frekuensi Unscheduled Breakdown: <b class="text-amber-600">${d.breakdowns}x Breakdown</b></div>`;
@@ -3499,7 +3520,7 @@
 
         window.downloadKPIAudit = function (type) {
             let data = [];
-            if (type === 'pa') data = window.kpiAuditRawData.pa;
+            if (type === 'pa' || type === 'ma') data = window.kpiAuditRawData.pa;
             else data = window.kpiAuditRawData.wo;
 
             if (!data || data.length === 0) return Swal.fire('Kosong', 'Tidak ada data detail untuk didownload.', 'info');
@@ -3713,6 +3734,23 @@
                     let tempPa = (((item.Plan_Hours - item.Downtime_Hours) / item.Plan_Hours) * 100).toFixed(2);
                     if (isNaN(tempPa) || !isFinite(tempPa)) tempPa = 100;
                     item.Actual_PA = tempPa + '%';
+
+                    let unitUptime = 0;
+                    if (masterCache.dailyHM && masterCache.dailyHM.length > 0) {
+                        masterCache.dailyHM.forEach(hm => {
+                            if (hm.equip_no && hm.equip_no.toString().toUpperCase() === item.Equip_No) {
+                                if (hm.tanggal >= startDateStr && hm.tanggal <= endDateStr) {
+                                    unitUptime += parseFloat(hm.total_hm) || 0;
+                                }
+                            }
+                        });
+                    }
+                    if (unitUptime === 0) {
+                        unitUptime = Math.max(0, parseFloat(item.Plan_Hours) - parseFloat(item.Downtime_Hours));
+                    }
+                    let tempMa = ((unitUptime / (unitUptime + parseFloat(item.Downtime_Hours))) * 100).toFixed(2);
+                    if (isNaN(tempMa) || !isFinite(tempMa)) tempMa = 100;
+                    item.Actual_MA = tempMa + '%';
                 });
             }
 
@@ -3726,13 +3764,19 @@
             if (totalPlanHours > 0) pa = (((totalPlanHours - totalDowntime) / totalPlanHours) * 100).toFixed(1);
             if (pa > 100) pa = 100; if (pa < 0 || isNaN(pa)) pa = 0;
 
+            let ma = 100;
+            if ((uptimeHours + totalDowntime) > 0) ma = (((uptimeHours) / (uptimeHours + totalDowntime)) * 100).toFixed(1);
+            if (ma > 100) ma = 100; if (ma < 0 || isNaN(ma)) ma = 0;
+
             window.kpiAuditRawData.summary = {
                 pa: { planHours: totalPlanHours.toFixed(1), downtime: totalDowntime.toFixed(1) },
+                ma: { uptime: uptimeHours.toFixed(1), downtime: totalDowntime.toFixed(1) },
                 mttr: { downtime: totalDowntime.toFixed(1), breakdowns: totalBreakdowns },
                 mtbf: { uptime: uptimeHours.toFixed(1), breakdowns: countUnsch }
             };
 
             if (document.getElementById('kpi-pa')) document.getElementById('kpi-pa').innerHTML = `${pa}<span class="text-lg md:text-2xl text-slate-400">%</span>`;
+            if (document.getElementById('kpi-ma')) document.getElementById('kpi-ma').innerHTML = `${ma}<span class="text-lg md:text-2xl text-slate-400">%</span>`;
             if (document.getElementById('kpi-mttr')) document.getElementById('kpi-mttr').innerHTML = `${mttr}<span class="text-lg md:text-2xl text-slate-400">h</span>`;
             if (document.getElementById('kpi-mtbf')) document.getElementById('kpi-mtbf').innerHTML = `${mtbf}<span class="text-lg md:text-2xl text-slate-400">h</span>`;
 
@@ -3950,6 +3994,24 @@
                 // Konversi desimal 0.85 ke 85% jika perlu
                 const planPa = (parseFloat(planPaRaw) > 0 && parseFloat(planPaRaw) < 1) ? (parseFloat(planPaRaw) * 100).toFixed(0) : planPaRaw;
 
+                // Hitung unit actual operating hours (uptime) dari Daily HM untuk unit ini
+                let unitUptime = 0;
+                if (masterCache.dailyHM && masterCache.dailyHM.length > 0) {
+                    masterCache.dailyHM.forEach(hm => {
+                        if (hm.equip_no && hm.equip_no.toString().toUpperCase() === unitNo) {
+                            if (hm.tanggal >= startDateStr && hm.tanggal <= endDateStr) {
+                                unitUptime += parseFloat(hm.total_hm) || 0;
+                            }
+                        }
+                    });
+                }
+                if (unitUptime === 0) {
+                    unitUptime = Math.max(0, totalHoursInRange - downtime);
+                }
+                let actMaCalc = (unitUptime / (unitUptime + downtime)) * 100;
+                if (isNaN(actMaCalc) || !isFinite(actMaCalc)) actMaCalc = 100;
+                const actMa = actMaCalc.toFixed(1);
+
                 // Hitung MTTR & MTBF per Unit TANPA NESTED LOOP FILTERING
                 const breakdownCount = woCountMap[unitNo] || 0;
                 const mttrVal = breakdownCount > 0 ? (downtime / breakdownCount).toFixed(1) : "0";
@@ -3966,6 +4028,7 @@
                     model: plan.model,
                     planPa: planPa,
                     actPa: actPa,
+                    actMa: actMa,
                     mttr: mttrVal,
                     mtbf: mtbfVal,
                     downtime: downtime.toFixed(1),
@@ -3992,6 +4055,7 @@
                                     <th class="p-2 w-16 text-[9px] font-black text-slate-400 uppercase">Model</th>
                                     <th class="p-2 w-16 text-center text-[9px] font-black text-slate-400 uppercase">Plan</th>
                                     <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase">Act PA</th>
+                                    <th class="p-2 w-20 text-center text-[9px] font-black text-emerald-600 uppercase">Act MA</th>
                                     <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase text-red-500">MTTR</th>
                                     <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase text-blue-500">MTBF</th>
                                     <th class="p-2 w-20 text-center text-[9px] font-black text-slate-400 uppercase text-slate-600">Total BD</th>
@@ -4011,6 +4075,7 @@
 
                     const isUnderPlan = parseFloat(u.actPa) < parseFloat(u.planPa);
                     const actBadgeColor = getColorClass(u.actPa);
+                    const actMaBadgeColor = getColorClass(u.actMa);
 
                     return `
                                     <tr class="hover:bg-slate-50 transition-colors">
@@ -4021,6 +4086,9 @@
                                         </td>
                                         <td class="p-2 text-center">
                                             <span class="${actBadgeColor} text-white px-2 py-0.5 rounded-md text-[10px] font-black shadow-sm">${u.actPa}%</span>
+                                        </td>
+                                        <td class="p-2 text-center">
+                                            <span class="${actMaBadgeColor} text-white px-2 py-0.5 rounded-md text-[10px] font-black shadow-sm">${u.actMa}%</span>
                                         </td>
                                         <td class="p-2 text-center font-mono font-bold text-[11px] text-red-600">${u.mttr}h</td>
                                         <td class="p-2 text-center font-mono font-bold text-[11px] text-blue-600">${u.mtbf}h</td>
@@ -6898,6 +6966,7 @@
                         'Model': u.model || '-',
                         'Plan PA (%)': parseFloat(u.planPa) || 0,
                         'Act PA (%)': parseFloat(u.actPa) || 0,
+                        'Act MA (%)': parseFloat(u.actMa) || 0,
                         'MTTR (hours)': parseFloat(u.mttr) || 0,
                         'MTBF (hours)': parseFloat(u.mtbf) || 0,
                         'Total Breakdown (hours)': parseFloat(u.downtime) || 0,
