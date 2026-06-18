@@ -635,7 +635,7 @@
                     <div class="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-md py-4 mb-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 no-print -mx-4 px-4 md:-mx-8 md:px-8">
                         <div class="flex items-center gap-3 w-full sm:w-auto">
                             <div class="bg-theme-main text-white px-3 py-1.5 rounded-lg text-xs font-black tracking-widest uppercase">
-                                EMAS
+                                OPTIMA
                             </div>
                             <span class="text-slate-300 font-bold">|</span>
                             <span class="text-slate-600 font-black text-xs uppercase tracking-wider"><i class="fas fa-filter text-theme-accent mr-1"></i> Filter Periode KPI</span>
@@ -656,10 +656,10 @@
                                 <div class="flex flex-col md:flex-row justify-between items-start w-full gap-4">
                                     <div>
                                         <h2 class="text-2xl md:text-4xl font-black mb-2 tracking-tight text-white"
-                                            id="dashTitle">Selamat datang di EMAS, <span id="dashName"
+                                            id="dashTitle">Selamat datang di OPTIMA, <span id="dashName"
                                                 class="text-theme-accent">Admin</span>! 👋</h2>
                                         <p class="text-slate-300 font-medium text-xs md:text-sm max-w-md leading-relaxed"
-                                            id="dashDesc">Equipment Monitoring Availability System — Monitoring secara langsung asset anda secara Real-Time.</p>
+                                            id="dashDesc">Operational Performance Through Integrated Maintenance Application — Monitoring secara langsung asset anda secara Real-Time.</p>
                                     </div>
                                 </div>
                                 <div class="flex flex-wrap gap-3 mt-6 md:mt-8">
@@ -3105,7 +3105,7 @@
             }
 
             if (isMekanik) {
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Mechanic Area - EMAS 👋";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Mechanic Area - OPTIMA 👋";
                 const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Pantau status Work Order, Backlog, Laporan Aktifitas, dan Monitoring.";
 
                 const btnPlan = document.querySelector('[data-page="master-plan"]'); if (btnPlan) btnPlan.style.display = 'none';
@@ -3118,7 +3118,7 @@
                 if (nDl) nDl.style.display = 'none';
 
             } else if (isOperation) {
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Operation Area - EMAS 👋";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Operation Area - OPTIMA 👋";
                 const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Pantau Kesiapan Unit (Status Board) & Daftar Backlog Management.";
 
                 // Sembunyikan SEMUA menu KECUALI Dashboard & Backlog
@@ -3139,13 +3139,13 @@
                 }
 
             } else if (r === 'IT HELPDESK') {
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "System Administrator - EMAS 👋";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "System Administrator - OPTIMA 👋";
                 const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Full access enabled. Kelola user, sinkronisasi data, dan migrasi sistem.";
                 if (nAd) nAd.style.display = 'block';
             } else {
                 // SPV PLANNER / ADMIN PLANT
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerHTML = "Selamat datang di EMAS, <span id=\"dashName\" class=\"text-theme-accent\">" + dN.innerText + "</span>! 👋";
-                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Equipment Monitoring Availability System.";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerHTML = "Selamat datang di OPTIMA, <span id=\"dashName\" class=\"text-theme-accent\">" + dN.innerText + "</span>! 👋";
+                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Operational Performance Through Integrated Maintenance Application.";
                 if (nAd) nAd.style.display = r.includes('PLANNER') ? 'block' : 'none';
             }
 
