@@ -631,6 +631,24 @@
             <div class="max-w-[1440px] mx-auto">
 
                 <section id="page-dashboard" class="page active pb-12">
+                    <!-- Sticky Filter Bar (Freeze Pane style) -->
+                    <div class="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-md py-4 mb-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 no-print -mx-4 px-4 md:-mx-8 md:px-8">
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <div class="bg-theme-main text-white px-3 py-1.5 rounded-lg text-xs font-black tracking-widest uppercase">
+                                EMAS
+                            </div>
+                            <span class="text-slate-300 font-bold">|</span>
+                            <span class="text-slate-600 font-black text-xs uppercase tracking-wider"><i class="fas fa-filter text-theme-accent mr-1"></i> Filter Periode KPI</span>
+                        </div>
+                        <div class="flex gap-2 items-center bg-white p-1.5 rounded-xl border border-slate-200 shadow-sm w-full sm:w-auto justify-between sm:justify-start">
+                            <input type="date" id="kpiStartDate" onchange="calculateKPIFrontEnd(); if(document.getElementById('kpiStartDateMobile')) document.getElementById('kpiStartDateMobile').value=this.value;"
+                                class="bg-slate-50 text-slate-700 border border-slate-200 outline-none font-bold text-xs cursor-pointer rounded-lg px-3 py-1.5 hover:bg-slate-100 transition-colors shadow-inner">
+                            <span class="text-slate-400 font-black text-xs">SD</span>
+                            <input type="date" id="kpiEndDate" onchange="calculateKPIFrontEnd(); if(document.getElementById('kpiEndDateMobile')) document.getElementById('kpiEndDateMobile').value=this.value;"
+                                class="bg-slate-50 text-slate-700 border border-slate-200 outline-none font-bold text-xs cursor-pointer rounded-lg px-3 py-1.5 hover:bg-slate-100 transition-colors shadow-inner">
+                        </div>
+                    </div>
+
                     <div id="banner-admin"
                         class="bg-gradient-to-r from-slate-900 to-slate-800 mobile-optim mb-8 text-white shadow-2xl relative overflow-hidden">
                         <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -638,24 +656,10 @@
                                 <div class="flex flex-col md:flex-row justify-between items-start w-full gap-4">
                                     <div>
                                         <h2 class="text-2xl md:text-4xl font-black mb-2 tracking-tight text-white"
-                                            id="dashTitle">Welcome back, <span id="dashName"
+                                            id="dashTitle">Selamat datang di EMAS, <span id="dashName"
                                                 class="text-theme-accent">Admin</span>! 👋</h2>
                                         <p class="text-slate-300 font-medium text-xs md:text-sm max-w-md leading-relaxed"
-                                            id="dashDesc">Pantau metrik KPI, WO Terbuka, Backlog, dan ketersediaan alat
-                                            secara Real-Time.</p>
-                                    </div>
-                                    <div
-                                        class="bg-white/10 p-3 md:p-4 rounded-2xl backdrop-blur-md border border-white/20 hidden md:block shadow-inner w-full md:w-auto">
-                                        <label
-                                            class="block text-[9px] font-black uppercase tracking-widest text-blue-200 mb-2"><i
-                                                class="fas fa-filter mr-1"></i> Filter Periode KPI (Range)</label>
-                                        <div class="flex gap-2 items-center">
-                                            <input type="date" id="kpiStartDate" onchange="calculateKPIFrontEnd()"
-                                                class="bg-slate-800 text-white border border-white/10 outline-none font-bold text-xs md:text-sm cursor-pointer rounded-xl px-3 py-2 hover:bg-slate-700 transition-colors shadow-sm">
-                                            <span class="text-white/50 font-black text-xs">SD</span>
-                                            <input type="date" id="kpiEndDate" onchange="calculateKPIFrontEnd()"
-                                                class="bg-slate-800 text-white border border-white/10 outline-none font-bold text-xs md:text-sm cursor-pointer rounded-xl px-3 py-2 hover:bg-slate-700 transition-colors shadow-sm">
-                                        </div>
+                                            id="dashDesc">Equipment Monitoring Availability System — Monitoring secara langsung asset anda secara Real-Time.</p>
                                     </div>
                                 </div>
                                 <div class="flex flex-wrap gap-3 mt-6 md:mt-8">
@@ -677,7 +681,7 @@
 
                     <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 ml-2 gap-3">
                         <h3 class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest"><i
-                                class="fas fa-tachometer-alt text-theme-accent mr-2"></i> Performance KPI</h3>
+                                class="fas fa-tachometer-alt text-theme-accent mr-2"></i> Indikator Performance</h3>
                         <div class="md:hidden flex gap-2 w-full">
                             <input type="date" id="kpiStartDateMobile"
                                 onchange="let el_sd=document.getElementById('kpiStartDate'); if(el_sd) el_sd.value=this.value; calculateKPIFrontEnd();"
@@ -706,9 +710,9 @@
                                 id="kpi-pa">0<span class="text-lg md:text-2xl text-slate-400">%</span></h3>
                             <p
                                 class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 md:mt-3 relative z-10 line-clamp-1">
-                                Physical Availability</p>
+                                Kesiapan Fisik Alat (PA)</p>
                         </div>
-
+ 
                         <div
                             class="kpi-card p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-200 flex flex-col relative overflow-hidden group">
                             <i class="fas fa-info-circle absolute top-4 right-4 text-slate-300 cursor-pointer hover:text-theme-accent text-lg opacity-0 group-hover:opacity-100 transition-opacity z-20"
@@ -725,9 +729,9 @@
                                 id="kpi-ma">0<span class="text-lg md:text-2xl text-slate-400">%</span></h3>
                             <p
                                 class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 md:mt-3 relative z-10 line-clamp-1">
-                                Mechanical Availability</p>
+                                Kesiapan Mekanis Alat (MA)</p>
                         </div>
-
+ 
                         <div
                             class="kpi-card p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-200 flex flex-col relative overflow-hidden group">
                             <i class="fas fa-info-circle absolute top-4 right-4 text-slate-300 cursor-pointer hover:text-red-500 text-lg opacity-0 group-hover:opacity-100 transition-opacity z-20"
@@ -744,9 +748,9 @@
                                 id="kpi-mttr">0<span class="text-lg md:text-2xl text-slate-400">h</span></h3>
                             <p
                                 class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 md:mt-3 relative z-10 line-clamp-1">
-                                Mean Time To Repair</p>
+                                Rata-rata Waktu Perbaikan (MTTR)</p>
                         </div>
-
+ 
                         <div
                             class="kpi-card p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-200 flex flex-col relative overflow-hidden group">
                             <i class="fas fa-info-circle absolute top-4 right-4 text-slate-300 cursor-pointer hover:text-blue-500 text-lg opacity-0 group-hover:opacity-100 transition-opacity z-20"
@@ -763,9 +767,9 @@
                                 id="kpi-mtbf">0<span class="text-lg md:text-2xl text-slate-400">h</span></h3>
                             <p
                                 class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 md:mt-3 relative z-10 line-clamp-1">
-                                Mean Time Btw Failure</p>
+                                Rata-rata Bebas Kendala (MTBF)</p>
                         </div>
-
+ 
                         <div
                             class="kpi-card p-4 md:p-6 rounded-2xl md:rounded-[2rem] border border-slate-200 flex flex-col relative overflow-hidden">
                             <div class="flex justify-between items-start mb-3 md:mb-4 relative z-10">
@@ -780,7 +784,7 @@
                                 id="kpi-pending-backlog">0</h3>
                             <p
                                 class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2 md:mt-3 relative z-10 line-clamp-1">
-                                Open Backlogs</p>
+                                Pekerjaan Tertunda (Backlog)</p>
                         </div>
                     </div>
 
@@ -791,13 +795,15 @@
                     <div
                         class="bg-white p-4 md:p-6 rounded-2xl md:rounded-[2.5rem] shadow-sm border border-slate-100 mb-8">
                         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
-                            <div class="text-[10px] md:text-xs font-bold text-slate-500">Status "As Of" End Date: <span
-                                    class="text-emerald-600 font-black ml-1" id="totalRfuCount">0 RFU</span> • <span
+                            <div class="text-[10px] md:text-xs font-bold text-slate-500">Status "As Of" <span id="statusAsOfDate" class="text-slate-800 font-black">End Date</span> (Last Update: <span id="statusLastUpdate" class="text-blue-600 font-black">-</span>): <span
+                                    class="text-emerald-600 font-black ml-1" id="totalRfuCount">0 RFU</span> • <span class="text-amber-500 font-black ml-1" id="totalRwnCount">0 RWN</span> • <span
                                     class="text-red-600 font-black" id="totalBdCount">0 B/D</span></div>
                             <div
                                 class="flex gap-3 text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 py-2 px-4 rounded-xl border border-slate-100 w-full md:w-auto justify-center">
                                 <div class="flex items-center gap-1.5"><span
                                         class="w-3 h-3 rounded bg-emerald-500 shadow-sm"></span> RFU</div>
+                                <div class="flex items-center gap-1.5"><span
+                                        class="w-3 h-3 rounded bg-amber-500 shadow-sm"></span> RWN</div>
                                 <div class="flex items-center gap-1.5"><span
                                         class="w-3 h-3 rounded bg-red-500 shadow-sm animate-pulse"></span> BD</div>
                             </div>
@@ -1478,6 +1484,7 @@
                                 <option value="OPEN">OPEN</option>
                                 <option value="PROGRESS">PROGRESS</option>
                                 <option value="WAITING PART">WAITING PART</option>
+                                <option value="READY WITH NOTE">READY WITH NOTE (RWN)</option>
                                 <option value="CLOSED">CLOSED</option>
                             </select>
                             <button onclick="toggleWOSort()" id="btnSortWO"
@@ -3098,8 +3105,8 @@
             }
 
             if (isMekanik) {
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Mechanic Area 👋";
-                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Pantau status Work Order, Backlog, Laporan Aktifitas, dan Monitoring.";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Mechanic Area - EMAS 👋";
+                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Pantau status Work Order, Backlog, Laporan Aktifitas, dan Monitoring.";
 
                 const btnPlan = document.querySelector('[data-page="master-plan"]'); if (btnPlan) btnPlan.style.display = 'none';
                 const btnSvcPlan = document.querySelector('[data-page="plan-service"]'); if (btnSvcPlan) btnSvcPlan.style.display = 'none';
@@ -3111,8 +3118,8 @@
                 if (nDl) nDl.style.display = 'none';
 
             } else if (isOperation) {
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Operation Area 👋";
-                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Pantau Kesiapan Unit (Status Board) & Daftar Backlog Management.";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Operation Area - EMAS 👋";
+                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Pantau Kesiapan Unit (Status Board) & Daftar Backlog Management.";
 
                 // Sembunyikan SEMUA menu KECUALI Dashboard & Backlog
                 document.querySelectorAll('.nav-btn').forEach(b => {
@@ -3132,13 +3139,13 @@
                 }
 
             } else if (r === 'IT HELPDESK') {
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "System Administrator 👋";
-                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Full access enabled. You can manage users, sync data, and perform system migrations.";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "System Administrator - EMAS 👋";
+                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Full access enabled. Kelola user, sinkronisasi data, dan migrasi sistem.";
                 if (nAd) nAd.style.display = 'block';
             } else {
                 // SPV PLANNER / ADMIN PLANT
-                const dT = document.getElementById('dashTitle'); if (dT) dT.innerText = "Welcome back, " + dN.innerText + "!";
-                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Pantau metrik KPI, WO Terbuka, Backlog, dan ketersediaan alat secara Real-Time.";
+                const dT = document.getElementById('dashTitle'); if (dT) dT.innerHTML = "Selamat datang di EMAS, <span id=\"dashName\" class=\"text-theme-accent\">" + dN.innerText + "</span>! 👋";
+                const dD = document.getElementById('dashDesc'); if (dD) dD.innerText = "Monitoring secara langsung asset anda — Equipment Monitoring Availability System.";
                 if (nAd) nAd.style.display = r.includes('PLANNER') ? 'block' : 'none';
             }
 
@@ -3642,7 +3649,7 @@
 
             if (type === 'pa') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">((Plan Hours - Downtime) / Plan Hours) * 100</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Plan Hours (Periode): <b class="text-blue-600">${d.planHours} Jam</b><br>• Total Downtime Hours: <b class="text-red-500">${d.downtime} Jam</b></div>`;
 
-            if (type === 'ma') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">(Uptime / (Uptime + Downtime)) * 100</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Uptime Hours (HM): <b class="text-emerald-600">${d.uptime} Jam</b><br>• Total Downtime Hours: <b class="text-red-500">${d.downtime} Jam</b></div>`;
+            if (type === 'ma') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">((Plan Hours - Total Downtime) / (Plan Hours - Scheduled Downtime)) * 100</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Plan Hours: <b class="text-slate-700">${d.planHours} Jam</b><br>• Total Downtime: <b class="text-red-500">${d.downtime} Jam</b><br>• Scheduled Downtime: <b class="text-blue-500">${d.downtimeSch} Jam</b></div>`;
 
             if (type === 'mttr') html = `<div class="mb-3"><span class="font-black text-slate-700">Formula (Standard):</span><br><code class="text-xs bg-slate-200 px-2 py-1 rounded">Total Downtime / Frekuensi Breakdown</code></div><div><span class="font-black text-slate-700">Variabel Kalkulasi:</span><br>• Total Downtime Hours: <b class="text-red-500">${d.downtime} Jam</b><br>• Frekuensi Breakdown (SCH + UNSCH): <b class="text-amber-600">${d.breakdowns}x Kerusakan</b></div>`;
 
@@ -3769,6 +3776,8 @@
 
             let downtimeUnsch = 0; let downtimeSch = 0; let countUnsch = 0; let countSch = 0;
             let unitDowntime = {};
+            let unitDowntimeSch = {};
+            let unitDowntimeUnsch = {};
             let unitStatusDowntime = {};
             let majorCompDowntime = {};
 
@@ -3818,14 +3827,22 @@
                         if (actualStart < actualEnd) {
                             const diffHours = (actualEnd - actualStart) / (1000 * 60 * 60);
 
-                            if ((wo.sch_unsch || '').toUpperCase() === 'UNSCH') {
-                                downtimeUnsch += diffHours; if (start >= filterStart && start <= filterEnd) countUnsch++;
-                            } else {
-                                downtimeSch += diffHours; if (start >= filterStart && start <= filterEnd) countSch++;
-                            }
-
                             const eq = wo.equip_no ? wo.equip_no.toUpperCase() : '';
-                            unitDowntime[eq] = (unitDowntime[eq] || 0) + diffHours;
+                            const isRwn = (wo.status || '').toUpperCase() === 'READY WITH NOTE' || (wo.status || '').toUpperCase() === 'RWN';
+
+                            if (!isRwn) {
+                                unitDowntime[eq] = (unitDowntime[eq] || 0) + diffHours;
+
+                                if ((wo.sch_unsch || '').toUpperCase() === 'UNSCH') {
+                                    downtimeUnsch += diffHours;
+                                    unitDowntimeUnsch[eq] = (unitDowntimeUnsch[eq] || 0) + diffHours;
+                                    if (start >= filterStart && start <= filterEnd) countUnsch++;
+                                } else {
+                                    downtimeSch += diffHours;
+                                    unitDowntimeSch[eq] = (unitDowntimeSch[eq] || 0) + diffHours;
+                                    if (start >= filterStart && start <= filterEnd) countSch++;
+                                }
+                            }
 
                             let mc = wo.major_comp ? String(wo.major_comp).toUpperCase() : 'UNSPECIFIED';
                             majorCompDowntime[mc] = (majorCompDowntime[mc] || 0) + diffHours;
@@ -3858,6 +3875,18 @@
                 if (unitDowntime[eq] > maxPhysicalHours) {
                     const excessHours = unitDowntime[eq] - maxPhysicalHours;
                     unitDowntime[eq] = maxPhysicalHours;
+                    
+                    let excessTemp = excessHours;
+                    let uSch = unitDowntimeSch[eq] || 0;
+                    let uUnsch = unitDowntimeUnsch[eq] || 0;
+                    
+                    if (uUnsch >= excessTemp) {
+                        unitDowntimeUnsch[eq] = uUnsch - excessTemp;
+                    } else {
+                        unitDowntimeUnsch[eq] = 0;
+                        unitDowntimeSch[eq] = Math.max(0, uSch - (excessTemp - uUnsch));
+                    }
+
                     if (downtimeUnsch >= excessHours) {
                         downtimeUnsch -= excessHours;
                     } else {
@@ -3876,21 +3905,13 @@
                     if (isNaN(tempPa) || !isFinite(tempPa)) tempPa = 100;
                     item.Actual_PA = tempPa + '%';
 
-                    let unitUptime = 0;
-                    if (masterCache.dailyHM && masterCache.dailyHM.length > 0) {
-                        masterCache.dailyHM.forEach(hm => {
-                            if (hm.equip_no && hm.equip_no.toString().toUpperCase() === item.Equip_No) {
-                                if (hm.tanggal >= startDateStr && hm.tanggal <= endDateStr) {
-                                    unitUptime += parseFloat(hm.total_hm) || 0;
-                                }
-                            }
-                        });
-                    }
-                    if (unitUptime === 0) {
-                        unitUptime = Math.max(0, parseFloat(item.Plan_Hours) - parseFloat(item.Downtime_Hours));
-                    }
-                    let tempMa = ((unitUptime / (unitUptime + parseFloat(item.Downtime_Hours))) * 100).toFixed(2);
+                    // MA = (Plan Hours - Total Downtime) / (Plan Hours - Scheduled Downtime)
+                    let uSch = unitDowntimeSch[item.Equip_No] || 0;
+                    let denomMa = item.Plan_Hours - uSch;
+                    if (denomMa <= 0) denomMa = item.Plan_Hours;
+                    let tempMa = (((item.Plan_Hours - item.Downtime_Hours) / denomMa) * 100).toFixed(2);
                     if (isNaN(tempMa) || !isFinite(tempMa)) tempMa = 100;
+                    if (parseFloat(tempMa) < parseFloat(tempPa)) tempMa = tempPa; // Safety cap
                     item.Actual_MA = tempMa + '%';
                 });
             }
@@ -3906,12 +3927,15 @@
             if (pa > 100) pa = 100; if (pa < 0 || isNaN(pa)) pa = 0;
 
             let ma = 100;
-            if ((uptimeHours + totalDowntime) > 0) ma = (((uptimeHours) / (uptimeHours + totalDowntime)) * 100).toFixed(1);
+            let denomGlobalMa = totalPlanHours - downtimeSch;
+            if (denomGlobalMa <= 0) denomGlobalMa = totalPlanHours;
+            if (denomGlobalMa > 0) ma = (((totalPlanHours - totalDowntime) / denomGlobalMa) * 100).toFixed(1);
             if (ma > 100) ma = 100; if (ma < 0 || isNaN(ma)) ma = 0;
+            if (parseFloat(ma) < parseFloat(pa)) ma = pa; // MA must be >= PA
 
             window.kpiAuditRawData.summary = {
                 pa: { planHours: totalPlanHours.toFixed(1), downtime: totalDowntime.toFixed(1) },
-                ma: { uptime: uptimeHours.toFixed(1), downtime: totalDowntime.toFixed(1) },
+                ma: { planHours: totalPlanHours.toFixed(1), downtime: totalDowntime.toFixed(1), downtimeSch: downtimeSch.toFixed(1) },
                 mttr: { downtime: totalDowntime.toFixed(1), breakdowns: totalBreakdowns },
                 mtbf: { uptime: uptimeHours.toFixed(1), breakdowns: countUnsch }
             };
@@ -4022,14 +4046,14 @@
                 }
             }
 
-            const detailBody = document.getElementById('detailBoardBody');
+             const detailBody = document.getElementById('detailBoardBody');
             if (masterCache.planAlat && detailBody) {
                 const boardData = {};
                 masterCache.planAlat.forEach(p => {
                     const unitNo = (p.equip_no || '').toUpperCase();
                     let model = p.model ? p.model.toUpperCase() : 'OTHERS';
                     if (!unitNo) return;
-                    if (!boardData[model]) boardData[model] = { rfu: [], bd: [] };
+                    if (!boardData[model]) boardData[model] = { rfu: [], bd: [], rwn: [] };
 
                     const wosAsOfEnd = kpiData.filter(d => {
                         if (d.equip_no.toUpperCase() !== unitNo || !d.tgl_rusak) return false;
@@ -4044,30 +4068,71 @@
                         return startB - startA;
                     });
 
-                    let isBD = false;
+                    let statusUnit = 'RFU';
                     if (wosAsOfEnd.length > 0) {
                         const latestW = wosAsOfEnd[0];
-                        if (latestW.status !== 'CLOSED' || !latestW.tgl_selesai) {
-                            isBD = true;
-                        } else {
+                        let wStatus = (latestW.status || '').toUpperCase();
+                        if (wStatus === 'CLOSED' || latestW.tgl_selesai) {
                             const end = new Date(`${latestW.tgl_selesai}T${latestW.jam_selesai || '00:00'}`);
-                            if (end > filterEnd) { isBD = true; }
+                            if (end > filterEnd) {
+                                statusUnit = (latestW.status_sebelum_closed || wStatus === 'READY WITH NOTE' || wStatus === 'RWN') ? 'RWN' : 'BD';
+                            } else {
+                                statusUnit = 'RFU';
+                            }
+                        } else {
+                            if (wStatus === 'READY WITH NOTE' || wStatus === 'RWN') {
+                                statusUnit = 'RWN';
+                            } else {
+                                statusUnit = 'BD';
+                            }
                         }
                     }
-                    if (isBD) { boardData[model].bd.push(unitNo); } else { boardData[model].rfu.push(unitNo); }
+                    if (statusUnit === 'BD') {
+                        boardData[model].bd.push(unitNo);
+                    } else if (statusUnit === 'RWN') {
+                        boardData[model].rwn.push(unitNo);
+                    } else {
+                        boardData[model].rfu.push(unitNo);
+                    }
                 });
 
-                let detailHTML = ''; let totalRFU = 0; let totalBD = 0;
+                let detailHTML = ''; let totalRFU = 0; let totalBD = 0; let totalRWN = 0;
                 const models = Object.keys(boardData).sort();
                 models.forEach(model => {
                     const rfuList = boardData[model].rfu.sort();
                     const bdList = boardData[model].bd.sort();
-                    totalRFU += rfuList.length; totalBD += bdList.length;
-                    detailHTML += `<div class="bg-slate-50 rounded-2xl md:rounded-3xl p-4 md:p-5 border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow"><h4 class="font-black text-slate-700 uppercase tracking-widest text-xs md:text-sm mb-3 md:mb-4 border-b border-slate-200 pb-2">${model}</h4><div class="mb-3 md:mb-4"><div class="text-[9px] md:text-[10px] font-bold text-emerald-600 mb-1.5 uppercase tracking-widest flex items-center justify-between"><span>Ready For Use</span> <span class="bg-emerald-100 px-2 py-0.5 rounded-md">${rfuList.length}</span></div><div class="flex flex-wrap gap-1.5">${rfuList.length > 0 ? rfuList.map(u => `<span class="px-2 py-1 bg-emerald-500 text-white rounded-lg text-[9px] md:text-[10px] shadow-sm font-bold tracking-tight">${u}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic font-medium">- Kosong -</span>'}</div></div><div><div class="text-[9px] md:text-[10px] font-bold text-red-600 mb-1.5 uppercase tracking-widest flex items-center justify-between"><span>Breakdown</span> <span class="bg-red-100 px-2 py-0.5 rounded-md">${bdList.length}</span></div><div class="flex flex-wrap gap-1.5">${bdList.length > 0 ? bdList.map(u => `<span class="px-2 py-1 bg-red-500 text-white rounded-lg text-[9px] md:text-[10px] shadow-sm font-bold animate-pulse tracking-tight cursor-pointer hover:scale-105 transition-transform" onclick="showBreakdownDetail('${u}')">${u}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic font-medium">- Kosong -</span>'}</div></div></div>`;
+                    const rwnList = boardData[model].rwn.sort();
+                    totalRFU += rfuList.length; totalBD += bdList.length; totalRWN += rwnList.length;
+                    
+                    detailHTML += `<div class="bg-slate-50 rounded-2xl md:rounded-3xl p-4 md:p-5 border border-slate-200 shadow-sm flex flex-col hover:shadow-md transition-shadow">
+                        <h4 class="font-black text-slate-700 uppercase tracking-widest text-xs md:text-sm mb-3 md:mb-4 border-b border-slate-200 pb-2">${model}</h4>
+                        
+                        <div class="mb-3">
+                            <div class="text-[9px] md:text-[10px] font-bold text-emerald-600 mb-1.5 uppercase tracking-widest flex items-center justify-between"><span>Ready For Use</span> <span class="bg-emerald-100 px-2 py-0.5 rounded-md">${rfuList.length}</span></div>
+                            <div class="flex flex-wrap gap-1.5">${rfuList.length > 0 ? rfuList.map(u => `<span class="px-2 py-1 bg-emerald-500 text-white rounded-lg text-[9px] md:text-[10px] shadow-sm font-bold tracking-tight cursor-pointer hover:scale-105 transition-transform" onclick="showUnitPartUsageDetail('${u}')">${u}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic font-medium">- Kosong -</span>'}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="text-[9px] md:text-[10px] font-bold text-amber-600 mb-1.5 uppercase tracking-widest flex items-center justify-between"><span>Ready With Note</span> <span class="bg-amber-100 px-2 py-0.5 rounded-md">${rwnList.length}</span></div>
+                            <div class="flex flex-wrap gap-1.5">${rwnList.length > 0 ? rwnList.map(u => `<span class="px-2 py-1 bg-amber-500 text-white rounded-lg text-[9px] md:text-[10px] shadow-sm font-bold tracking-tight cursor-pointer hover:scale-105 transition-transform" onclick="showUnitPartUsageDetail('${u}')">${u}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic font-medium">- Kosong -</span>'}</div>
+                        </div>
+                        
+                        <div>
+                            <div class="text-[9px] md:text-[10px] font-bold text-red-600 mb-1.5 uppercase tracking-widest flex items-center justify-between"><span>Breakdown</span> <span class="bg-red-100 px-2 py-0.5 rounded-md">${bdList.length}</span></div>
+                            <div class="flex flex-wrap gap-1.5">${bdList.length > 0 ? bdList.map(u => `<span class="px-2 py-1 bg-red-500 text-white rounded-lg text-[9px] md:text-[10px] shadow-sm font-bold animate-pulse tracking-tight cursor-pointer hover:scale-105 transition-transform" onclick="showBreakdownDetail('${u}')">${u}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic font-medium">- Kosong -</span>'}</div>
+                        </div>
+                    </div>`;
                 });
                 if (models.length === 0) detailHTML = `<div class="col-span-full p-6 text-center text-slate-400 font-bold border-2 border-dashed border-slate-200 rounded-2xl">Silakan daftarkan unit di Master Plan Alat.</div>`;
                 if (document.getElementById('totalRfuCount')) document.getElementById('totalRfuCount').innerText = `${totalRFU} RFU`;
                 if (document.getElementById('totalBdCount')) document.getElementById('totalBdCount').innerText = `${totalBD} B/D`;
+                if (document.getElementById('totalRwnCount')) document.getElementById('totalRwnCount').innerText = `${totalRWN} RWN`;
+                
+                // Update As Of dan Last Update Periode
+                const formattedDate = endDateStr ? new Date(endDateStr).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+                if (document.getElementById('statusAsOfDate')) document.getElementById('statusAsOfDate').innerText = formattedDate;
+                if (document.getElementById('statusLastUpdate')) document.getElementById('statusLastUpdate').innerText = formattedDate;
+                
                 if (detailBody) detailBody.innerHTML = detailHTML;
 
                 // Panggil fungsi render tabel detail unit DENGAN mengirimkan data status
@@ -6249,6 +6314,7 @@
                     <option value="OPEN" ${existingWO.status === 'OPEN' ? 'selected' : ''}>OPEN</option>
                     <option value="PROGRESS" ${existingWO.status === 'PROGRESS' ? 'selected' : ''}>PROGRESS</option>
                     <option value="WAITING PART" ${existingWO.status === 'WAITING PART' ? 'selected' : ''}>WAITING PART</option>
+                    <option value="READY WITH NOTE" ${existingWO.status === 'READY WITH NOTE' || existingWO.status === 'RWN' ? 'selected' : ''}>READY WITH NOTE (RWN)</option>
                     <option value="CLOSED" ${existingWO.status === 'CLOSED' ? 'selected' : ''}>CLOSED / READY</option>
                 </select>
                 </div>
@@ -7012,6 +7078,96 @@
 
             Swal.fire({
                 title: `<span class="text-theme-main font-black text-2xl">${equipNo}</span>`,
+                html: htmlContent,
+                width: '500px',
+                showCloseButton: true,
+                showConfirmButton: true,
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#0f172a'
+            });
+        };
+
+        // --- FITUR DETAIL PENGGUNAAN PART & BIAYA UNIT RFU/RWN ---
+        window.showUnitPartUsageDetail = function (equipNo) {
+            if (!equipNo) return;
+
+            // 1. Extract parts used by this unit
+            let unitParts = [];
+
+            (woDataCache || []).forEach(wo => {
+                const getVal = (keys) => {
+                    for (let k of keys) if (wo[k] !== undefined && wo[k] !== null && String(wo[k]).trim() !== '') return wo[k];
+                    return "";
+                };
+                const eq = getVal(['equip_no', 'equipno', 'Equip_No']);
+                if (String(eq).toUpperCase() === equipNo.toUpperCase()) {
+                    let parts = [];
+                    try {
+                        if (wo.parts_json) parts = JSON.parse(wo.parts_json);
+                        else if (wo.parts) parts = wo.parts;
+                    } catch (e) {}
+
+                    if (Array.isArray(parts)) {
+                        parts.forEach(p => {
+                            if (p.no || p.desc) {
+                                const qty = parseFloat(p.qty) || 0;
+                                unitParts.push({
+                                    no_wo: wo.no_wo,
+                                    tanggal: getVal(['tgl_rusak', 'tglrusak', 'Tgl_Rusak']),
+                                    part_no: p.no || '-',
+                                    desc: p.desc || '-',
+                                    qty: qty,
+                                    uom: p.uom || 'pcs'
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+
+            // 2. Generate HTML content
+            let rowsHtml = '';
+            if (unitParts.length === 0) {
+                rowsHtml = `<tr><td colspan="3" class="p-6 text-center text-slate-400 font-bold">Tidak ada riwayat penggunaan part untuk unit ini.</td></tr>`;
+            } else {
+                // Sort by WO date / number descending
+                unitParts.sort((a, b) => b.no_wo.localeCompare(a.no_wo));
+                rowsHtml = unitParts.map(p => `
+                    <tr class="border-b border-slate-100 hover:bg-slate-50 transition-colors text-[11px] text-slate-700">
+                        <td class="p-3">
+                            <div class="font-black text-slate-800">${p.no_wo}</div>
+                            <div class="text-[9px] text-slate-400">${p.tanggal || '-'}</div>
+                        </td>
+                        <td class="p-3">
+                            <div class="font-bold text-slate-800">${p.part_no}</div>
+                            <div class="text-[9px] text-slate-500 truncate max-w-[200px]" title="${p.desc}">${p.desc}</div>
+                        </td>
+                        <td class="p-3 text-center font-black text-slate-800">${p.qty} ${p.uom}</td>
+                    </tr>
+                `).join('');
+            }
+
+            let htmlContent = `
+                <div class="text-left bg-slate-50 p-4 rounded-xl border border-slate-200 mt-4 space-y-4">
+                    <div class="overflow-x-auto border border-slate-100 rounded-xl bg-white shadow-inner max-h-[350px] overflow-y-auto">
+                        <table class="w-full text-left table-fixed min-w-[350px]">
+                            <thead class="bg-slate-100 border-b border-slate-200 text-slate-500 font-black uppercase text-[9px] tracking-wider sticky top-0">
+                                <tr>
+                                    <th class="p-3 w-[30%]">WO / Tgl</th>
+                                    <th class="p-3 w-[50%]">Part No & Desc</th>
+                                    <th class="p-3 w-[20%] text-center">Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            Swal.fire({
+                title: `<span class="text-theme-main font-black text-xl">Part Usage Log</span><br><span class="text-sm font-black text-theme-accent uppercase tracking-widest">${equipNo}</span>`,
                 html: htmlContent,
                 width: '500px',
                 showCloseButton: true,
