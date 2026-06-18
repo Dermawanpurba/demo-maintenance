@@ -4072,7 +4072,9 @@
                     if (wosAsOfEnd.length > 0) {
                         const latestW = wosAsOfEnd[0];
                         let wStatus = (latestW.status || '').toUpperCase();
-                        if (wStatus === 'CLOSED' || latestW.tgl_selesai) {
+                        let hasValidSelesai = latestW.tgl_selesai && String(latestW.tgl_selesai).trim() !== '' && String(latestW.tgl_selesai).trim() !== '-';
+
+                        if (wStatus === 'CLOSED' && hasValidSelesai) {
                             const end = new Date(`${latestW.tgl_selesai}T${latestW.jam_selesai || '00:00'}`);
                             if (end > filterEnd) {
                                 statusUnit = (latestW.status_sebelum_closed || wStatus === 'READY WITH NOTE' || wStatus === 'RWN') ? 'RWN' : 'BD';
