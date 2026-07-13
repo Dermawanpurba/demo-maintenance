@@ -499,7 +499,7 @@
                             data-page="list-wo">
                             <i
                                 class="fas fa-laptop-medical w-8 group-hover:scale-110 transition-transform text-cyan-400"></i>
-                            Monitoring Service
+                            Monitoring no WO
                         </button>
                     </div>
                 </div>
@@ -1577,7 +1577,7 @@
                         <div
                             class="bg-amber-50 border border-amber-200 p-4 md:p-5 rounded-2xl mb-8 text-amber-800 text-[10px] md:text-xs font-medium leading-relaxed shadow-sm">
                             <i class="fas fa-info-circle text-amber-500 mr-1"></i> Data backlog yang diinput di sini
-                            akan terhubung langsung ke <b>Monitoring Service</b> untuk memudahkan mekanik melihat
+                            akan terhubung langsung ke <b>Monitoring no WO</b> untuk memudahkan mekanik melihat
                             riwayat pending perbaikan alat.
                         </div>
 
@@ -2399,7 +2399,7 @@
                                         <option value="backlog">Backlog Management</option>
                                         <option value="aktifitas">Laporan Aktifitas</option>
                                         <option value="input-service">Input Service (PM)</option>
-                                        <option value="list-wo">Monitoring Service</option>
+                                        <option value="list-wo">Monitoring no WO</option>
                                         <option value="daily-hm">Input Daily HM</option>
                                         <option value="master-plan">Plan Alat</option>
                                         <option value="plan-service">Plan Service</option>
@@ -4980,7 +4980,7 @@
                 'backlog': 'Backlog Management',
                 'aktifitas': 'Laporan Aktifitas',
                 'input-service': 'Input Service (PM)',
-                'list-wo': 'Monitoring Service',
+                'list-wo': 'Monitoring no WO',
                 'daily-hm': 'Input Daily HM',
                 'master-plan': 'Plan Alat & Service',
                 'master-equip': 'Equipments',
@@ -5949,7 +5949,7 @@
                 endLoading();
                 Swal.fire('Sukses', 'Work Order berhasil disimpan langsung ke Cloud!', 'success');
 
-                // Pindah layar ke Monitoring Service
+                // Pindah layar ke Monitoring no WO
                 navigate('list-wo');
             } catch (err) {
                 endLoading();
