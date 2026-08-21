@@ -167,13 +167,12 @@
         @media print {
             @page {
                 size: A4;
-                margin: 0.2cm;
+                margin: 0.5cm;
             }
 
             html,
             body {
-                height: 99%;
-                overflow: hidden;
+                height: auto;
                 background: white !important;
             }
 
@@ -187,7 +186,7 @@
                 display: none !important;
             }
 
-            #printArea {
+            #printArea:not(.hidden) {
                 display: block !important;
                 position: absolute;
                 left: 0;
@@ -200,6 +199,17 @@
                 line-height: 1.1;
             }
 
+            #printExecSummaryArea:not(.hidden) {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: #fff !important;
+                color: #1e293b !important;
+                font-family: 'Plus Jakarta Sans', Arial, sans-serif !important;
+            }
+
             .border-black {
                 border: 1.2pt solid #000 !important;
             }
@@ -209,7 +219,7 @@
                 -webkit-print-color-adjust: exact;
             }
 
-            #printArea * {
+            #printArea:not(.hidden) * {
                 color: #000 !important;
                 font-weight: 800 !important;
             }
@@ -727,7 +737,7 @@
         </aside>
 
         <main
-            class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 relative no-print h-screen bg-slate-50 pb-20 w-full transition-all duration-300">
+            class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 lg:p-8 relative no-print h-screen bg-slate-50 pb-20 w-full transition-all duration-300">
             <!-- Sidebar Desktop Toggle Button -->
             <button onclick="toggleSidebarDesktop()" id="sidebar-toggle-btn"
                 class="hidden md:flex no-print"
@@ -738,7 +748,7 @@
 
                 <section id="page-dashboard" class="page active pb-12">
                     <!-- Sticky Filter Bar (Freeze Pane style) -->
-                    <div class="sticky top-0 z-30 bg-slate-50/90 backdrop-blur-md py-4 mb-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4 no-print -mx-4 px-4 md:-mx-8 md:px-8">
+                    <div class="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md py-3 px-4 mb-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 no-print">
                         <div class="flex items-center gap-3 w-full sm:w-auto">
                             <div class="bg-theme-main text-white px-3 py-1.5 rounded-lg text-xs font-black tracking-widest uppercase">
                                 OPTIMA
@@ -785,9 +795,258 @@
                         </div>
                     </div>
 
+                    <!-- ========================================================================= -->
+                    <!-- 👑 EXECUTIVE BRIEFING & RESUME GRAFIK HUB (KHUSUS DIREKSI / BIG BOSS / OWNER) -->
+                    <!-- ========================================================================= -->
+                    <div id="executive-resume-hub" class="mb-10 bg-white rounded-3xl p-6 md:p-8 border border-slate-200/80 shadow-xl shadow-slate-200/50 relative overflow-hidden">
+                        <!-- Top Accent Glow -->
+                        <div class="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-blue-500/10 via-amber-500/10 to-transparent rounded-full filter blur-3xl pointer-events-none"></div>
+
+                        <!-- Header Bar Eksekutif -->
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 pb-6 border-b border-slate-100 relative z-10">
+                            <div>
+                                <div class="flex items-center gap-2.5 mb-1.5 flex-wrap">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm">
+                                        <i class="fas fa-crown"></i> Executive Summary
+                                    </span>
+                                    <span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-bold uppercase tracking-wider border border-blue-200/60">
+                                        <i class="fas fa-eye mr-1"></i> Ringkasan Direksi & Owner
+                                    </span>
+                                </div>
+                                <h2 class="text-xl md:text-2xl font-black text-slate-800 tracking-tight">
+                                    Resume Grafik & Kesehatan Armada Alat Berat
+                                </h2>
+                                <p class="text-xs text-slate-500 font-medium mt-0.5">
+                                    Informasi inti performa operasional armada dalam bahasa bisnis sederhana tanpa istilah teknis rumit.
+                                </p>
+                            </div>
+
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                <button onclick="printExecutiveSummary()"
+                                    class="bg-gradient-to-r from-slate-900 to-slate-800 hover:from-black hover:to-slate-900 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
+                                    <i class="fas fa-print text-amber-400"></i> Cetak Resume Eksekutif
+                                </button>
+                                <button onclick="calculateKPIFrontEnd()"
+                                    class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all active:scale-95 flex items-center gap-1.5"
+                                    title="Perbarui Analisis">
+                                    <i class="fas fa-sync-alt text-theme-accent"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 4 Kartu Metrik Utama Eksekutif (Bahasa Bisnis Sederhana) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 mt-6 mb-6">
+                            <!-- Card 1: Skor Kesehatan Armada -->
+                            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-lg relative overflow-hidden flex flex-col justify-between">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Kesehatan Armada</span>
+                                        <div class="flex items-baseline gap-1 mt-1">
+                                            <span class="text-3xl md:text-4xl font-black text-white tracking-tight" id="exec-health-score">0</span>
+                                            <span class="text-lg font-bold text-slate-400">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-xl shadow-inner" id="exec-health-icon">
+                                        <i class="fas fa-shield-heart text-emerald-400"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between">
+                                    <span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider" id="exec-health-badge">
+                                        Memuat Status...
+                                    </span>
+                                    <span class="text-[9px] text-slate-400 font-bold" id="exec-health-sub">Target >85%</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Status Unit Siap Kerja vs Mogok -->
+                            <div class="bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Kesiapan Unit Produksi</span>
+                                        <span class="text-xs font-black text-emerald-600" id="exec-ready-pct">0%</span>
+                                    </div>
+                                    <h3 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight" id="exec-ready-count">0 <span class="text-sm font-bold text-slate-500">Unit Siap</span></h3>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-2 text-[10px] font-bold">
+                                    <span class="text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md" id="exec-rfu-pill">0 Siap Kerja</span>
+                                    <span class="text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-md" id="exec-rwn-pill">0 Bersyarat</span>
+                                    <span class="text-red-700 bg-red-100/80 px-2 py-0.5 rounded-md" id="exec-bd-pill">0 Mogok</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Kehilangan Jam Operasi (Downtime Loss) -->
+                            <div class="bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Jam Mogok / Rusak</span>
+                                        <span class="text-xs font-black text-red-500" id="exec-breakdown-freq">0x Kasus</span>
+                                    </div>
+                                    <h3 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight" id="exec-downtime-hours">0 <span class="text-sm font-bold text-slate-500">Jam Hilang</span></h3>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-[10px] font-bold text-slate-500">
+                                    <span>Rata-rata Penanganan:</span>
+                                    <span class="font-black text-slate-700" id="exec-avg-repair">0 Jam/Perbaikan</span>
+                                </div>
+                            </div>
+
+                            <!-- Card 4: Hambatan Sparepart & Antrean -->
+                            <div class="bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Kendala Suku Cadang</span>
+                                        <span class="text-xs font-black text-amber-600" id="exec-pending-backlog">0 Antrean</span>
+                                    </div>
+                                    <h3 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight" id="exec-wait-parts">0 <span class="text-sm font-bold text-slate-500">Unit Tunggu Part</span></h3>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-[10px] font-bold text-slate-500">
+                                    <span>Pekerjaan Tertunda:</span>
+                                    <span class="font-black text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md" id="exec-backlog-badge">0 Backlog</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Smart Executive Narrative Briefing Box (Narasi Inti Ringkas) -->
+                        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white rounded-2xl p-6 mb-6 shadow-md border border-slate-700/50 relative overflow-hidden">
+                            <div class="flex items-center gap-2.5 mb-4 border-b border-white/10 pb-3">
+                                <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-sm">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-black text-sm uppercase tracking-wider text-white">Ringkasan Eksekutif & Temuan Kunci Manajemen</h4>
+                                    <p class="text-[10px] text-slate-300">Penjelasan naratif otomatis kondisi armada real-time untuk pengambilan keputusan cepat.</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-medium text-slate-200 leading-relaxed" id="exec-briefing-points">
+                                <div class="flex items-start gap-2.5 bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <i class="fas fa-check-circle text-emerald-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <b class="text-white font-black block text-[11px] uppercase tracking-wider mb-0.5">Status Kesiapan Armada</b>
+                                        <span id="exec-brief-operational">Memuat analisis armada...</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-2.5 bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <i class="fas fa-exclamation-triangle text-amber-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <b class="text-white font-black block text-[11px] uppercase tracking-wider mb-0.5">Unit Yang Perlu Perhatian</b>
+                                        <span id="exec-brief-critical">Memuat data unit kritis...</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-2.5 bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <i class="fas fa-boxes-packing text-blue-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <b class="text-white font-black block text-[11px] uppercase tracking-wider mb-0.5">Suku Cadang & Antrean Kerja</b>
+                                        <span id="exec-brief-parts">Memuat status sparepart...</span>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-2.5 bg-white/5 p-3 rounded-xl border border-white/5">
+                                    <i class="fas fa-bolt text-amber-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <b class="text-white font-black block text-[11px] uppercase tracking-wider mb-0.5">Rekomendasi Tindakan Segera</b>
+                                        <span id="exec-brief-action">Memuat rekomendasi manajemen...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Visual Charts Grid (Resume Grafik) -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <!-- Grafik 1: Proporsi Kesiapan Armada -->
+                            <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-chart-pie text-theme-accent"></i> 1. Kesiapan Operasional Armada
+                                    </h4>
+                                    <span class="text-[10px] font-bold text-slate-400">Total Unit Aktif</span>
+                                </div>
+                                <div class="h-60 relative flex justify-center items-center">
+                                    <canvas id="execReadinessChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Grafik 2: Kesiapan Per Jenis Alat Berat -->
+                            <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-truck-moving text-indigo-500"></i> 2. Kesiapan Per Jenis Alat Berat
+                                    </h4>
+                                    <span class="text-[10px] font-bold text-slate-400">Target Minimal: 85%</span>
+                                </div>
+                                <div class="h-60 relative">
+                                    <canvas id="execCategoryChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Grafik 3: Akar Masalah Kerusakan Terlama -->
+                            <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-screwdriver-wrench text-rose-500"></i> 3. Bagian Paling Sering Rusak (Lost Hours)
+                                    </h4>
+                                    <span class="text-[10px] font-bold text-slate-400">Major Component</span>
+                                </div>
+                                <div class="h-60 relative">
+                                    <canvas id="execRootCauseChart"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Grafik 4: Jam Kerja Produktif vs Jam Mogok -->
+                            <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h4 class="font-black text-slate-700 text-xs uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-chart-column text-emerald-500"></i> 4. Jam Kerja Produktif vs Jam Mogok
+                                    </h4>
+                                    <span class="text-[10px] font-bold text-slate-400">Total Jam Armada</span>
+                                </div>
+                                <div class="h-60 relative">
+                                    <canvas id="execTrendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabel Ringkas Unit Kritis (Top Critical Attention Units) -->
+                        <div class="bg-slate-50/70 border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2 border-b border-slate-200/60 pb-3">
+                                <div>
+                                    <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider flex items-center gap-2">
+                                        <i class="fas fa-circle-exclamation text-red-500"></i> Unit Yang Sedang Bermasalah & Butuh Tindakan Cepat
+                                    </h4>
+                                    <p class="text-[10px] text-slate-400 font-medium">Daftar unit yang saat ini tidak dapat bekerja secara optimal atau menunggu penanganan mekanik/part.</p>
+                                </div>
+                                <span class="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-[10px] font-black uppercase" id="exec-critical-count-badge">0 Unit</span>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs min-w-[700px]">
+                                    <thead class="bg-slate-100/80 text-[9px] uppercase font-black text-slate-600 tracking-wider">
+                                        <tr>
+                                            <th class="p-3 rounded-l-xl w-32">KODE UNIT</th>
+                                            <th class="p-3 w-36">TIPE / MODEL</th>
+                                            <th class="p-3">KENDALA UTAMA (BAHASA AWAM)</th>
+                                            <th class="p-3 text-center w-28">JAM MOGOK</th>
+                                            <th class="p-3 text-center rounded-r-xl w-36">STATUS TINDAKAN</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="execCriticalUnitsTableBody" class="divide-y divide-slate-200/60 font-medium text-slate-700">
+                                        <tr>
+                                            <td colspan="5" class="p-6 text-center text-slate-400 italic">Semua unit armada dalam kondisi siap operasi (RFU).</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Indikator Teknis (Engineering Details) -->
                     <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-6 ml-2 gap-3">
-                        <h3 class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest"><i
-                                class="fas fa-tachometer-alt text-theme-accent mr-2"></i> Indikator Performance</h3>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 bg-slate-200 text-slate-700 rounded-md text-[9px] font-black uppercase tracking-wider">Engineering View</span>
+                            <h3 class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest"><i
+                                    class="fas fa-tachometer-alt text-theme-accent mr-1"></i> Rincian Indikator Teknis (PA / MA / MTTR / MTBF)</h3>
+                        </div>
                         <div class="md:hidden flex gap-2 w-full">
                             <input type="date" id="kpiStartDateMobile"
                                 onchange="let el_sd=document.getElementById('kpiStartDate'); if(el_sd) el_sd.value=this.value; calculateKPIFrontEnd();"
@@ -2344,19 +2603,32 @@
                             <h3 class="text-sm font-black uppercase tracking-wider text-slate-800 mb-4">
                                 <i class="fas fa-database mr-2 text-blue-600"></i> Sinkronisasi & Optimasi Database
                             </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                                    <h4 class="font-bold text-slate-700 text-xs mb-1">Muat Ulang Cache & Master Data</h4>
-                                    <p class="text-[11px] text-slate-500 mb-3">Tarik seluruh data terbaru dari Google Sheets secara langsung ke memori aplikasi.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between">
+                                    <div>
+                                        <h4 class="font-bold text-slate-700 text-xs mb-1">Muat Ulang Seluruh Data</h4>
+                                        <p class="text-[11px] text-slate-500 mb-3">Tarik seluruh data terbaru dari Google Sheets secara langsung ke memori aplikasi.</p>
+                                    </div>
                                     <button type="button" onclick="globalDataSync()" class="w-full bg-theme-main hover:bg-slate-800 text-white font-black py-2.5 px-4 rounded-xl transition-all text-xs uppercase tracking-wider shadow-md">
-                                        <i class="fas fa-sync-alt mr-2"></i> Reload Seluruh Data
+                                        <i class="fas fa-sync-alt mr-2"></i> Reload Data
                                     </button>
                                 </div>
-                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                                    <h4 class="font-bold text-slate-700 text-xs mb-1">Migrasi PartUsage ke Kolom Parts WO</h4>
-                                    <p class="text-[11px] text-slate-500 mb-3">Gabungkan catatan sparepart dari sheet PartUsage ke kolom Parts_JSON sheet WorkOrders.</p>
-                                    <button type="button" onclick="runMigratePartUsage()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-4 rounded-xl transition-all text-xs uppercase tracking-wider shadow-md">
-                                        <i class="fas fa-file-import mr-2"></i> Jalankan Migrasi Parts
+                                <div class="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl flex flex-col justify-between">
+                                    <div>
+                                        <h4 class="font-bold text-emerald-800 text-xs mb-1">Setup & Data Sample Lengkap</h4>
+                                        <p class="text-[11px] text-emerald-700/80 mb-3">Buat seluruh sheet & isi data sampel realistis untuk semua menu sidebar tanpa bentrok.</p>
+                                    </div>
+                                    <button type="button" onclick="runSetupDatabase()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-4 rounded-xl transition-all text-xs uppercase tracking-wider shadow-md">
+                                        <i class="fas fa-magic mr-2"></i> Setup & Sample
+                                    </button>
+                                </div>
+                                <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col justify-between">
+                                    <div>
+                                        <h4 class="font-bold text-slate-700 text-xs mb-1">Migrasi PartUsage ke WO</h4>
+                                        <p class="text-[11px] text-slate-500 mb-3">Gabungkan catatan sparepart dari sheet PartUsage ke kolom Parts_JSON sheet WorkOrders.</p>
+                                    </div>
+                                    <button type="button" onclick="runMigratePartUsage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-2.5 px-4 rounded-xl transition-all text-xs uppercase tracking-wider shadow-md">
+                                        <i class="fas fa-file-import mr-2"></i> Jalankan Migrasi
                                     </button>
                                 </div>
                             </div>
@@ -2415,6 +2687,104 @@
 
             </div>
         </main>
+    </div>
+
+    <!-- Dedicated Executive Summary Print Container -->
+    <div id="printExecSummaryArea" class="hidden">
+        <div class="p-8 bg-white text-slate-800">
+            <!-- Kop Surat / Header Perusahaan -->
+            <div class="flex justify-between items-center border-b-2 border-slate-900 pb-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-slate-900 text-white rounded-xl flex items-center justify-center font-black text-xl">
+                        <i class="fas fa-industry"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black uppercase tracking-tight company-display-name">WOSys ERP - OPTIMA</h1>
+                        <p class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Executive Fleet Maintenance & Health Briefing</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[9px] font-black uppercase text-slate-400">Periode Laporan</div>
+                    <div class="text-xs font-black text-slate-900" id="prn-exec-period">-</div>
+                    <div class="text-[9px] text-slate-500 font-medium mt-0.5">Tgl Cetak: <span id="prn-exec-print-date">-</span></div>
+                </div>
+            </div>
+
+            <!-- Skor Kesehatan & 4 Indikator Eksekutif -->
+            <div class="grid grid-cols-4 gap-3 mb-6">
+                <div class="border-2 border-slate-900 rounded-xl p-3 text-center bg-slate-50">
+                    <div class="text-[8px] font-black uppercase tracking-wider text-slate-500">Skor Kesehatan Armada</div>
+                    <div class="text-2xl font-black text-slate-900 mt-1" id="prn-exec-health-score">0%</div>
+                    <div class="text-[8px] font-bold mt-0.5" id="prn-exec-health-status">PRIMA</div>
+                </div>
+                <div class="border border-slate-300 rounded-xl p-3 text-center">
+                    <div class="text-[8px] font-black uppercase tracking-wider text-slate-500">Kesiapan Unit (RFU)</div>
+                    <div class="text-2xl font-black text-emerald-600 mt-1" id="prn-exec-ready-count">0 Unit</div>
+                    <div class="text-[8px] text-slate-500 font-bold" id="prn-exec-ready-pct">0% Siap Operasi</div>
+                </div>
+                <div class="border border-slate-300 rounded-xl p-3 text-center">
+                    <div class="text-[8px] font-black uppercase tracking-wider text-slate-500">Jam Mogok (Downtime)</div>
+                    <div class="text-2xl font-black text-red-600 mt-1" id="prn-exec-downtime">0 Jam</div>
+                    <div class="text-[8px] text-slate-500 font-bold" id="prn-exec-breakdown-freq">0x Kasus</div>
+                </div>
+                <div class="border border-slate-300 rounded-xl p-3 text-center">
+                    <div class="text-[8px] font-black uppercase tracking-wider text-slate-500">Menunggu Sparepart</div>
+                    <div class="text-2xl font-black text-amber-600 mt-1" id="prn-exec-wait-parts">0 Unit</div>
+                    <div class="text-[8px] text-slate-500 font-bold" id="prn-exec-backlogs">0 Backlog</div>
+                </div>
+            </div>
+
+            <!-- Temuan Kunci & Resume Naratif -->
+            <div class="border border-slate-300 rounded-xl p-4 mb-6 bg-slate-50">
+                <h3 class="font-black text-[11px] uppercase tracking-wider text-slate-900 mb-2.5 border-b border-slate-200 pb-1.5">
+                    <i class="fas fa-file-alt mr-1.5"></i> Ringkasan Eksekutif & Temuan Kunci Manajemen
+                </h3>
+                <div class="space-y-1.5 text-[9.5pt] leading-relaxed text-slate-800" id="prn-exec-narrative">
+                    <!-- Dynamic narrative inserted here -->
+                </div>
+            </div>
+
+            <!-- Daftar Unit Kritis Yang Perlu Perhatian -->
+            <div class="border border-slate-300 rounded-xl overflow-hidden mb-6">
+                <div class="bg-slate-900 text-white px-3 py-1.5 text-[10px] font-black uppercase tracking-wider flex justify-between">
+                    <span>Daftar Unit Mengalami Kendala / Breakdown Saat Ini</span>
+                    <span id="prn-exec-critical-count">0 Unit</span>
+                </div>
+                <table class="w-full text-left text-[9pt]">
+                    <thead class="bg-slate-100 font-black text-[8pt] uppercase text-slate-700 border-b">
+                        <tr>
+                            <th class="p-2 w-28">Kode Unit</th>
+                            <th class="p-2 w-32">Tipe / Model</th>
+                            <th class="p-2">Kendala Utama</th>
+                            <th class="p-2 text-center w-24">Jam Mogok</th>
+                            <th class="p-2 text-center w-36">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prn-exec-critical-body" class="divide-y divide-slate-200">
+                        <tr><td colspan="5" class="p-3 text-center text-slate-400">Seluruh unit armada dalam kondisi siap kerja (RFU).</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tanda Tangan Approval Eksekutif -->
+            <div class="grid grid-cols-3 text-center text-[9pt] font-bold pt-4 border-t border-slate-300">
+                <div>
+                    <div class="text-[8pt] uppercase text-slate-500 font-black mb-10">Disiapkan Oleh:</div>
+                    <div class="border-b border-slate-400 w-3/4 mx-auto font-black text-slate-800 uppercase" id="prn-exec-sign-planner">SPV Planner / Plant</div>
+                    <div class="text-[7.5pt] text-slate-400 uppercase mt-0.5">Plant Department</div>
+                </div>
+                <div>
+                    <div class="text-[8pt] uppercase text-slate-500 font-black mb-10">Diperiksa Oleh:</div>
+                    <div class="border-b border-slate-400 w-3/4 mx-auto font-black text-slate-800 uppercase">Plant Dept Head</div>
+                    <div class="text-[7.5pt] text-slate-400 uppercase mt-0.5">Maintenance Manager</div>
+                </div>
+                <div>
+                    <div class="text-[8pt] uppercase text-slate-500 font-black mb-10">Mengetahui (Owner / Direksi):</div>
+                    <div class="border-b border-slate-400 w-3/4 mx-auto font-black text-slate-800 uppercase">Director / Owner</div>
+                    <div class="text-[7.5pt] text-slate-400 uppercase mt-0.5">Management</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="printArea" class="hidden">
@@ -2608,8 +2978,7 @@
                     </div>
                 </div>
                 <small id="bd_next_wo_info" class="text-[10px] font-bold text-red-500 block mt-1 ml-1"></small>
-        </div>
-        <div class="space-y-2">
+                <div class="space-y-2">
             <label class="text-[9px] font-black uppercase text-slate-500 tracking-widest">Problem / Kendala Awal</label>
             <textarea id="bd_problem"
                 class="w-full px-4 py-3 border border-slate-200 rounded-xl font-medium focus:ring-2 focus:ring-red-400 outline-none resize-none h-20 text-sm shadow-sm"
@@ -2794,6 +3163,7 @@
         let currentMonPage = 1, currentEqPage = 1, currentPtPage = 1, currentHmPage = 1;
         const ITEMS_PER_PAGE = 50;
         let statusChartInstance = null, serviceChartInstance = null;
+        let execReadinessChartInstance = null, execCategoryChartInstance = null, execRootCauseChartInstance = null, execTrendChartInstance = null;
         // ==========================================
         // INITIALIZATION & AUTH
         // ==========================================
@@ -3829,10 +4199,32 @@
                 if (document.getElementById('statusAsOfDate')) document.getElementById('statusAsOfDate').innerText = formattedDate;
                 if (document.getElementById('statusLastUpdate')) document.getElementById('statusLastUpdate').innerText = formattedDate;
                 
-                if (detailBody) detailBody.innerHTML = detailHTML;
-
                 // Panggil fungsi render tabel detail unit DENGAN mengirimkan data status
                 renderUnitPerformanceTables(unitDowntime, unitStatusDowntime);
+
+                // Panggil render Dashboard Resume Eksekutif (Khusus Direksi / Owner)
+                renderExecutiveDashboard({
+                    totalUnits: (masterCache.planAlat || []).filter(p => (p.kategori || '').toUpperCase() !== 'SERVICE').length || (totalRFU + totalBD + totalRWN),
+                    totalRFU: totalRFU,
+                    totalRWN: totalRWN,
+                    totalBD: totalBD,
+                    totalWaitParts: totalWait,
+                    totalDowntime: totalDowntime,
+                    totalBreakdowns: totalBreakdowns,
+                    mttr: mttr,
+                    mtbf: mtbf,
+                    pa: pa,
+                    ma: ma,
+                    uptimeHours: uptimeHours,
+                    openBacklogs: openBacklogCount,
+                    unitDowntime: unitDowntime,
+                    majorCompDowntime: majorCompDowntime,
+                    kpiData: kpiData,
+                    filteredWOForCounts: filteredWOForCounts,
+                    boardData: boardData,
+                    startDateStr: startDateStr,
+                    endDateStr: endDateStr
+                });
             }
         }
 
@@ -4007,6 +4399,370 @@
             });
             container.innerHTML = html;
             window.lastPerformanceGroups = groups;
+        }
+
+        // =========================================================================
+        // 👑 EXECUTIVE DASHBOARD & RESUME GRAFIK RENDERER (KHUSUS DIREKSI / OWNER)
+        // =========================================================================
+        window.lastExecutiveSummary = null;
+
+        function renderExecutiveDashboard(summary) {
+            if (!summary) return;
+            window.lastExecutiveSummary = summary;
+
+            // 1. Health Score Calculation & Badge
+            const healthScore = Math.min(100, Math.max(0, Math.round(parseFloat(summary.pa) || 0)));
+            const elScore = document.getElementById('exec-health-score');
+            if (elScore) elScore.innerText = healthScore;
+
+            const elBadge = document.getElementById('exec-health-badge');
+            const elIcon = document.getElementById('exec-health-icon');
+            if (elBadge && elIcon) {
+                if (healthScore >= 88) {
+                    elBadge.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
+                    elBadge.innerText = "🟢 PRIMA (SIAP OPERASI)";
+                    elIcon.innerHTML = '<i class="fas fa-shield-heart text-emerald-400"></i>';
+                } else if (healthScore >= 75) {
+                    elBadge.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/40";
+                    elBadge.innerText = "🟡 PERLU PERHATIAN (WASPADA)";
+                    elIcon.innerHTML = '<i class="fas fa-triangle-exclamation text-amber-400"></i>';
+                } else {
+                    elBadge.className = "px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-red-500/20 text-red-300 border border-red-500/40";
+                    elBadge.innerText = "🔴 KRITIS (GANGGUAN TINGGI)";
+                    elIcon.innerHTML = '<i class="fas fa-circle-exclamation text-red-400"></i>';
+                }
+            }
+
+            // 2. Kesiapan Unit Produksi
+            const readyCount = summary.totalRFU + summary.totalRWN;
+            const totalAllUnits = summary.totalUnits || (readyCount + summary.totalBD);
+            const readyPct = totalAllUnits > 0 ? ((readyCount / totalAllUnits) * 100).toFixed(1) : 0;
+
+            if (document.getElementById('exec-ready-count')) document.getElementById('exec-ready-count').innerHTML = `${readyCount} <span class="text-sm font-bold text-slate-500">/ ${totalAllUnits} Unit Siap</span>`;
+            if (document.getElementById('exec-ready-pct')) document.getElementById('exec-ready-pct').innerText = `${readyPct}%`;
+            if (document.getElementById('exec-rfu-pill')) document.getElementById('exec-rfu-pill').innerText = `${summary.totalRFU} Siap Kerja`;
+            if (document.getElementById('exec-rwn-pill')) document.getElementById('exec-rwn-pill').innerText = `${summary.totalRWN} Bersyarat`;
+            if (document.getElementById('exec-bd-pill')) document.getElementById('exec-bd-pill').innerText = `${summary.totalBD} Mogok`;
+
+            // 3. Jam Kehilangan Operasi (Downtime Loss)
+            if (document.getElementById('exec-downtime-hours')) document.getElementById('exec-downtime-hours').innerHTML = `${summary.totalDowntime.toFixed(1)} <span class="text-sm font-bold text-slate-500">Jam Hilang</span>`;
+            if (document.getElementById('exec-breakdown-freq')) document.getElementById('exec-breakdown-freq').innerText = `${summary.totalBreakdowns}x Kasus`;
+            if (document.getElementById('exec-avg-repair')) document.getElementById('exec-avg-repair').innerText = `${summary.mttr} Jam/Kasus`;
+
+            // 4. Hambatan Suku Cadang & Backlog
+            if (document.getElementById('exec-wait-parts')) document.getElementById('exec-wait-parts').innerHTML = `${summary.totalWaitParts} <span class="text-sm font-bold text-slate-500">Unit Tunggu Part</span>`;
+            if (document.getElementById('exec-pending-backlog')) document.getElementById('exec-pending-backlog').innerText = `${summary.openBacklogs} Antrean`;
+            if (document.getElementById('exec-backlog-badge')) document.getElementById('exec-backlog-badge').innerText = `${summary.openBacklogs} Backlog`;
+
+            // Ekstrak data unit kritis (BD & RWN)
+            const bdUnitList = [];
+            const rwnUnitList = [];
+            Object.keys(summary.boardData || {}).forEach(m => {
+                (summary.boardData[m].bd || []).forEach(u => bdUnitList.push(u));
+                (summary.boardData[m].rwn || []).forEach(u => rwnUnitList.push(u));
+            });
+
+            // Ekstrak komponen penyebab downtime terlama
+            const topComps = Object.entries(summary.majorCompDowntime || {}).sort((a, b) => b[1] - a[1]);
+            const topCompStr = topComps.length > 0 && topComps[0][1] > 0 ? `${topComps[0][0]} (${topComps[0][1].toFixed(1)} Jam)` : 'Tidak ada gangguan signifikan';
+
+            // 5. Smart Executive Narrative Generation
+            const point1 = `Dari total ${totalAllUnits} unit alat berat terdaftar, ${summary.totalRFU} unit (${totalAllUnits > 0 ? (summary.totalRFU / totalAllUnits * 100).toFixed(0) : 0}%) beroperasi normal dan ${summary.totalRWN} unit beroperasi dengan catatan ringan. Kesiapan operasional armada secara umum mencapai ${readyPct}%.`;
+            const point2 = bdUnitList.length > 0
+                ? `Terdapat ${bdUnitList.length} unit saat ini terhenti/mogok (${bdUnitList.slice(0, 4).join(', ')}${bdUnitList.length > 4 ? "..." : ""}). Bagian yang paling banyak menyita jam perbaikan adalah ${topCompStr}.`
+                : `Seluruh armada saat ini siap kerja (tidak ada kerusakan fatal). Kendala minor diselesaikan tim mekanik rata-rata dalam ${summary.mttr} jam.`;
+            const point3 = `Tercatat ${summary.totalWaitParts} unit dalam proses menunggu suku cadang dan ${summary.openBacklogs} antrean pekerjaan tertunda (backlog) yang akan dikerjakan saat servis berkala berikutnya.`;
+            const point4 = summary.totalWaitParts > 0
+                ? `Prioritas Manajemen: Percepat persetujuan (approval) pengadaan suku cadang untuk unit ${bdUnitList.slice(0, 3).join(', ') || 'terkait'} agar unit segera kembali berproduksi menghasilkan pendapatan.`
+                : (bdUnitList.length > 0
+                    ? `Prioritas Manajemen: Dorong tim mekanik memprioritaskan penyelesaian unit ${bdUnitList.slice(0, 3).join(', ')} dan pastikan pencegahan kerusakan berulang.`
+                    : `Pertahankan jadwal perawatan berkala (Preventive Maintenance 250H) dan kontrol jam kerja harian agar kesehatan armada tetap prima di atas target 85%.`);
+
+            if (document.getElementById('exec-brief-operational')) document.getElementById('exec-brief-operational').innerText = point1;
+            if (document.getElementById('exec-brief-critical')) document.getElementById('exec-brief-critical').innerText = point2;
+            if (document.getElementById('exec-brief-parts')) document.getElementById('exec-brief-parts').innerText = point3;
+            if (document.getElementById('exec-brief-action')) document.getElementById('exec-brief-action').innerText = point4;
+
+            // 6. Render 4 Executive Charts
+            // Chart 1: Donut Readiness
+            const ctx1 = document.getElementById('execReadinessChart');
+            if (ctx1) {
+                if (execReadinessChartInstance) execReadinessChartInstance.destroy();
+                execReadinessChartInstance = new Chart(ctx1.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Siap Kerja (RFU)', 'Siap Bersyarat (RWN)', 'Mogok / B/D', 'Menunggu Part'],
+                        datasets: [{
+                            data: [summary.totalRFU, summary.totalRWN, summary.totalBD, summary.totalWaitParts],
+                            backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#f97316'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, family: 'Plus Jakarta Sans', weight: 'bold' } } }
+                        },
+                        cutout: '62%'
+                    }
+                });
+            }
+
+            // Chart 2: Category Readiness Horizontal Bar
+            const categoryLabels = [];
+            const categoryPcts = [];
+            const categoryColors = [];
+            Object.keys(summary.boardData || {}).sort().forEach(model => {
+                const b = summary.boardData[model];
+                const tot = b.rfu.length + b.rwn.length + b.bd.length;
+                if (tot > 0) {
+                    const readyRatio = ((b.rfu.length + b.rwn.length) / tot) * 100;
+                    categoryLabels.push(model);
+                    categoryPcts.push(readyRatio.toFixed(1));
+                    categoryColors.push(readyRatio >= 85 ? '#10b981' : (readyRatio >= 70 ? '#f59e0b' : '#ef4444'));
+                }
+            });
+
+            const ctx2 = document.getElementById('execCategoryChart');
+            if (ctx2) {
+                if (execCategoryChartInstance) execCategoryChartInstance.destroy();
+                execCategoryChartInstance = new Chart(ctx2.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: categoryLabels.length > 0 ? categoryLabels : ['Semua Unit'],
+                        datasets: [{
+                            label: 'Kesiapan Armada (%)',
+                            data: categoryPcts.length > 0 ? categoryPcts : [100],
+                            backgroundColor: categoryColors.length > 0 ? categoryColors : ['#10b981'],
+                            borderRadius: 6,
+                            barThickness: 14
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+                            y: { ticks: { font: { size: 9, family: 'Plus Jakarta Sans', weight: 'bold' } } }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Chart 3: Root Causes / Major Component Lost Hours
+            const topCompsSlice = Object.entries(summary.majorCompDowntime || {}).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            const compLabels = topCompsSlice.map(c => c[0]);
+            const compHours = topCompsSlice.map(c => c[1].toFixed(1));
+
+            const ctx3 = document.getElementById('execRootCauseChart');
+            if (ctx3) {
+                if (execRootCauseChartInstance) execRootCauseChartInstance.destroy();
+                execRootCauseChartInstance = new Chart(ctx3.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: compLabels.length > 0 ? compLabels : ['Tidak Ada Kerusakan'],
+                        datasets: [{
+                            label: 'Jam Kehilangan (Hours)',
+                            data: compHours.length > 0 ? compHours : [0],
+                            backgroundColor: '#f43f5e',
+                            borderRadius: 6,
+                            barThickness: 18
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { callback: v => v + 'h' } },
+                            x: { ticks: { font: { size: 9, family: 'Plus Jakarta Sans', weight: 'bold' } } }
+                        },
+                        plugins: {
+                            legend: { display: false }
+                        }
+                    }
+                });
+            }
+
+            // Chart 4: Productive vs Downtime Hours
+            const ctx4 = document.getElementById('execTrendChart');
+            if (ctx4) {
+                if (execTrendChartInstance) execTrendChartInstance.destroy();
+                execTrendChartInstance = new Chart(ctx4.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total Jam Armada'],
+                        datasets: [
+                            { label: 'Jam Kerja Produktif (Uptime)', data: [summary.uptimeHours.toFixed(1)], backgroundColor: '#10b981', borderRadius: 6, barThickness: 38 },
+                            { label: 'Jam Mogok / Kerusakan (Downtime)', data: [summary.totalDowntime.toFixed(1)], backgroundColor: '#f43f5e', borderRadius: 6, barThickness: 38 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, ticks: { callback: v => v + ' Jam' } }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9, family: 'Plus Jakarta Sans', weight: 'bold' } } }
+                        }
+                    }
+                });
+            }
+
+            // 7. Render Critical Attention Units Table
+            const criticalTbody = document.getElementById('execCriticalUnitsTableBody');
+            const criticalBadge = document.getElementById('exec-critical-count-badge');
+            const allCriticalUnits = [...bdUnitList, ...rwnUnitList];
+
+            if (criticalBadge) criticalBadge.innerText = `${allCriticalUnits.length} Unit Perlu Perhatian`;
+
+            if (criticalTbody) {
+                if (allCriticalUnits.length === 0) {
+                    criticalTbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-emerald-600 font-bold bg-emerald-50/50 rounded-xl"><i class="fas fa-check-circle mr-1"></i> Seluruh unit armada saat ini beroperasi normal (RFU) tanpa kendala breakdown.</td></tr>`;
+                } else {
+                    criticalTbody.innerHTML = allCriticalUnits.map(unitNo => {
+                        const isBD = bdUnitList.includes(unitNo);
+                        const woList = (woDataCache || []).filter(w => (w.equip_no || '').toUpperCase() === unitNo.toUpperCase());
+                        woList.sort((a, b) => new Date(b.tgl_rusak || '1970-01-01') - new Date(a.tgl_rusak || '1970-01-01'));
+                        const latestWO = woList[0] || {};
+                        const planInfo = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === unitNo.toUpperCase()) || {};
+
+                        const probDesc = latestWO.kendala || latestWO.deskripsi || planInfo.model || 'Pemeriksaan / Perbaikan Komponen';
+                        const dtHours = (summary.unitDowntime[unitNo] || 0).toFixed(1);
+                        const woStatus = (latestWO.status || '').toUpperCase();
+
+                        let statusBadge = isBD
+                            ? '<span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase bg-red-100 text-red-700 border border-red-200 animate-pulse"><i class="fas fa-tools mr-1"></i> MOGOK (B/D)</span>'
+                            : '<span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase bg-amber-100 text-amber-700 border border-amber-200"><i class="fas fa-note-sticky mr-1"></i> BERSYARAT (RWN)</span>';
+
+                        if (woStatus === 'WAITING PART') {
+                            statusBadge = '<span class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase bg-orange-100 text-orange-700 border border-orange-200"><i class="fas fa-box-open mr-1"></i> TUNGGU PART</span>';
+                        }
+
+                        return `<tr class="hover:bg-slate-100/60 transition-colors">
+                            <td class="p-3 font-black text-slate-800 uppercase">${unitNo}</td>
+                            <td class="p-3 font-bold text-slate-500 uppercase text-[11px]">${planInfo.model || '-'}</td>
+                            <td class="p-3 font-medium text-slate-700 text-[11px]">${probDesc}</td>
+                            <td class="p-3 text-center font-mono font-black text-red-600 text-xs">${dtHours} Jam</td>
+                            <td class="p-3 text-center">${statusBadge}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+        }
+
+        // =========================================================================
+        // 🖨️ FUNGSI CETAK RESUME EKSEKUTIF UNTUK BIG BOSS / OWNER
+        // =========================================================================
+        function printExecutiveSummary() {
+            const summary = window.lastExecutiveSummary;
+            if (!summary) {
+                return Swal.fire('Data Belum Siap', 'Silakan tunggu atau refresh halaman terlebih dahulu.', 'info');
+            }
+
+            const printDiv = document.getElementById('printExecSummaryArea');
+            if (!printDiv) return;
+
+            // Isi data cetak
+            const startDateStr = document.getElementById('kpiStartDate')?.value || '-';
+            const endDateStr = document.getElementById('kpiEndDate')?.value || '-';
+            const fmtPeriod = `${startDateStr} s/d ${endDateStr}`;
+
+            if (document.getElementById('prn-exec-period')) document.getElementById('prn-exec-period').innerText = fmtPeriod;
+            if (document.getElementById('prn-exec-print-date')) document.getElementById('prn-exec-print-date').innerText = new Date().toLocaleString('id-ID');
+
+            const healthScore = Math.min(100, Math.max(0, Math.round(parseFloat(summary.pa) || 0)));
+            if (document.getElementById('prn-exec-health-score')) document.getElementById('prn-exec-health-score').innerText = `${healthScore}%`;
+            if (document.getElementById('prn-exec-health-status')) {
+                document.getElementById('prn-exec-health-status').innerText = healthScore >= 88 ? "🟢 PRIMA" : (healthScore >= 75 ? "🟡 WASPADA" : "🔴 KRITIS");
+            }
+
+            const readyCount = summary.totalRFU + summary.totalRWN;
+            const totalAllUnits = summary.totalUnits || (readyCount + summary.totalBD);
+            const readyPct = totalAllUnits > 0 ? ((readyCount / totalAllUnits) * 100).toFixed(1) : 0;
+
+            if (document.getElementById('prn-exec-ready-count')) document.getElementById('prn-exec-ready-count').innerText = `${readyCount} / ${totalAllUnits} Unit`;
+            if (document.getElementById('prn-exec-ready-pct')) document.getElementById('prn-exec-ready-pct').innerText = `${readyPct}% Siap Operasi`;
+
+            if (document.getElementById('prn-exec-downtime')) document.getElementById('prn-exec-downtime').innerText = `${summary.totalDowntime.toFixed(1)} Jam`;
+            if (document.getElementById('prn-exec-breakdown-freq')) document.getElementById('prn-exec-breakdown-freq').innerText = `${summary.totalBreakdowns}x Kasus (${summary.mttr}h/kasus)`;
+
+            if (document.getElementById('prn-exec-wait-parts')) document.getElementById('prn-exec-wait-parts').innerText = `${summary.totalWaitParts} Unit`;
+            if (document.getElementById('prn-exec-backlogs')) document.getElementById('prn-exec-backlogs').innerText = `${summary.openBacklogs} Backlog Tertunda`;
+
+            // Naratif Cetak
+            const p1 = document.getElementById('exec-brief-operational')?.innerText || '-';
+            const p2 = document.getElementById('exec-brief-critical')?.innerText || '-';
+            const p3 = document.getElementById('exec-brief-parts')?.innerText || '-';
+            const p4 = document.getElementById('exec-brief-action')?.innerText || '-';
+
+            const narrativeHTML = `
+                <div class="mb-1.5"><b class="text-slate-900">1. Kesiapan Operasional:</b> ${p1}</div>
+                <div class="mb-1.5"><b class="text-slate-900">2. Unit Kritis & Kendala:</b> ${p2}</div>
+                <div class="mb-1.5"><b class="text-slate-900">3. Suku Cadang & Backlog:</b> ${p3}</div>
+                <div><b class="text-slate-900">4. Rekomendasi Keputusan Direksi:</b> <span class="bg-amber-50 font-bold px-1 rounded">${p4}</span></div>
+            `;
+            if (document.getElementById('prn-exec-narrative')) document.getElementById('prn-exec-narrative').innerHTML = narrativeHTML;
+
+            // Unit Kritis Cetak
+            const bdUnitList = [];
+            const rwnUnitList = [];
+            Object.keys(summary.boardData || {}).forEach(m => {
+                (summary.boardData[m].bd || []).forEach(u => bdUnitList.push(u));
+                (summary.boardData[m].rwn || []).forEach(u => rwnUnitList.push(u));
+            });
+            const allCriticalUnits = [...bdUnitList, ...rwnUnitList];
+
+            if (document.getElementById('prn-exec-critical-count')) document.getElementById('prn-exec-critical-count').innerText = `${allCriticalUnits.length} Unit`;
+
+            const prnTbody = document.getElementById('prn-exec-critical-body');
+            if (prnTbody) {
+                if (allCriticalUnits.length === 0) {
+                    prnTbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 font-bold">Semua unit armada dalam kondisi siap kerja (RFU).</td></tr>`;
+                } else {
+                    prnTbody.innerHTML = allCriticalUnits.map(unitNo => {
+                        const isBD = bdUnitList.includes(unitNo);
+                        const woList = (woDataCache || []).filter(w => (w.equip_no || '').toUpperCase() === unitNo.toUpperCase());
+                        woList.sort((a, b) => new Date(b.tgl_rusak || '1970-01-01') - new Date(a.tgl_rusak || '1970-01-01'));
+                        const latestWO = woList[0] || {};
+                        const planInfo = (masterCache.planAlat || []).find(p => (p.equip_no || '').toUpperCase() === unitNo.toUpperCase()) || {};
+
+                        const probDesc = latestWO.kendala || latestWO.deskripsi || planInfo.model || 'Perbaikan Komponen';
+                        const dtHours = (summary.unitDowntime[unitNo] || 0).toFixed(1);
+                        const statusStr = isBD ? 'MOGOK (B/D)' : 'READY WITH NOTE';
+
+                        return `<tr>
+                            <td class="p-2 font-black uppercase">${unitNo}</td>
+                            <td class="p-2 uppercase">${planInfo.model || '-'}</td>
+                            <td class="p-2">${probDesc}</td>
+                            <td class="p-2 text-center font-bold text-red-600">${dtHours} Jam</td>
+                            <td class="p-2 text-center font-black ${isBD ? 'text-red-700' : 'text-amber-700'}">${statusStr}</td>
+                        </tr>`;
+                    }).join('');
+                }
+            }
+
+            // Nama planner/user saat ini
+            if (document.getElementById('prn-exec-sign-planner')) {
+                document.getElementById('prn-exec-sign-planner').innerText = (currentUser && currentUser.nama) ? currentUser.nama.toUpperCase() : "SPV PLANNER";
+            }
+
+            // Aktifkan area print
+            const woPrint = document.getElementById('printArea');
+            if (woPrint) woPrint.classList.add('hidden');
+            printDiv.classList.remove('hidden');
+
+            window.print();
+
+            setTimeout(() => {
+                printDiv.classList.add('hidden');
+            }, 1000);
         }
 
         // ==========================================
@@ -7391,6 +8147,32 @@
                     <td class="p-4 text-center"><span class="px-2 py-1 text-[10px] font-black rounded-md bg-emerald-50 text-emerald-600 border border-emerald-200">SUCCESS</span></td>
                 </tr>
             `).join('');
+        };
+
+        // Setup Database & Sample Data Trigger
+        window.runSetupDatabase = async function() {
+            const confirm = await Swal.fire({
+                title: 'Setup Database & Data Sample?',
+                text: 'Sistem akan membuat seluruh sheet yang dibutuhkan di Google Spreadsheet dan mengisikan data sample lengkap untuk seluruh menu sidebar tanpa bentrok.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Jalankan Setup',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#0f172a'
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            startLoading("Menginisialisasi Database & Data Sample...");
+            try {
+                const res = await fetchGAS("setupDatabase", {});
+                endLoading();
+                await Swal.fire('Sukses!', (res && res.message) || 'Database dan data sample berhasil disinkronkan ke Google Sheets.', 'success');
+                globalDataSync();
+            } catch (err) {
+                endLoading();
+                Swal.fire('Error', err.toString(), 'error');
+            }
         };
 
         // Helper alias sendGAS
