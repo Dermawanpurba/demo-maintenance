@@ -6817,7 +6817,9 @@
             const totalBreakdowns = countUnsch + countSch;
             const uptimeHours = actualOperatingHours > 0 ? actualOperatingHours : Math.max(0, totalPlanHours - totalDowntime);
             const mttr = totalBreakdowns > 0 ? (totalDowntime / totalBreakdowns).toFixed(1) : 0;
-            const mtbf = countUnsch > 0 ? (uptimeHours / countUnsch).toFixed(1) : (uptimeHours > 0 ? (uptimeHours / Math.max(1, validEquipSet.size)).toFixed(1) : 0);
+            // MTBF tidak boleh memakai jumlah unit sebagai pengganti frekuensi breakdown.
+            // Jika tidak ada UNSCH, MTBF belum dapat dihitung (0 ditampilkan sebagai '-').
+            const mtbf = countUnsch > 0 ? (uptimeHours / countUnsch).toFixed(1) : 0;
 
             let pa = 100;
             if (totalPlanHours > 0) pa = (((totalPlanHours - totalDowntime) / totalPlanHours) * 100).toFixed(1);
@@ -7216,9 +7218,9 @@
                 const breakdownCount = woCountMap[unitNo] || 0;
                 const mttrVal = breakdownCount > 0 ? (downtime / breakdownCount).toFixed(1) : "0";
 
-                // MTBF: (Uptime / Jumlah Breakdown)
+                // MTBF: Uptime / UNSCH. Tanpa UNSCH, MTBF tidak terdefinisi.
                 const uptime = unitUptime > 0 ? unitUptime : Math.max(0, totalHoursInRange - downtime);
-                const mtbfVal = breakdownCount > 0 ? (uptime / breakdownCount).toFixed(1) : uptime.toFixed(1);
+                const mtbfVal = breakdownCount > 0 ? (uptime / breakdownCount).toFixed(1) : "0";
 
                 // EKSTRAK DATA JAM PER STATUS
                 let statusHours = unitStatusDowntimeMap[unitNo] || { OPEN: 0, PROGRESS: 0, 'WAITING PART': 0 };
