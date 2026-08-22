@@ -1187,7 +1187,8 @@
                                     <span class="text-xs font-black text-emerald-600" id="exec-ready-pct">0%</span>
                                 </div>
                                 <h3 class="text-3xl font-black text-slate-800 tracking-tight" id="exec-ready-count">0
-                                    <span class="text-sm font-bold text-slate-500">Unit Operasional</span></h3>
+                                    <span class="text-sm font-bold text-slate-500">Unit Operasional</span>
+                                </h3>
                             </div>
                             <div
                                 class="mt-5 pt-3 border-t border-slate-200/60 flex items-center gap-1.5 text-[9.5px] font-bold">
@@ -1211,7 +1212,8 @@
                                         Kasus</span>
                                 </div>
                                 <h3 class="text-3xl font-black text-slate-800 tracking-tight" id="exec-downtime-hours">0
-                                    <span class="text-sm font-bold text-slate-500">Lost Hours</span></h3>
+                                    <span class="text-sm font-bold text-slate-500">Lost Hours</span>
+                                </h3>
                             </div>
                             <div
                                 class="mt-5 pt-3 border-t border-slate-200/60 flex items-center justify-between text-[10px] font-bold text-slate-500">
@@ -1232,7 +1234,8 @@
                                         Antrean</span>
                                 </div>
                                 <h3 class="text-3xl font-black text-slate-800 tracking-tight" id="exec-wait-parts">0
-                                    <span class="text-sm font-bold text-slate-500">Unit Tunggu Part</span></h3>
+                                    <span class="text-sm font-bold text-slate-500">Unit Tunggu Part</span>
+                                </h3>
                             </div>
                             <div
                                 class="mt-5 pt-3 border-t border-slate-200/60 flex items-center justify-between text-[10px] font-bold text-slate-500">
@@ -1743,7 +1746,8 @@
                                 <span id="statusLastUpdate" class="text-blue-600 font-black">-</span>): <span
                                     class="text-emerald-600 font-black ml-1" id="totalRfuCount">0 RFU</span> • <span
                                     class="text-amber-500 font-black ml-1" id="totalRwnCount">0 RWN</span> • <span
-                                    class="text-red-600 font-black" id="totalBdCount">0 B/D</span></div>
+                                    class="text-red-600 font-black" id="totalBdCount">0 B/D</span>
+                            </div>
                             <div
                                 class="flex gap-3 text-[9px] font-black uppercase tracking-widest text-slate-500 bg-slate-50 py-2 px-4 rounded-xl border border-slate-100 w-full md:w-auto justify-center">
                                 <div class="flex items-center gap-1.5"><span
@@ -2930,7 +2934,8 @@
                             <div class="pt-4 border-t border-slate-200">
                                 <h3 class="text-xs md:text-sm font-black text-slate-500 uppercase tracking-widest mb-4">
                                     <i class="fas fa-file-invoice mr-2 text-blue-500"></i> Log Riwayat Service Interval
-                                    (Plan vs Actual HM)</h3>
+                                    (Plan vs Actual HM)
+                                </h3>
                                 <div class="overflow-x-auto border border-slate-100 rounded-2xl shadow-sm bg-white">
                                     <table class="w-full text-left text-sm min-w-[800px]">
                                         <thead
@@ -4807,7 +4812,8 @@
                                                 class="fas fa-nuke"></i> Hapus SEMUA Data Operasional</h4>
                                         <p class="text-[11px] text-slate-500 mb-3">Menghapus seluruh data transaksi dari
                                             semua sheet sekaligus. Master data (unit, mekanik, stock)
-                                            <strong>tidak</strong> terpengaruh.</p>
+                                            <strong>tidak</strong> terpengaruh.
+                                        </p>
                                         <button type="button" onclick="runClearAllData()"
                                             class="w-full bg-red-700 hover:bg-red-800 text-white font-black py-3 px-4 rounded-xl transition-all text-xs uppercase tracking-widest shadow-lg flex items-center justify-center gap-2">
                                             <i class="fas fa-trash-alt text-sm"></i> Hapus Semua Data Operasional
@@ -5564,17 +5570,22 @@
         // ==========================================
         // 3. GOOGLE APPS SCRIPT API (DYNAMIC ENDPOINT & PROXY CHAINING)
         // ==========================================
-        const DEFAULT_GAS_API_URL = "https://script.google.com/macros/s/AKfycbxnNnIEKvta8IiqsGpqC3JRL1vC3qP7OA6dfc3AIQuTchfg6FKI63ivZKdcavGm8PpNLA/exec";
+        const DEFAULT_GAS_API_URL = "https://script.google.com/macros/s/AKfycbwQC6HxpYH06C-PEaycRCLO7SXygS3nBncaz04c2GPHPBtJnjtjhwb2MSAyzcjzis3F4A/exec";
 
         function getGASApiUrl() {
-            return localStorage.getItem('gas_api_url') || window.CUSTOM_GAS_API_URL || DEFAULT_GAS_API_URL;
+            return localStorage.getItem('gas_api_url') || localStorage.getItem('bss_optima_gas_url_v18') || window.CUSTOM_GAS_API_URL || DEFAULT_GAS_API_URL;
         }
 
         function setGASApiUrl(url) {
             if (url && url.trim()) {
-                localStorage.setItem('gas_api_url', url.trim());
+                const u = url.trim();
+                localStorage.setItem('gas_api_url', u);
+                localStorage.setItem('bss_optima_gas_url_v18', u);
+                window.CUSTOM_GAS_API_URL = u;
             } else {
                 localStorage.removeItem('gas_api_url');
+                localStorage.removeItem('bss_optima_gas_url_v18');
+                window.CUSTOM_GAS_API_URL = '';
             }
         }
 
@@ -5843,7 +5854,7 @@
         window.onload = () => {
             // Restore settings dari localStorage segera (sebelum fetch GAS selesai)
             const savedCompany = localStorage.getItem('bss_company_name');
-            const savedColor   = localStorage.getItem('bss_theme_color');
+            const savedColor = localStorage.getItem('bss_theme_color');
             if (savedCompany) {
                 document.querySelectorAll('.company-display-name').forEach(el => el.textContent = savedCompany);
                 document.title = 'WOSys ERP - ' + savedCompany;
@@ -11533,12 +11544,12 @@
             const step1 = await Swal.fire({
                 title: '⚠ Hapus Semua Data Operasional?',
                 html: '<p style="font-size:13px;color:#475569;margin-bottom:8px">Aksi ini akan <strong>menghapus permanen</strong> seluruh data transaksi dari sheet:</p>' +
-                      '<div style="text-align:left;font-size:11px;font-family:monospace;background:#fef2f2;border:1px solid #fca5a5;padding:10px;border-radius:8px;color:#dc2626">' +
-                      '• WorkOrders &nbsp;• PMRecords &nbsp;• Backlog<br>' +
-                      '• DailyHM &nbsp;&nbsp;&nbsp;• Inspection &nbsp;• Activity<br>' +
-                      '• PartUsage &nbsp;• SystemLogs' +
-                      '</div>' +
-                      '<p style="font-size:11px;color:#94a3b8;margin-top:8px">Master data (unit, mekanik, stock) <strong>tidak</strong> terpengaruh.</p>',
+                    '<div style="text-align:left;font-size:11px;font-family:monospace;background:#fef2f2;border:1px solid #fca5a5;padding:10px;border-radius:8px;color:#dc2626">' +
+                    '• WorkOrders &nbsp;• PMRecords &nbsp;• Backlog<br>' +
+                    '• DailyHM &nbsp;&nbsp;&nbsp;• Inspection &nbsp;• Activity<br>' +
+                    '• PartUsage &nbsp;• SystemLogs' +
+                    '</div>' +
+                    '<p style="font-size:11px;color:#94a3b8;margin-top:8px">Master data (unit, mekanik, stock) <strong>tidak</strong> terpengaruh.</p>',
                 icon: 'error',
                 showCancelButton: true,
                 confirmButtonText: 'Lanjutkan →',
@@ -11551,12 +11562,12 @@
             const step2 = await Swal.fire({
                 title: 'Konfirmasi Penghapusan',
                 html: '<p style="font-size:13px;color:#475569;margin-bottom:10px">Ketik <strong style="color:#dc2626;font-family:monospace">HAPUS SEMUA</strong> untuk melanjutkan.</p>' +
-                      '<input id="swal-confirm-input" class="swal2-input" placeholder="Ketik HAPUS SEMUA" style="font-weight:700;text-align:center;text-transform:uppercase;font-size:14px">',
+                    '<input id="swal-confirm-input" class="swal2-input" placeholder="Ketik HAPUS SEMUA" style="font-weight:700;text-align:center;text-transform:uppercase;font-size:14px">',
                 showCancelButton: true,
                 confirmButtonText: 'Hapus Sekarang',
                 cancelButtonText: 'Batal',
                 confirmButtonColor: '#dc2626',
-                preConfirm: function() {
+                preConfirm: function () {
                     var val = (document.getElementById('swal-confirm-input') ? document.getElementById('swal-confirm-input').value : '').trim().toUpperCase();
                     if (val !== 'HAPUS SEMUA') {
                         Swal.showValidationMessage('Ketik tepat: HAPUS SEMUA');
@@ -11576,7 +11587,7 @@
                         icon: 'success',
                         title: 'Semua Data Berhasil Dihapus',
                         html: '<p style="font-size:13px;color:#475569">Seluruh data operasional telah dihapus dari Google Sheets.</p>' +
-                              (res.message ? '<p style="font-size:11px;color:#94a3b8;margin-top:6px">' + res.message + '</p>' : '')
+                            (res.message ? '<p style="font-size:11px;color:#94a3b8;margin-top:6px">' + res.message + '</p>' : '')
                     });
                     await globalDataSync();
                 } else {
@@ -11640,8 +11651,7 @@
             const color = (document.getElementById('conf_color')?.value || '#0f172a').trim();
 
             if (apiUrl) {
-                localStorage.setItem('bss_optima_gas_url_v18', apiUrl);
-                GAS_URL = apiUrl;
+                setGASApiUrl(apiUrl);
             }
 
             const payload = {
@@ -11670,19 +11680,19 @@
             if (!s) return;
 
             const company = s.company_name || s.CompanyName || '';
-            const logo    = s.logo_url    || s.LogoUrl    || '';
-            const color   = s.theme_color || s.ThemeColor || '';
+            const logo = s.logo_url || s.LogoUrl || '';
+            const color = s.theme_color || s.ThemeColor || '';
 
             // 1. Update form fields
             if (document.getElementById('conf_company')) document.getElementById('conf_company').value = company;
-            if (document.getElementById('conf_logo'))    document.getElementById('conf_logo').value    = logo;
-            if (document.getElementById('conf_color'))   document.getElementById('conf_color').value   = color;
+            if (document.getElementById('conf_logo')) document.getElementById('conf_logo').value = logo;
+            if (document.getElementById('conf_color')) document.getElementById('conf_color').value = color;
             if (document.getElementById('hexDisplay') && color) document.getElementById('hexDisplay').innerText = color;
-            if (document.getElementById('conf_api_url') && GAS_URL) document.getElementById('conf_api_url').value = GAS_URL;
+            if (document.getElementById('conf_api_url')) document.getElementById('conf_api_url').value = getGASApiUrl();
 
             // 2. Update semua elemen nama perusahaan di UI (sidebar, header)
             if (company) {
-                document.querySelectorAll('.company-display-name').forEach(function(el) {
+                document.querySelectorAll('.company-display-name').forEach(function (el) {
                     el.textContent = company;
                 });
                 document.title = 'WOSys ERP - ' + company;
@@ -11691,7 +11701,7 @@
 
             // 3. Update logo dinamis
             if (logo) {
-                document.querySelectorAll('.dynamic-logo-wrapper').forEach(function(wrapper) {
+                document.querySelectorAll('.dynamic-logo-wrapper').forEach(function (wrapper) {
                     var existing = wrapper.querySelector('img.dynamic-logo-img');
                     if (existing) {
                         existing.src = logo;
@@ -11707,7 +11717,7 @@
             // 4. Terapkan tema warna (CSS variable)
             if (color) {
                 document.documentElement.style.setProperty('--theme-main', color);
-                document.querySelectorAll('.bg-theme-main').forEach(function(el) {
+                document.querySelectorAll('.bg-theme-main').forEach(function (el) {
                     el.style.backgroundColor = color;
                 });
                 localStorage.setItem('bss_theme_color', color);
