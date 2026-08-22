@@ -7109,11 +7109,23 @@
 
             let groups = {};
 
-            // ================= INJECTION: PRE-COMPUTE WO HASH MAP O(1) =================
+            // ================= INJECTION: PRE-COMPUTE WO HASH MAP O(1) (FILTERED BY DATE) =================
+            const startDateStr = document.getElementById('kpiStartDate')?.value || getFirstDateOfMonth();
+            const endDateStr = document.getElementById('kpiEndDate')?.value || getShiftDate();
             let woCountMap = {};
             (woDataCache || []).forEach(w => {
-                const eNo = String(w.equip_no || '').toUpperCase();
-                woCountMap[eNo] = (woCountMap[eNo] || 0) + 1;
+                let tglR = w.tgl_rusak || w.tglrusak;
+                if (tglR) {
+                    let s = String(tglR).split('T')[0].trim();
+                    if (s.includes('/')) {
+                        let parts = s.split('/');
+                        if (parts.length === 3) s = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                    }
+                    if (s >= startDateStr && s <= endDateStr) {
+                        const eNo = String(w.equip_no || '').toUpperCase();
+                        woCountMap[eNo] = (woCountMap[eNo] || 0) + 1;
+                    }
+                }
             });
             // ===========================================================================
 
@@ -11592,11 +11604,12 @@
             try {
                 const res = await fetchGAS("seedRealisticData");
                 endLoading();
-                if (res && res.success) {
-                    Swal.fire('Sukses!', 'Database berhasil di-setup dengan 68 Work Orders realistis dan data Plan Service 250H!', 'success');
+                const isSuccess = res && (res.success || (typeof res === 'string' && res.toLowerCase().includes('sukses')) || (res.message && res.message.toLowerCase().includes('sukses')));
+                if (isSuccess) {
+                    Swal.fire('Sukses!', (res && res.message) || (typeof res === 'string' ? res : 'Database berhasil di-setup dengan 68 Work Orders realistis dan data Plan Service 250H!'), 'success');
                     await globalDataSync();
                 } else {
-                    Swal.fire('Error', (res && res.message) || 'Gagal setup database.', 'error');
+                    Swal.fire('Error', (res && res.message) || (typeof res === 'string' ? res : 'Gagal setup database.'), 'error');
                 }
             } catch (err) {
                 endLoading();
