@@ -7125,6 +7125,10 @@
             const endDateStr = document.getElementById('kpiEndDate')?.value || getShiftDate();
             let woCountMap = {};
             (woDataCache || []).forEach(w => {
+                const type = String(w.sch_unsch || '').toUpperCase();
+                const status = String(w.status || '').toUpperCase();
+                if (type !== 'UNSCH' || status === 'READY WITH NOTE' || status === 'RWN') return;
+
                 let tglR = w.tgl_rusak || w.tglrusak;
                 if (tglR) {
                     let s = String(tglR).split('T')[0].trim();
